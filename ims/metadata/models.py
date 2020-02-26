@@ -1,7 +1,7 @@
 from django.db import models
-from metadata.validators import alphanumeric
 from django.contrib.auth.models import User
 from django.contrib.postgres.fields import JSONField
+from metadata.validators import alphanumeric
 
 # Create your models here.
 
@@ -26,16 +26,15 @@ class Project(models.Model):
     class Meta:
         ordering = ['-pk']
 
-
 # class Contributing_Lab(models.Model):
 #     lab_name = models.CharField(max_length=100, null=False, default="", help_text="Name of the lab")
 #     contact_person=models.CharField(max_length=100, null=False, default="", help_text="Name of contact person")
 #     contact_info = JSONField ("ContactInfo", default=contact_default)
-#     
+#
 #     def contact_default():
 #         return {"email": "to1@example.com"}
-#     
+#
 #     def __str__(self):
 #         return self.lab_name
 #     class Meta:
-#         ordering = ['lab_name'] 
+#         ordering = ['lab_name']
