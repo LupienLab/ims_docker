@@ -1,0 +1,10 @@
+__pycache__/
+.project
+.pydevproject
+*.pyc
+.settings/
+migrations/*
+media/
+static/
+.metadata
+.DS_Store

@@ -1,0 +1,42 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:12.2
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=ims_db
+    volumes:
+      - ../../pgdata:/var/lib/postgresql/data
+      - ../db-initialization:/docker-entrypoint-initdb.d
+      - ../../db_backups:/db_backups
+  web:
+    restart: always
+    build: .
+    environment:
+       - PRODUCTION=1
+    env_file:
+       - ./config/db_variables.env
+    command: bash /code/start_django_server.sh
+    volumes:
+      - ../ims:/ims
+      - ../../static:/ims/static
+      - ../../media:/ims/media
+    expose:
+      - "8080"
+    depends_on:
+      - db
+
+  nginx:
+    restart: always
+    image: nginx:1.16.1
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ../../static:/static
+      - ../ims:/src
+      - ./config/nginx:/etc/nginx/conf.d
+    depends_on:
+      - web
