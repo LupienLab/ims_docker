@@ -7,4 +7,4 @@ def index(request):
     return HttpResponse("Hi! Welcomeec f")
 
 def test(request):
-    return HttpResponse("test")
+    return HttpResponse("test111")
