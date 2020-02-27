@@ -14,4 +14,6 @@ from metadata.views import *
 urlpatterns = [
     url(r'^$', views.index, name='index'),
     url(r'^addProject/$', AddProject.as_view(), name='addProject'),
+    url(r'^showProject/$', ShowProject.as_view(), name='showProject'),
+    url(r'^detailProject/(?P<prj_pk>[0-9]+)/$', DetailProject.as_view(), name='detailProject'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

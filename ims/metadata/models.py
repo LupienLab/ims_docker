@@ -16,9 +16,9 @@ class Project(models.Model):
                               related_name='ownerProject', on_delete=models.CASCADE)
     contributor = models.ManyToManyField(
         User, help_text="Collaborating members for this project", related_name='contributorProject', blank=True)
-    models.CharField(choices=STATUS_CHOICES, help_text="Is project currently in progress")
+    status=models.CharField(choices=STATUS_CHOICES, max_length=10, default= "Active", help_text="Is project currently in progress")
     created_at = models.DateTimeField(auto_now_add=True, help_text="When this project is added to the system")
-    decription = models.TextField(null=True, blank=True, help_text="Notes for the project")
+    description = models.TextField(null=True, blank=True, help_text="Notes for the project")
 
     def __str__(self):
         return self.name

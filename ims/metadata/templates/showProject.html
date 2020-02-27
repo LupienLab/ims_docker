@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block content %}
+
+	{% if object %}
+	<h1>Projects</h1><br/>
+	<div class="container">
+	<table class="cell-border table-hover data_table">
+	<thead>
+		<tr>
+		    <th style="width:5%"></th>
+			<th>Project Name</th>
+			<th>Status</th>
+			<th>Owner</th>
+			<th>Contributors</th>
+			<th>Created at</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for project in object %}
+		<tr data-child-value="{{ project.description }}">
+            <td style="width:5%" class="details-control"></td>
+			<td>{{ project.name }}</td>
+			<td>{{ project.status }}</td> 
+			<td>{{ project.owner }}</td>
+			{% if project.contributor.all %}
+			<td>
+			{% for contributor in project.contributor.all %} 
+			({{forloop.counter }}) {{contributor}}<br /> 
+			{% endfor %}
+			</td>
+			{% else %}
+			<td>No contributors added.</td>
+			{% endif %}
+			<td>{{ project.created_at|date }}</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+	</table>
+	{% else %}
+	<p>No data available.</p>
+</div>
+{% endif %}
+{% endblock %}
