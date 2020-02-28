@@ -4,26 +4,40 @@ from django.http.response import HttpResponseRedirect
 from metadata.forms import *
 from metadata.models import *
 from django.views.generic.base import View
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic.edit import CreateView
 # Create your views here.
 
 def index(request):
     return HttpResponse("Hi! Welcome lab user")
 
-class AddProject(View): 
+
+class AddProject(LoginRequiredMixin, CreateView):
     template_name = 'customForm.html'
     form_class = ProjectForm
+    success_url = '/showProject/'
+
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
     
-    def get(self,request):
-        form = self.form_class()
-        return render(request, self.template_name,{'form':form})
-    
-    def post(self,request):
-        form = self.form_class(request.POST)
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect('/showProject')
-        else:
-            return render(request, self.template_name,{'form':form})
+
+
+# class AddProject(View): 
+#     template_name = 'customForm.html'
+#     form_class = ProjectForm
+#     
+#     def get(self,request):
+#         form = self.form_class()
+#         return render(request, self.template_name,{'form':form})
+#     
+#     def post(self,request):
+#         form = self.form_class(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             return HttpResponseRedirect('/showProject')
+#         else:
+#             return render(request, self.template_name,{'form':form})
         
 
 class ShowProject(View):

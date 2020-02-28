@@ -1,13 +1,37 @@
-{% extends 'base.html' %}
-{% block content %}
-
+{% extends 'base.html' %} 
+{% block content %} 
 {% if project %}
 <div class="container">
-	<h3>{{ project.name }}</h3>
-	<h5>{{ project.status }}</h5>
-	<h5>{{ project.description }}</h5>
+  <br/> <a href="/editProject/{{ project.id }}"><button type="button" class="btn btn-danger float-right">Edit Project</button></a><br/><br/>
+	<table class="table table-bordered">
+		<tr>
+			<td><b>Project name:</b> {{ project.name }}</td>
+		</tr>
+		<tr>
+			<td><b>Project status:</b> {{ project.status }}</td>
+		</tr>
+		<tr>
+			<td><b>Project owner:</b> {{ project.owner }}</td>
+		</tr>
+		<tr>
+			<td><b>Project contributors:</b> <br /> 
+			{% if project.contributor.all %} 
+			{% for contributor in project.contributor.all %}
+				({{forloop.counter }}) {{contributor}}<br /> 
+			{% endfor %} 
+			{% else %} 
+				No contributors added. 
+			{% endif %}
+			</td>
+		</tr>
+		<tr>
+			<td><b>Project created on:</b> {{ project.created_at|date }}</td>
+		</tr>
+	</table>
+	
+	<br/> <a href="/addExperiment/{{ project.id }}"><button type="button" class="btn btn-success">Add experiment</button></a><br/><br/>
+	
+	
 </div>
-{% endif %}
-
-
+{% endif %} 
 {% endblock %}

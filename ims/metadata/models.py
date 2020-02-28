@@ -5,20 +5,24 @@ from metadata.validators import alphanumeric
 
 # Create your models here.
 
+class UserLog(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True, help_text="When this object is added to the system")
+    created_by = models.ForeignKey(User, related_name="project_created", on_delete=models.CASCADE, help_text="Who created this object",)
+    edited_at = models.DateTimeField(auto_now_add=True, help_text="When this object was edited last")
+    edited_by = models.ForeignKey(User, related_name="project_edited" , on_delete=models.CASCADE, help_text="Who edited this object last")
 
-class Project(models.Model):
+
+class Project(UserLog):
     STATUS_CHOICES = (
         ('Active', 'Active'),
         ('Archived', 'Archived'),
     )
     name = models.CharField(max_length=500, help_text="Name of the project", unique=True, validators=[alphanumeric])
-    owner = models.ForeignKey(User, help_text="Name the owner of this project",
-                              related_name='ownerProject', on_delete=models.CASCADE)
     contributor = models.ManyToManyField(
-        User, help_text="Collaborating members for this project", related_name='contributorProject', blank=True)
+        User, help_text="Collaborating members for this project", related_name='project_contibutor', blank=True)
     status=models.CharField(choices=STATUS_CHOICES, max_length=10, default= "Active", help_text="Is project currently in progress")
-    created_at = models.DateTimeField(auto_now_add=True, help_text="When this project is added to the system")
     description = models.TextField(null=True, blank=True, help_text="Notes for the project")
+    
 
     def __str__(self):
         return self.name

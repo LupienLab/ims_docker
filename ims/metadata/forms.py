@@ -9,4 +9,4 @@ from metadata.models import *
 class ProjectForm(ModelForm):
     class Meta:
         model = Project
-        exclude = ('created_at',)
+        exclude = ('created_at','created_by','edited_by')
