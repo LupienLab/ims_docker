@@ -2,6 +2,7 @@
 {% block content %}
 
 	{% if object %}
+	<br/><a href="{% url 'addProject' %}"><button type="button" class="btn btn-success float-right">Add Project</button></a><br/>
 	<h1>Projects</h1><br/>
 <div class="container">
 	<table class="cell-border table-hover data_table">
@@ -21,7 +22,7 @@
 				<td style="width: 5%" class="details-control"></td>
 				<td><a href="{% url 'detailProject' project.pk %}">{{ project.name }}</a></td>
 				<td>{{ project.status }}</td>
-				<td>{{ project.owner }}</td> 
+				<td>{{ project.created_by }}</td> 
 			    <td> 
 			         {% if project.contributor.all %} 
 			              {% for contributor in project.contributor.all %}

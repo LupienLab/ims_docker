@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="bodyContent container">
+{% if usr %}
+	<br/><h3>Welcome {{usr}}!</h3><br/>
+{% endif %}
+<table class="table table-bordered table-hover data_table">
+<thead>
+  <tr>
+    <th class="table_head">
+    	Active Projects
+    </th>
+  </tr>
+</thead>
+<tbody>
+{% if object %}
+  {% for project in object %}
+  <tr> 
+	<td><a href="{% url 'detailProject' project.pk %}">{{ project.name }}</a></td>
+</tr>
+	{% endfor %}
+</tbody>
+{% else %}
+    <p>No data available.</p>
+</table>
+</div>
+{% endif %}
+{% endblock %} 

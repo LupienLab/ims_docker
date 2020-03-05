@@ -2,19 +2,21 @@
 {% block content %} 
 {% if project %}
 <div class="container">
-  <br/> <a href="/editProject/{{ project.id }}"><button type="button" class="btn btn-danger float-right">Edit Project</button></a><br/><br/>
+  <br/> <a href="{% url 'editProject' prj_pk=project.pk %}"><button type="button" class="btn btn-danger float-right">Edit Project</button></a><br/><br/>
+  
+  <h3>Project Details</h6>
 	<table class="table table-bordered">
 		<tr>
-			<td><b>Project name:</b> {{ project.name }}</td>
+			<td><b>Name:</b> {{ project.name }}</td>
 		</tr>
 		<tr>
-			<td><b>Project status:</b> {{ project.status }}</td>
+			<td><b>Status:</b> {{ project.status }}</td>
 		</tr>
 		<tr>
-			<td><b>Project owner:</b> {{ project.owner }}</td>
+			<td><b>Created by:</b> {{ project.created_by }}</td>
 		</tr>
 		<tr>
-			<td><b>Project contributors:</b> <br /> 
+			<td><b>Contributors:</b> <br /> 
 			{% if project.contributor.all %} 
 			{% for contributor in project.contributor.all %}
 				({{forloop.counter }}) {{contributor}}<br /> 
@@ -25,11 +27,21 @@
 			</td>
 		</tr>
 		<tr>
-			<td><b>Project created on:</b> {{ project.created_at|date }}</td>
+			<td><b>Created on:</b> {{ project.created_at|date }}</td>
 		</tr>
+		<tr>
+			<td><b>Last edited by:</b> {{ project.edited_by }}</td>
+		</tr>
+		<tr>
+			<td><b>Last edited on:</b> {{ project.edited_at }}</td>
+		</tr>
+		<tr>
+			<td><b>Description:</b> {{ project.description }}</td>
+		</tr>
+		
 	</table>
 	
-	<br/> <a href="/addExperiment/{{ project.id }}"><button type="button" class="btn btn-success">Add experiment</button></a><br/><br/>
+	<br/> <a href="{% url 'editProject' prj_pk=project.pk %}"><button type="button" class="btn btn-success">Add experiment</button></a><br/><br/>
 	
 	
 </div>
