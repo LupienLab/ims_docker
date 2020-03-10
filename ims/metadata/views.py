@@ -104,6 +104,11 @@ class AddExperiment(LoginRequiredMixin, CreateView):
     template_name = 'customForm.html'
     form_class = ExperimentForm
     success_url = reverse_lazy('showProject')
+    
+    
+    def post(self,request,prj_pk):
+        if 'type' in request:
+            
          
 
     def form_valid(self, form):
