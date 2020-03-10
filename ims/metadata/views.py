@@ -50,7 +50,6 @@ class DetailProject(LoginRequiredMixin, View):
     def get(self,request,prj_pk):
         prj = Project.objects.get(pk=prj_pk)
         exp = Experiment.objects.filter(project=prj_pk)
-        print(exp)
         context = {
             'project': prj,
             'experiment': exp,
@@ -107,11 +106,16 @@ class AddExperiment(LoginRequiredMixin, CreateView):
     
     
     def post(self,request,prj_pk):
-        if 'type' in request:
-            
-         
+#         
+# #         if 'type' in request:
+# #             exp_type = request.POST['type']
+# #             print(exp_type)
+#     
+#         return reverse('detailProject', kwargs={'prj_pk': self.kwargs['prj_pk']})
+
 
     def form_valid(self, form):
+        print(Choice.objects.get(pk=self.request.POST['type']).name)
         form.instance.created_by = self.request.user
         form.instance.edited_by = self.request.user
         form.instance.project=Project.objects.get(pk=self.kwargs['prj_pk'])
