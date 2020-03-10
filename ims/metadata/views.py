@@ -12,9 +12,10 @@ from django.urls import reverse
 from django.urls.base import reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
+
 # Create your views here.
 
-
+####INDEX############
 
 class Index(LoginRequiredMixin, View):
     template_name = 'index.html'
@@ -30,7 +31,7 @@ class Index(LoginRequiredMixin, View):
         return render(request, self.template_name, context)
     
 
-####PROJECT########
+####PROJECT############
     
  
 class ShowProject(LoginRequiredMixin, View):
@@ -40,6 +41,19 @@ class ShowProject(LoginRequiredMixin, View):
         obj = Project.objects.all().order_by('-pk')
         context = {
             'object': obj,
+        }
+        
+        return render(request, self.template_name, context)
+
+class DetailProject(LoginRequiredMixin, View):
+    template_name = 'detailProject.html'
+    def get(self,request,prj_pk):
+        prj = Project.objects.get(pk=prj_pk)
+        exp = Experiment.objects.filter(project=prj_pk)
+        print(exp)
+        context = {
+            'project': prj,
+            'experiment': exp,
         }
         
         return render(request, self.template_name, context)
@@ -54,17 +68,7 @@ class AddProject(LoginRequiredMixin, CreateView):
         form.instance.created_by = self.request.user
         form.instance.edited_by = self.request.user
         return super().form_valid(form)
-    
-    
-   
-class DetailProject(LoginRequiredMixin, View):
-    template_name = 'detailProject.html'
-    def get(self,request,prj_pk):
-        context = {}
-        prj = Project.objects.get(pk=prj_pk)
-        context['project']= prj
-        return render(request, self.template_name, context)
-    
+     
 
 class EditProject(LoginRequiredMixin, UpdateView):
     model = Project
@@ -88,11 +92,28 @@ class DeleteProject(LoginRequiredMixin, DeleteView):
     template_name = 'delete.html'
     success_url = reverse_lazy('showProject')
     
+    def get_object(self):
+        return get_object_or_404(Project, pk=self.kwargs['prj_pk'])
+    
 
-###################
+######################
 
 ####EXPERIMENT########
 
+class AddExperiment(LoginRequiredMixin, CreateView):
+    template_name = 'customForm.html'
+    form_class = ExperimentForm
+    success_url = reverse_lazy('showProject')
+         
+
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        form.instance.edited_by = self.request.user
+        form.instance.project=Project.objects.get(pk=self.kwargs['prj_pk'])
+        return super().form_valid(form)
+    
+    def get_success_url(self):
+        return reverse('detailProject', kwargs={'prj_pk': self.kwargs['prj_pk']})
 
 ######################
 

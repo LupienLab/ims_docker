@@ -12,9 +12,13 @@ from metadata.views import *
 
 urlpatterns = [
     url(r'^$', Index.as_view(), name='index'),
+    
     url(r'^addProject/$', AddProject.as_view(), name='addProject'),
     url(r'^showProject/$', ShowProject.as_view(), name='showProject'),
     url(r'^detailProject/(?P<prj_pk>[0-9]+)/$', DetailProject.as_view(), name='detailProject'),
     url(r'^editProject/(?P<prj_pk>[0-9]+)/$', EditProject.as_view(), name='editProject'),
-    url(r'^deleteProject/$', DeleteProject.as_view(), name='deleteProject'),
+    url(r'^deleteProject/(?P<prj_pk>[0-9]+)/$', DeleteProject.as_view(), name='deleteProject'),
+    
+    url(r'^addExperiment/(?P<prj_pk>[0-9]+)/$', AddExperiment.as_view(), name='addExperiment'),
+    
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
