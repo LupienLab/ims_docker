@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
-from django.http.response import HttpResponseRedirect
+from django.http.response import HttpResponseRedirect, JsonResponse
 from metadata.forms import *
 from metadata.models import *
 from django.views.generic.base import View
@@ -12,6 +12,7 @@ from django.urls import reverse
 from django.urls.base import reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
+from django.core import serializers
 
 # Create your views here.
 
@@ -102,20 +103,19 @@ class DeleteProject(LoginRequiredMixin, DeleteView):
 class AddExperiment(LoginRequiredMixin, CreateView):
     template_name = 'customForm.html'
     form_class = ExperimentForm
-    success_url = reverse_lazy('showProject')
+    
     
     
     def post(self,request,prj_pk):
-#         
-# #         if 'type' in request:
-# #             exp_type = request.POST['type']
-# #             print(exp_type)
-#     
-#         return reverse('detailProject', kwargs={'prj_pk': self.kwargs['prj_pk']})
+        if (self.request.POST['type']) != None:
+            exp_type = Choice.objects.get(pk=self.request.POST['type']).name
+        
+        exp_fields=JsonObj.objects.get(type=exp_type).fields
+                
+        return JsonResponse(exp_fields)
 
 
     def form_valid(self, form):
-        print(Choice.objects.get(pk=self.request.POST['type']).name)
         form.instance.created_by = self.request.user
         form.instance.edited_by = self.request.user
         form.instance.project=Project.objects.get(pk=self.kwargs['prj_pk'])
