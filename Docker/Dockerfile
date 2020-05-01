@@ -9,6 +9,7 @@ ADD ./config/pip-requirements.txt  /code/
 RUN pip install -r /code/pip-requirements.txt
 
 RUN apt-get install netcat -y
+RUN apt install python-pygraphviz
  
 WORKDIR /ims
 ADD start_django_server.sh /code/

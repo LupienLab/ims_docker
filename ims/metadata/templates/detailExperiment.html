@@ -1,0 +1,63 @@
+{% extends 'base.html' %} 
+{% block content %}
+{% load tags %}
+{% if experiment %}
+<div class="container">
+<br/>
+<div class="float-right">
+  <a href="{% url 'editExperiment' exp_pk=experiment.pk %}"><button type="button" class="btn btn-warning float-left">Edit Experiment</button></a>&nbsp;&nbsp;
+  <a href="{% url 'deleteExperiment' exp_pk=experiment.pk %}"><button type="button" class="btn btn-danger float-right">Delete Experiment</button></a><br/><br/>
+  </div>
+  <h3>Project <a href="{% url 'detailProject' prj_pk=experiment.project.pk %}">{{ experiment.project.name|title }}</a> | 
+  Experiment <a href="{% url 'detailExperiment' exp_pk=experiment.pk %}">{{ experiment.name|title }}</a></h6>
+	
+	<table class="table table-bordered">
+		<tr>
+			<td><b>Experiment name:</b> {{ experiment.name }}</td>
+		</tr>
+		<tr>
+			<td><b>Biosource: </b><a href="{% url 'detailBiosource' source_pk=experiment.biosample.biosource.pk %}">{{ experiment.biosample.biosource }}</a></td>
+		</tr>
+		<tr>
+			<td><b>Biosample: </b><a href="{% url 'detailBiosample' sample_pk=experiment.biosample.pk %}">{{ experiment.biosample }}</a></td></td>
+		</tr>
+		<tr>
+			<td><b>Bio rep_no:</b> {{ experiment.bio_rep_no }}</td>
+		</tr>
+		<tr>
+			<td><b>Tech rep_no:</b> {{ experiment.tec_rep_no }}</td>
+		</tr>
+		<tr>
+			<td><b>Assay type:</b> {{ experiment.json_type }}</td>
+		</tr>
+		<tr>
+			<td><b>Protocol:</b> {{ experiment.protocol }}</td>
+		</tr>
+		<tr>
+			<td><b>Created by:</b> {{ experiment.created_by }}</td>
+		</tr>
+		<tr>
+			<td><b>Created on:</b> {{ experiment.created_at }}</td>
+		</tr>
+		<tr>
+			<td><b>Last edited by:</b> {{ experiment.edited_by }}</td>
+		</tr>
+		<tr>
+			<td><b>Last edited on:</b> {{ experiment.edited_at }}</td>
+		</tr>
+		<tr>
+			<td><b>Description:</b> {{ experiment.description }}</td>
+		</tr>
+		<tr><td>
+		<b>{{ experiment.json_type }} specific fields:</b>
+		<table>
+		{% json_saved_data experiment.json_fields as jsonEntry %} 
+		{% for keys, values in jsonEntry.items %}
+		<tr><td>{{ keys|title }}</td><td>{{ values |title  }}</td></tr>
+		{% endfor %}
+		</table>
+	</td></tr>
+	</table>
+</div>
+{% endif %} 
+{% endblock %}

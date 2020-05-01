@@ -43,7 +43,7 @@
 		</tr>
 		
 	</table>
-	<br/> <a href="{% url 'addExperiment' prj_pk=project.pk %}"><button type="button" class="btn btn-success">Add experiment</button></a><br/><br/>
+	<br/> <a href="{% url 'addBiosource' prj_pk=project.pk %}"><button type="button" class="btn btn-success">Add experiment</button></a><br/><br/>
 	
 	{% if experiment %}
 	<h3>Experiment Details</h6>
@@ -51,7 +51,7 @@
 		<thead>
 			<tr>
 				<th>Name</th>
-				<th>Protocol</th>
+				<th>Type</th>
 				<th>Created on</th>
 				<th>Created by</th>
 			</tr>
@@ -59,8 +59,8 @@
 		<tbody>
 		{% for exp in experiment %}
 			<tr>
-				<td>{{ exp.name }}</td>
-				<td>{{ exp.protocol }}</td>
+				<td><a href="{% url 'detailExperiment' exp_pk=exp.pk %}">{{ exp.name }}</a></td>
+				<td>{{ exp.json_type }}</td>
 				<td>{{ exp.created_at }}</td>
 				<td>{{ exp.created_by }}</td>
 			</tr>

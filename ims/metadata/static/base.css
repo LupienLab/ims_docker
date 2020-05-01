@@ -67,4 +67,11 @@ tr.shown td.details-control {
     background: url('../static/img/details_close.png') no-repeat center center;
 }
 
+#json_form_display {
+  background-color: #fefbd8;
+}
 
+#div_id_choose_existing{
+	background-color: #fedfd8;
+	height: 100px;
+}
