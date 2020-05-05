@@ -8,7 +8,10 @@ RUN mkdir /code
 ADD ./config/pip-requirements.txt  /code/
 RUN pip install -r /code/pip-requirements.txt
 
-RUN apt-get install netcat -y
+RUN mkdir -p /db_backups
+RUN chmod -R 777 /db_backups
+
+#RUN apt-get install netcat -y
 #RUN apt install python-pygraphviz
  
 WORKDIR /ims
