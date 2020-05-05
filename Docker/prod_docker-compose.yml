@@ -8,9 +8,9 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=ims_db
     volumes:
-      - ../../pgdata:/var/lib/postgresql/data
-      - ../db-initialization:/docker-entrypoint-initdb.d
-      - ../../db_backups:/db_backups
+      - ../../pgdata:/var/lib/postgresql/data:z
+      - ../db-initialization:/docker-entrypoint-initdb.d:z
+      - ../../db_backups:/db_backups:z
   web:
     restart: always
     build: .

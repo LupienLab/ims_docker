@@ -33,7 +33,7 @@ if [ ! -d $DBINITFOLDER ];
 then
     mkdir $DBINITFOLDER
 fi
-chmod -R 777 DBINITFOLDER
+
 ###################################################
 ## TO DO
 # #COMPOSEFILE=development_docker-compose.yml
