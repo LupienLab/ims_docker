@@ -24,7 +24,7 @@ services:
       - ../../static:/ims/static
       - ../../media:/ims/media
     expose:
-      - "8080"
+      - "5050"
     depends_on:
       - db
 

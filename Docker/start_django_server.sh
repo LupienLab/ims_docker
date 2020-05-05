@@ -15,7 +15,7 @@ set -e
 # which is 80 or 8080
 
 
-PRODUCTION_PORT=8080
+PRODUCTION_PORT=5050
 DEVELOPMENT_PORT=8000
 
 ##############################################
