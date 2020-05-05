@@ -14,3 +14,5 @@ RUN pip install -r /code/pip-requirements.txt
  
 WORKDIR /ims
 ADD start_django_server.sh /code/
+
+chmod 777 docker-entrypoint-initdb.d/
