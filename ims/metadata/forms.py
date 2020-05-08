@@ -20,10 +20,11 @@ class ExperimentForm(ModelForm):
     class Meta:
         model = Experiment 
         exclude = ('created_at','created_by','edited_at','edited_by','json_fields','biosample')
-        fields = ('name','bio_rep_no','tec_rep_no','modification','treatment','json_type','protocol','description')
+        fields = ('name','biosample_quantity','biosample_quantity_units','bio_rep_no','tec_rep_no','modification','treatment','json_type','protocol','description')
         widgets = {
             'modification': RelatedFieldWidgetCanAdd(Modification,'addModification'),
             'treatment': RelatedFieldWidgetCanAdd(Treatment,'addTreatment'),
+            'protocol': RelatedFieldWidgetCanAdd(Treatment,'addProtocol'),
         }
         
         
@@ -64,6 +65,35 @@ class TreatmentForm(ModelForm):
         exclude = ('created_at','created_by','edited_at','edited_by','json_fields')
         fields = ('name','json_type','description')
 
+class ProtocolForm(ModelForm):
+    class Meta:
+        model = Protocol
+        exclude = ('created_at','created_by','edited_at','edited_by')
+        fields = ('name','attachment','class_type','description')
+
+class SequencingRunForm(ModelForm):
+    class Meta:
+        model = SequencingRun
+        exclude = ('created_at','created_by','edited_at','edited_by','project',)
+        fields = ('name','sequencing_center','sequencing_instrument','experiment','submission_date','retrieval_date','submitted','approved','description',)
+        widgets = {
+            'submission_date': forms.DateInput(attrs={'type': 'date'}),
+            'retrieval_date': forms.DateInput(attrs={'type': 'date'}),
+        }
+        
+        def __init__(self, *args, **kwargs):
+            prj_pk = kwargs.get('initial')['prj_pk']
+            super(SequencingRunForm, self).__init__(*args, **kwargs)
+            if prj_pk:
+                self.fields['experiment'].queryset = Experiment.objects.filter(project=prj_pk).order_by('-pk')
+            
+ 
+class SeqencingFileForm(ModelForm):
+    class Meta:
+        model = SeqencingFile
+        exclude = ('created_at','created_by','edited_at','edited_by','project','experiment','run')
+        fields = ('name','paired_end','read_length','cluster_path','sha256sum','md5sum','description',)
+        
 
 class FieldsForm(forms.Form): 
     def __init__(self, *args, **kwargs):

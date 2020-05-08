@@ -126,6 +126,8 @@ class Experiment(UserLog):
     project = models.ForeignKey(Project,related_name='exp_project', on_delete=models.CASCADE,)
     name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the experiment")
     biosample = models.ForeignKey(Biosample,related_name='exp_biosample', null=False, on_delete=models.CASCADE, help_text="Related biosample")
+    biosample_quantity = models.IntegerField(null=False, default=1, help_text="The amount of starting Biological sample going into the experiment")
+    biosample_quantity_units = models.ForeignKey(Choice, related_name='biosample_quantity_units', limit_choices_to={'class_type': "quantity_units"}, null=True, blank=True, on_delete=models.SET_NULL, help_text="The units that go along with the biological sample quantity")
     bio_rep_no = models.IntegerField(null=False, default=1, help_text="Biological replicate number")
     tec_rep_no = models.IntegerField(null=False, default=1, help_text="Technical replicate number")
     modification = models.ForeignKey(Modification,related_name='exp_modification', null=True, blank=True, on_delete=models.SET_NULL, help_text="Expression or targeting vectors stably transfected to generate Crispr'ed or other genomic modification")
@@ -137,8 +139,46 @@ class Experiment(UserLog):
     def __str__(self):
         return self.name
     
-     
+class SequencingRun(UserLog):
+    name = models.CharField(max_length=300, null=False, default="", validators=[alphanumeric],help_text="Name of the sequencing run")
+    project = models.ForeignKey(Project, related_name='run_project', on_delete=models.CASCADE,)
+    experiment = models.ManyToManyField(Experiment, related_name='run_experiment')
+    sequencing_center = models.ForeignKey(Choice, related_name='run_sequencing_center', limit_choices_to={'class_type': "sequencing_center"}, null=True, blank=True, on_delete=models.SET_NULL, help_text="Where the sequencing has been done")
+    sequencing_instrument = models.ForeignKey(Choice, related_name='run_sequencing_instrument', limit_choices_to={'class_type': "sequencing_instrument"}, null=True, blank=True, on_delete=models.SET_NULL, help_text="Instrument used for sequencing")
+    submission_date = models.DateField(help_text="Submission date for sample")
+    retrieval_date = models.DateField(null=True, blank=True, help_text="Collection date for sample")
+    submitted = models.BooleanField(default=False,help_text="Is sample submitted for sequencing")
+    approved = models.BooleanField(default=False,help_text="Is sample approved for sequencing")
     
-
-
-
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        unique_together = ('project', 'name',)
+     
+class SeqencingFile(UserLog):
+    PAIR_CHOICES = (
+        ('', ''),
+        ('1', '1'),
+        ('2', '2'),
+    )
+    name = models.CharField(max_length=300, null=False, default="", validators=[alphanumeric],help_text="Name of the sequencing file")
+    project = models.ForeignKey(Project, related_name='file_Project', on_delete=models.CASCADE,)
+    paired_end = models.CharField(
+        max_length=1,
+        choices=PAIR_CHOICES,
+        default='',
+        null=True, 
+        blank=True,
+        help_text="Which pair the file belongs to (if paired end library)"
+    )    
+    read_length = models.IntegerField(null=True, blank=True, help_text="Length of sequencing reads in base pairs for fastq files")
+    cluster_path = models.CharField(max_length=1000, null=False, default="", help_text="Path on the cluster including the file name and extension e.g /mnt/work1/users/lupiengroup/Projects/folder/test.fastq.gz")
+    sha256sum = models.CharField(max_length=64, null=False, default="",help_text="sha256sum" )
+    md5sum = models.CharField(max_length=32, null=True, blank=True, default="",help_text="md5sum")
+    run = models.ForeignKey(SequencingRun, related_name='file_run', on_delete=models.CASCADE)
+    experiment = models.ForeignKey(Experiment, related_name='file_exp', on_delete=models.CASCADE)
+ 
+    def __str__(self):  
+        return self.name
+    

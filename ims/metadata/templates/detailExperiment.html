@@ -53,7 +53,7 @@
 		<table>
 		{% json_saved_data experiment.json_fields as jsonEntry %} 
 		{% for keys, values in jsonEntry.items %}
-		<tr><td>{{ keys|title }}</td><td>{{ values |title  }}</td></tr>
+		<tr><td><b>{{ keys|title }}</b></td><td>{{ values |title  }}</td></tr>
 		{% endfor %}
 		</table>
 	</td></tr>

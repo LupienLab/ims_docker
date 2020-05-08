@@ -34,9 +34,15 @@ urlpatterns = [
     url(r'^editBiosample/(?P<obj_pk>[0-9]+)/$', EditBiosample.as_view(), name='editBiosample'),
     url(r'^deleteBiosample/(?P<obj_pk>[0-9]+)/$', DeleteBiosample.as_view(), name='deleteBiosample'),
     
+    url(r'^addSequencingRun/(?P<prj_pk>[0-9]+)/$', AddSequencingRun.as_view(), name='addSequencingRun'),
+    url(r'^detailSequencingRun/(?P<run_pk>[0-9]+)/$', DetailSequencingRun.as_view(), name='detailSequencingRun'),
+    url(r'^editSequencingRun/(?P<obj_pk>[0-9]+)/$', EditSequencingRun.as_view(), name='editSequencingRun'),
+    url(r'^deleteSequencingRun/(?P<obj_pk>[0-9]+)/$', DeleteSequencingRun.as_view(), name='deleteSequencingRun'),
+
     url(r'^addModification/$', AddModification.as_view(), name='addModification'),
     url(r'^addTreatment/$', AddTreatment.as_view(), name='addTreatment'),
+    url(r'^addProtocol/$', AddProtocol.as_view(), name='addProtocol'),
     
     url(r'^addFields/$', views.addFields, name='addFields'), 
 
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)  
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)  + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

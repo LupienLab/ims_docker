@@ -83,9 +83,11 @@ class DetailProject(LoginRequiredMixin, View):
     def get(self,request,prj_pk):
         prj = Project.objects.get(pk=prj_pk)
         exp = Experiment.objects.filter(project=prj_pk)
+        run = SequencingRun.objects.filter(project=prj_pk)
         context = {
             'project': prj,
             'experiment': exp,
+            'sequencingRun': run
         }
         
         return render(request, self.template_name, context)
@@ -336,6 +338,72 @@ class DeleteExperiment(LoginRequiredMixin, DeleteView):
         return reverse('detailProject', kwargs={'prj_pk': self.prj_pk})
 
 ########################
+###SequencingRun#######
+class AddSequencingRun(LoginRequiredMixin, CreateView):
+    template_name = 'customForm.html'
+    form_class = SequencingRunForm
+    
+    def get_initial(self):
+        initial = super(AddSequencingRun, self).get_initial()
+        initial.update({'prj_pk': self.kwargs['prj_pk']})
+        return initial
+    
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        form.instance.edited_by = self.request.user
+        form.instance.project=Project.objects.get(pk=self.kwargs['prj_pk'])
+        return super().form_valid(form)
+    
+    def get_success_url(self):
+        return reverse('detailProject', kwargs={'prj_pk':self.kwargs['prj_pk']})
+    
+
+
+class DetailSequencingRun(LoginRequiredMixin, View):
+    template_name = 'detailClass.html'
+    def get(self,request,run_pk):
+        run = SequencingRun.objects.get(pk=run_pk)
+        
+        context = {
+            'object': run,
+        }
+        
+        return render(request, self.template_name, context)
+
+
+class EditSequencingRun(LoginRequiredMixin, UpdateView):
+    model = SequencingRun
+    template_name = 'editForm.html'
+    form_class = SequencingRunForm
+    
+    def form_valid(self, form):
+        form.instance.edited_by = self.request.user
+        form.instance.edited_at = timezone.now()
+        return super().form_valid(form)
+    
+    def get_object(self):
+        return get_object_or_404(SequencingRun, pk=self.kwargs['obj_pk'])
+    
+    def get_success_url(self):
+        return reverse('detailSequencingRun', kwargs={'run_pk': self.kwargs['obj_pk']})
+    
+
+class DeleteSequencingRun(LoginRequiredMixin, DeleteView):
+    model = SequencingRun
+    template_name = 'delete.html'
+    prj_pk = None
+    
+    def get_object(self):
+        run = get_object_or_404(SequencingRun, pk=self.kwargs['obj_pk'])
+        self.prj_pk = run.project.pk
+        return run
+    
+    def get_success_url(self):
+        return reverse('detailProject', kwargs={'prj_pk': self.prj_pk})
+
+########################
+
+
 
 ########################
 class AddModification(LoginRequiredMixin, CreateView):
@@ -371,6 +439,32 @@ class AddTreatment(LoginRequiredMixin, CreateView):
     
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
+        if form.is_valid():
+            newObject = None
+            try:
+                newObject = form.save(commit= False)
+                newObject.created_by = self.request.user
+                newObject.edited_by = self.request.user
+                newObject.save()
+                
+            except(forms.ValidationError):
+                newObject = None
+                
+            if newObject:
+                return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, "%s", "%s");</script>' %(escape(newObject._get_pk_val()), escape(newObject)))
+
+        
+        else:
+            pageContext = {'form': form}
+            return render(request,self.template_name,pageContext)
+
+class AddProtocol(LoginRequiredMixin, CreateView):
+    template_name = 'customForm.html'
+    form_class = ProtocolForm
+    
+    
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST,request.FILES)
         if form.is_valid():
             newObject = None
             try:

@@ -43,10 +43,13 @@
 		</tr>
 		
 	</table>
-	<br/> <a href="{% url 'addBiosource' prj_pk=project.pk %}"><button type="button" class="btn btn-success">Add experiment</button></a><br/><br/>
-	
+	<br/> 
+	<a href="{% url 'addBiosource' prj_pk=project.pk %}"><button type="button" class="btn btn-success">Add experiment</button></a>
+	<a href="{% url 'addSequencingRun' prj_pk=project.pk %}"><button type="button" class="btn btn-success">Add SequencingRun</button></a>
+	<br/><br/>
+	<hr><br>
 	{% if experiment %}
-	<h3>Experiment Details</h6>
+	<h3>Experiment details</h6>
 	<table class="cell-border table-hover data_table">
 		<thead>
 			<tr>
@@ -68,6 +71,39 @@
 		</tbody>
 		</table>
 	{% endif %} 
+	<br><hr><br>
+	{% if sequencingRun %}
+	<h3>Sequencing run details</h6>
+	<table class="cell-border table-hover data_table">
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Experiments</th>
+				<th>Created on</th>
+				<th>Submitted</th>
+				<th>Approved</th>
+			</tr>
+		</thead>
+		<tbody>
+		{% for run in sequencingRun %}
+			<tr>
+				<td><a href="{% url 'detailSequencingRun' run_pk=project.pk %}">{{ run.name }}</a></td>
+				<td>
+				{% for exp in run.experiment.all %}
+					({{ forloop.counter }}) <a href="{% url 'detailExperiment' exp_pk=exp.pk %}">{{ exp.name }}</a>
+				{% endfor %}
+				</td>
+				<td>{{ run.created_at }}</td>
+				<td>{{ run.submitted }}</td>
+				<td>{{ run.approved }}</td>
+			</tr>
+		{% endfor %}	
+		</tbody>
+		</table>
+	{% endif %} 
+	
+	
+	
 </div>
 {% endif %} 
 {% endblock %}

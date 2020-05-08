@@ -8,6 +8,8 @@
   <form method="post">
     {% csrf_token %}
     
+    {% json_saved_data form.instance.json_fields as jsonEntry %}
+    {{ jsonEntry|json_script:"json-data" }}
     
     <h1>Edit {{form | modelname}}</h1>
      {{ form|crispy }}
