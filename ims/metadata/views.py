@@ -361,7 +361,8 @@ class AddModification(LoginRequiredMixin, CreateView):
 
         
         else:
-            return render(request,self.template_name)
+            pageContext = {'form': form}
+            return render(request,self.template_name,pageContext)
     
 class AddTreatment(LoginRequiredMixin, CreateView):
     template_name = 'customForm.html'
@@ -386,7 +387,8 @@ class AddTreatment(LoginRequiredMixin, CreateView):
 
         
         else:
-            return render(request,self.template_name)
+            pageContext = {'form': form}
+            return render(request,self.template_name,pageContext)
 
 
 

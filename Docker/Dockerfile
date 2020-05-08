@@ -8,11 +8,17 @@ RUN mkdir /code
 ADD ./config/pip-requirements.txt  /code/
 RUN pip install -r /code/pip-requirements.txt
 
+RUN mkdir /docker-entrypoint-initdb.d
+RUN chmod 777 /docker-entrypoint-initdb.d
 
-#RUN apt-get install netcat -y
+RUN mkdir /db_backups
+RUN chmod 777 /db_backups
+
+
+RUN apt-get install netcat -y
 #RUN apt install python-pygraphviz
  
 WORKDIR /ims
 ADD start_django_server.sh /code/
 
-chmod 777 docker-entrypoint-initdb.d/
+RUN chmod 777 /code
