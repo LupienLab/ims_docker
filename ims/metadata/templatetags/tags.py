@@ -27,7 +27,7 @@ def get_fields(obj):
                 value = None
 
         # only display fields with values and skip some fields entirely
-        if f.editable and value and f.name not in ('id') :
+        if value and f.name not in ('id') :
 
             fields.append(
               {
@@ -36,6 +36,7 @@ def get_fields(obj):
                'value':value,
               }
             )
+            
     return fields
 
 
