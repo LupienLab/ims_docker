@@ -79,32 +79,6 @@ class JsonObj(models.Model):
     def __str__(self):
         return self.name
 
-class Biosource(UserLog):
-    name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the Biosource")
-    disease=models.CharField(max_length=500, null=True, blank=True, help_text="Name of the disease")
-    disease_ontology_uri= models.CharField(max_length=500, null=True, blank=True, help_text="disease ontology uri")
-    source_organism = models.ForeignKey(Choice, related_name='source_organism', limit_choices_to={'class_type': "source_organism"}, null=True, blank=True, on_delete=models.SET_NULL, help_text="Source of the biomaterial/biosource")
-    json_type = models.ForeignKey(JsonObj, verbose_name="biomaterial type" ,related_name='biomaterial_type', limit_choices_to={'json_type': "biomaterial_type"}, on_delete=models.CASCADE, help_text="The categorization of the biomaterial/biosource")
-    json_fields = JSONField(null=True, blank=True)
-    
-    def __str__(self):
-        return self.name
-    
-    
-class Biosample(UserLog, Contributing_Lab):
-    name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the biosample")
-    biosource = models.ForeignKey(Biosource,related_name='sample_source', null=False, on_delete=models.CASCADE, help_text="Related biosource")
-    sample_id = models.CharField(max_length=100, null=False, default="", help_text="Sample id")
-    sample_ontology_uri= models.CharField(max_length=500, null=True, blank=True, help_text="Sample ontology uri")
-    collection_date = models.DateField(help_text="Collection date for this biosample")
-    collection_method = models.CharField(max_length=100, null=True, blank=True, help_text="Method of collection for this biosample")
-    json_type = models.ForeignKey(JsonObj, verbose_name="cell culture details" ,related_name='cell_culture_details', limit_choices_to={'json_type': "cell_culture_details"}, on_delete=models.CASCADE, help_text="Cell culture details of sample")
-    json_fields = JSONField(null=True, blank=True)
-    
-    def __str__(self):
-        return self.name 
- 
-    
 class Modification(UserLog):
     name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the modification")
     modification_type = models.ForeignKey(Choice, limit_choices_to={'class_type': "modification_type"}, related_name='modification_type', null=True, blank=True, on_delete=models.SET_NULL, help_text="The method used to make the genomic modification")
@@ -121,6 +95,36 @@ class Treatment(UserLog):
 
     def __str__(self):
         return self.name
+
+class Biosource(UserLog):
+    name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the Biosource")
+    disease=models.CharField(max_length=500, null=True, blank=True, help_text="Name of the disease")
+    disease_ontology_uri= models.CharField(max_length=500, null=True, blank=True, help_text="disease ontology uri")
+    source_organism = models.ForeignKey(Choice, related_name='source_organism', limit_choices_to={'class_type': "source_organism"}, null=True, blank=True, on_delete=models.SET_NULL, help_text="Source of the biomaterial/biosource")
+    json_type = models.ForeignKey(JsonObj, verbose_name="biomaterial type" ,related_name='biomaterial_type', limit_choices_to={'json_type': "biomaterial_type"}, on_delete=models.CASCADE, help_text="The categorization of the biomaterial/biosource")
+    json_fields = JSONField(null=True, blank=True)
+    
+    def __str__(self): 
+        return self.name
+     
+    
+class Biosample(UserLog, Contributing_Lab):
+    name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the biosample")
+    biosource = models.ForeignKey(Biosource,related_name='sample_source', null=False, on_delete=models.CASCADE, help_text="Related biosource")
+    sample_id = models.CharField(max_length=100, null=False, default="", help_text="Sample id")
+    sample_ontology_uri= models.CharField(max_length=500, null=True, blank=True, help_text="Sample ontology uri")
+    modification = models.ForeignKey(Modification,related_name='exp_modification', null=True, blank=True, on_delete=models.SET_NULL, help_text="Expression or targeting vectors stably transfected to generate Crispr'ed or other genomic modification")
+    treatment = models.ForeignKey(Treatment,related_name='exp_treatment', null=True, blank=True, on_delete=models.SET_NULL, help_text="Chemical/RNAi treatment")
+    collection_date = models.DateField(help_text="Collection date for this biosample")
+    collection_method = models.CharField(max_length=100, null=True, blank=True, help_text="Method of collection for this biosample")
+    json_type = models.ForeignKey(JsonObj, verbose_name="cell culture details" ,related_name='cell_culture_details', limit_choices_to={'json_type': "cell_culture_details"}, on_delete=models.CASCADE, help_text="Cell culture details of sample")
+    json_fields = JSONField(null=True, blank=True)
+    
+    def __str__(self):
+        return self.name 
+  
+    
+
  
 class Experiment(UserLog): 
     project = models.ForeignKey(Project,related_name='exp_project', on_delete=models.CASCADE,)
@@ -130,8 +134,6 @@ class Experiment(UserLog):
     biosample_quantity_units = models.ForeignKey(Choice, related_name='biosample_quantity_units', limit_choices_to={'class_type': "quantity_units"}, null=True, blank=True, on_delete=models.SET_NULL, help_text="The units that go along with the biological sample quantity")
     bio_rep_no = models.IntegerField(null=False, default=1, help_text="Biological replicate number")
     tec_rep_no = models.IntegerField(null=False, default=1, help_text="Technical replicate number")
-    modification = models.ForeignKey(Modification,related_name='exp_modification', null=True, blank=True, on_delete=models.SET_NULL, help_text="Expression or targeting vectors stably transfected to generate Crispr'ed or other genomic modification")
-    treatment = models.ForeignKey(Treatment,related_name='exp_treatment', null=True, blank=True, on_delete=models.SET_NULL, help_text="Chemical/RNAi treatment")
     protocol = models.ForeignKey(Protocol,related_name='exp_protocol', null=True, blank=True, on_delete=models.SET_NULL, help_text="Reference protocol document") 
     json_type = models.ForeignKey(JsonObj, verbose_name="experiment type", limit_choices_to={'json_type': "experiment_type"}, on_delete=models.CASCADE, help_text="The category that best describes the experiment")
     json_fields = JSONField(null=True, blank=True) 
@@ -168,7 +170,7 @@ class SeqencingFile(UserLog):
         max_length=1,
         choices=PAIR_CHOICES,
         default='',
-        null=True, 
+        null=True,
         blank=True,
         help_text="Which pair the file belongs to (if paired end library)"
     )    

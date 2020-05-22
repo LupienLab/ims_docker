@@ -20,10 +20,8 @@ class ExperimentForm(ModelForm):
     class Meta:
         model = Experiment 
         exclude = ('created_at','created_by','edited_at','edited_by','json_fields','biosample')
-        fields = ('name','biosample_quantity','biosample_quantity_units','bio_rep_no','tec_rep_no','modification','treatment','json_type','protocol','description')
+        fields = ('name','biosample_quantity','biosample_quantity_units','bio_rep_no','tec_rep_no','json_type','protocol','description')
         widgets = {
-            'modification': RelatedFieldWidgetCanAdd(Modification,'addModification'),
-            'treatment': RelatedFieldWidgetCanAdd(Treatment,'addTreatment'),
             'protocol': RelatedFieldWidgetCanAdd(Treatment,'addProtocol'),
         }
         
@@ -47,10 +45,12 @@ class BiosampleForm(ModelForm):
     class Meta:
         model = Biosample
         exclude = ('created_at','created_by','edited_at','edited_by','json_fields', 'biosource')
-        fields = ('choose_existing','name','sample_id','sample_ontology_uri','collection_date','collection_method','delivery_date','lab_name','contact_person','contact_info','description','json_type')
+        fields = ('choose_existing','name','sample_id','sample_ontology_uri','collection_date','modification','treatment','collection_method','delivery_date','lab_name','contact_person','contact_info','description','json_type')
         widgets = {
             'collection_date': forms.DateInput(attrs={'type': 'date'}),
             'delivery_date': forms.DateInput(attrs={'type': 'date'}),
+            'modification': RelatedFieldWidgetCanAdd(Modification,'addModification'),
+            'treatment': RelatedFieldWidgetCanAdd(Treatment,'addTreatment'),
         }
 
 class ModificationForm(ModelForm):
@@ -91,8 +91,8 @@ class SequencingRunForm(ModelForm):
 class SeqencingFileForm(ModelForm):
     class Meta:
         model = SeqencingFile
-        exclude = ('created_at','created_by','edited_at','edited_by','project','experiment','run')
-        fields = ('name','paired_end','read_length','cluster_path','sha256sum','md5sum','description',)
+        exclude = ('created_at','created_by','edited_at','edited_by','project','experiment')
+        fields = ('name','paired_end','read_length','cluster_path','sha256sum','md5sum','run','description',)
         
 
 class FieldsForm(forms.Form): 
