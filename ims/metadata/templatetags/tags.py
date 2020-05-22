@@ -27,7 +27,8 @@ def get_fields(obj):
                 value = None
 
         # only display fields with values and skip some fields entirely
-        if value and f.name not in ('id') :
+        #if value and f.name not in ('id') :
+        if f.name not in ('id') :
 
             fields.append(
               {

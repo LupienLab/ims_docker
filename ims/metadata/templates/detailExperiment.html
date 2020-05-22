@@ -3,13 +3,18 @@
 {% load tags %}
 {% if experiment %}
 <div class="container">
+{% load django_bootstrap_breadcrumbs %}
+{% block breadcrumbs %}
 <br/>
+ {% render_breadcrumbs 'django_bootstrap_breadcrumbs/bootstrap4.html' %}
+{% endblock %}
+
 <div class="float-right">
-  <a href="{% url 'editExperiment' exp_pk=experiment.pk %}"><button type="button" class="btn btn-warning float-left">Edit Experiment</button></a>&nbsp;&nbsp;
-  <a href="{% url 'deleteExperiment' exp_pk=experiment.pk %}"><button type="button" class="btn btn-danger float-right">Delete Experiment</button></a><br/><br/>
+  <a href="{% url 'addSeqencingFile' prj_pk=experiment.project.pk exp_pk=experiment.pk %}"><button type="button" class="btn btn-primary ">Add SeqencingFile</button></a>&nbsp;&nbsp;
+  <a href="{% url 'editExperiment' exp_pk=experiment.pk %}"><button type="button" class="btn btn-warning">Edit Experiment</button></a>&nbsp;&nbsp;
+  <a href="{% url 'deleteExperiment' exp_pk=experiment.pk %}"><button type="button" class="btn btn-danger">Delete Experiment</button></a><br/><br/>
   </div>
-  <h3>Project <a href="{% url 'detailProject' prj_pk=experiment.project.pk %}">{{ experiment.project.name|title }}</a> | 
-  Experiment <a href="{% url 'detailExperiment' exp_pk=experiment.pk %}">{{ experiment.name|title }}</a></h6>
+  
 	
 	<table class="table table-bordered">
 		<tr>
@@ -49,14 +54,22 @@
 			<td><b>Description:</b> {{ experiment.description }}</td>
 		</tr>
 		<tr><td>
-		<b>{{ experiment.json_type }} specific fields:</b>
-		<table>
+		<b>{{ experiment.json_type }} specific fields:</b><button type="button" class="hide-show float-right">Show/Hide</button>
+		<table class="jsontable">
 		{% json_saved_data experiment.json_fields as jsonEntry %} 
 		{% for keys, values in jsonEntry.items %}
 		<tr><td><b>{{ keys|title }}</b></td><td>{{ values |title  }}</td></tr>
 		{% endfor %}
 		</table>
 	</td></tr>
+	<tr><td>
+	    <b>Sequencing File details:</b>
+	    <table>
+	    {% for files in experiment.file_exp.all %}
+			<tr><td>({{forloop.counter }}) <a href="{% url 'detailSeqencingFile' file_pk=files.pk %}">{{files}}</a></tr></td><br /> 
+	     {% endfor %}
+	     </table>
+	   </td></tr>
 	</table>
 </div>
 {% endif %} 

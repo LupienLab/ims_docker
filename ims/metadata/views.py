@@ -154,21 +154,29 @@ class AddBiosource(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         return reverse('addBiosample', kwargs={'prj_pk':self.kwargs['prj_pk'], 'source_pk':self.object.pk})
     
+from django.views.generic import DetailView
+from view_breadcrumbs import BaseBreadcrumbMixin, ListBreadcrumbMixin, DetailBreadcrumbMixin
+from django.utils.functional import cached_property
     
-class DetailBiosource(LoginRequiredMixin, View):
+class DetailBiosource(LoginRequiredMixin, DetailBreadcrumbMixin, DetailView):
     template_name = 'detailClass.html'
-    def get(self,request,source_pk):
-        bio = Biosource.objects.get(pk=source_pk)
+    model = Biosource
+    pk_url_kwarg = 'source_pk'
+    
+
+    @cached_property
+    def crumbs(self):
+        return [('Biosource:', reverse('detailBiosource', kwargs={'source_pk': self.kwargs['source_pk']}))]
         
-        context = {
-            'object': bio,
-        }
-        
-        return render(request, self.template_name, context)
+         
+#     
+#         return [('Project: '+self.object.project.name, reverse('detailProject', kwargs={'prj_pk': self.object.project.pk})),
+#                 ('Experiment: '+self.object.name, reverse('detailExperiment', kwargs={'exp_pk': self.object.pk}))]
+
 
 class EditBiosource(LoginRequiredMixin, UpdateView):
     model = Biosource
-    template_name = 'editForm.html'
+    template_name = 'editFormJson.html'
     form_class = BiosourceForm
     
     def form_valid(self, form):
@@ -243,7 +251,7 @@ class DetailBiosample(LoginRequiredMixin, View):
 
 class EditBiosample(LoginRequiredMixin, UpdateView):
     model = Biosample
-    template_name = 'editForm.html'
+    template_name = 'editFormJson.html'
     form_class = BiosampleForm
     
     def form_valid(self, form):
@@ -251,6 +259,11 @@ class EditBiosample(LoginRequiredMixin, UpdateView):
         form.instance.edited_at = timezone.now()
         form.instance.json_fields = createJSON(self.request)
         return super().form_valid(form)
+    
+    def get_initial(self):
+        initial = super(EditBiosample, self).get_initial()
+        initial.update({'source_pk': self.kwargs['obj_pk']})
+        return initial
     
     def get_object(self):
         return get_object_or_404(Biosample, pk=self.kwargs['obj_pk'])
@@ -295,20 +308,23 @@ class AddExperiment(LoginRequiredMixin, CreateView):
     
 
 
-class DetailExperiment(LoginRequiredMixin, View):
+
+class DetailExperiment(LoginRequiredMixin, DetailBreadcrumbMixin, DetailView):
     template_name = 'detailExperiment.html'
+    model = Experiment
+    pk_url_kwarg = 'exp_pk'
     
-    def get(self,request,exp_pk):
-        exp = Experiment.objects.get(pk=exp_pk)
-        context = {
-            'experiment': exp
-        }
-        
-        return render(request, self.template_name, context)
+
+    @cached_property
+    def crumbs(self):
+        return [('Project: ' + self.object.project.name, reverse('detailProject', kwargs={'prj_pk': self.object.project.pk})),
+                ('Experiment: ' + self.object.name, reverse('detailExperiment', kwargs={'exp_pk': self.object.pk}))]
+
+
 
 class EditExperiment(LoginRequiredMixin, UpdateView):
     model = Experiment
-    template_name = 'editForm.html'
+    template_name = 'editFormJson.html'
     form_class = ExperimentForm
     
     def form_valid(self, form):
@@ -402,7 +418,67 @@ class DeleteSequencingRun(LoginRequiredMixin, DeleteView):
         return reverse('detailProject', kwargs={'prj_pk': self.prj_pk})
 
 ########################
+###SequencingFile#######
+class AddSeqencingFile(LoginRequiredMixin, CreateView):
+    template_name = 'customForm.html'
+    form_class = SeqencingFileForm
+    
 
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        form.instance.edited_by = self.request.user
+        form.instance.project=Project.objects.get(pk=self.kwargs['prj_pk'])
+        form.instance.experiment=Experiment.objects.get(pk=self.kwargs['exp_pk'])
+        return super().form_valid(form)
+    
+    def get_success_url(self):
+        return reverse('detailExperiment', kwargs={'exp_pk': self.kwargs['exp_pk']})
+    
+
+
+class DetailSeqencingFile(LoginRequiredMixin, View):
+    template_name = 'detailClass.html'
+    def get(self,request,file_pk):
+        file = SeqencingFile.objects.get(pk=file_pk)
+        
+        context = {
+            'object': file,
+        }
+        
+        return render(request, self.template_name, context)
+
+
+class EditSeqencingFile(LoginRequiredMixin, UpdateView):
+    model = SeqencingFile
+    template_name = 'editForm.html'
+    form_class = SeqencingFileForm
+    
+    def form_valid(self, form):
+        form.instance.edited_by = self.request.user
+        form.instance.edited_at = timezone.now()
+        return super().form_valid(form)
+    
+    def get_object(self):
+        return get_object_or_404(SeqencingFile, pk=self.kwargs['obj_pk'])
+    
+    def get_success_url(self):
+        return reverse('detailSeqencingFile', kwargs={'file_pk': self.kwargs['obj_pk']})
+    
+
+class DeleteSeqencingFile(LoginRequiredMixin, DeleteView):
+    model = SeqencingFile
+    template_name = 'delete.html'
+    exp_pk = None
+    
+    def get_object(self):
+        file = get_object_or_404(SeqencingFile, pk=self.kwargs['obj_pk'])
+        self.exp_pk = file.experiment.pk
+        return file
+    
+    def get_success_url(self):
+        return reverse('detailExperiment', kwargs={'exp_pk': self.exp_pk})
+
+########################
 
 
 ########################

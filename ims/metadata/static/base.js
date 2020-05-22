@@ -102,6 +102,9 @@ $(document).ready(function () {
     	
     $( "<h5>Or Add New</h5>" ).insertAfter( "#div_id_choose_existing" );
     
-    
+    $('.jsontable').hide();
+    $('.hide-show').click(function() {
+       $('.jsontable').toggle();
+    }); 
     
 });

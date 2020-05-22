@@ -2,12 +2,20 @@
 {% block content %} 
 {% load tags %}
 
-{% if object %}
 <div class="container">
+{% load django_bootstrap_breadcrumbs %}
+{% block breadcrumbs %}
 <br/>
+ {% render_breadcrumbs 'django_bootstrap_breadcrumbs/bootstrap4.html' %}
+ 
+{% endblock %}
+
+{% if object %}
+
+<br/>
+{% firstof object|modelname as model_val %}
 <div class="float-right">
 	<div class="float-right">
-	{% firstof object|modelname as model_val %}
 	<a href="{% url 'edit'|add:model_val obj_pk=object.pk %}"><button type="button" class="btn btn-warning float-left">Edit {{model_val}}</button></a>&nbsp;&nbsp;
   	<a href="{% url 'delete'|add:model_val obj_pk=object.pk %}"><button type="button" class="btn btn-danger float-right">Delete {{model_val}}</button></a><br/><br/>
   	</div>
