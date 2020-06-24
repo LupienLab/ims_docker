@@ -179,7 +179,7 @@ class SeqencingFile(UserLog):
     related_files = models.ForeignKey('SeqencingFile', null=True, blank=True,on_delete=models.SET_NULL, help_text="Related paired file reference")
     run = models.ForeignKey(SequencingRun, related_name='file_run', on_delete=models.CASCADE)
     experiment = models.ForeignKey(Experiment, related_name='file_exp', on_delete=models.CASCADE)
-    file_format = models.ForeignKey(Choice, on_delete=models.CASCADE, related_name='fileChoice', limit_choices_to={'class_type': "file_format"}, help_text="Type of file format")
+    file_format = models.ForeignKey(Choice, on_delete=models.SET_NULL, null=True, blank=True, default="", related_name='fileChoice', limit_choices_to={'class_type': "file_format"}, help_text="Type of file format")
     
     def __str__(self):  
         return self.name
