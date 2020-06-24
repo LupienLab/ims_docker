@@ -8,7 +8,7 @@
     {% csrf_token %}
     
     <h1>Add {{form | modelname}}</h1>
-  
+     {% include "modelHelpFrag.html" with form=form %}
      {{ form|crispy }}
      
      <div id="json_form_display">
@@ -16,4 +16,6 @@
      </div>
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
+
+
 {% endblock %}

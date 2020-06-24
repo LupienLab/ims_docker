@@ -41,12 +41,14 @@ $(document).ready(function () {
 		    success: function(obj){
 		    	$('#json_form_display').empty();
 		    	$('#json_form_display').html(obj);
+		    	addCalender();
 		    	if($( "#json-data" ).length){
 		    		var json_data = JSON.parse(document.getElementById('json-data').textContent);
 		    		populate(json_data);
 		    	}
 		    	},
 		    	error : function(xhr,errmsg,err) {
+		    		$('#json_form_display').empty();
 		            $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
 		                " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
 		            console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
@@ -71,15 +73,14 @@ $(document).ready(function () {
     	$('label.requiredField').each(function(){
     		prevRequired.push($(this).parent('div').attr('id'))
     	})
-    	      if($("#id_choose_existing").val() !=""){
-//    	    	  $("label:not(#div_id_choose_existing .requiredField)").removeClass("requiredField");
-//            	  $("input").removeAttr("required" );
-//            	  $("select:not(#id_choose_existing)").removeAttr("required" );
-//            	  $(".asteriskField:not(#div_id_choose_existing .asteriskField)").remove();
-    	    	  
-    	    	  
+    	      if($("#id_choose_existing").val() !=""){    	  
+    	    	  $('#id_json_type').val("");
+    	    	  callAjax();
     	    	  $("input").removeAttr("required" );
+    	    	  $( "input[name!='csrfmiddlewaretoken']" ).prop('disabled',true);
     	    	  $("select").removeAttr("required" );
+    	    	  $("select:not(#id_choose_existing)").prop('disabled',true);
+    	    	  $("textarea").prop('disabled',true);
     	    	  $(".asteriskField").remove();
     	    	  
             	  $("#id_choose_existing").prop('required',true);
@@ -89,7 +90,9 @@ $(document).ready(function () {
     	      else{
     	    	  $("#id_choose_existing").removeAttr("required" );
     	    	  $("#div_id_choose_existing .asteriskField").remove();
-    	    	  
+    	    	  $('input').prop('disabled',false);
+    	    	  $('select').prop('disabled',false);
+    	    	  $("textarea").prop('disabled',false);
     	    	  $.each( prevRequired, function( index, prev ){
     	    		    $("#" + prev +' input').prop('required',true);
     	    		    $("#" + prev +' select').prop('required',true);
@@ -105,6 +108,14 @@ $(document).ready(function () {
     $('.jsontable').hide();
     $('.hide-show').click(function() {
        $('.jsontable').toggle();
-    }); 
-    
+    });
+    addCalender();
+    function addCalender() {
+    $( ".dateinput" ).datepicker({
+    	dateFormat:'yy-mm-dd',
+    	changeMonth: true,
+        changeYear: true
+    });
+    }
+  
 });

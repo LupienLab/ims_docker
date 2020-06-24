@@ -36,12 +36,12 @@ urlpatterns = [
     
     url(r'^addSequencingRun/(?P<prj_pk>[0-9]+)/$', AddSequencingRun.as_view(), name='addSequencingRun'),
     url(r'^detailSequencingRun/(?P<run_pk>[0-9]+)/$', DetailSequencingRun.as_view(), name='detailSequencingRun'),
-    url(r'^editSequencingRun/(?P<obj_pk>[0-9]+)/$', EditSequencingRun.as_view(), name='editSequencingRun'),
+    url(r'^editSequencingRun/(?P<prj_pk>[0-9]+)/(?P<obj_pk>[0-9]+)/$', EditSequencingRun.as_view(), name='editSequencingRun'),
     url(r'^deleteSequencingRun/(?P<obj_pk>[0-9]+)/$', DeleteSequencingRun.as_view(), name='deleteSequencingRun'),
     
     url(r'^addSeqencingFile/(?P<prj_pk>[0-9]+)/(?P<exp_pk>[0-9]+)/$', AddSeqencingFile.as_view(), name='addSeqencingFile'),
     url(r'^detailSeqencingFile/(?P<file_pk>[0-9]+)/$', DetailSeqencingFile.as_view(), name='detailSeqencingFile'),
-    url(r'^editSeqencingFile/(?P<obj_pk>[0-9]+)/$', EditSeqencingFile.as_view(), name='editSeqencingFile'),
+    url(r'^editSeqencingFile/(?P<prj_pk>[0-9]+)/(?P<obj_pk>[0-9]+)/$', EditSeqencingFile.as_view(), name='editSeqencingFile'),
     url(r'^deleteSeqencingFile/(?P<obj_pk>[0-9]+)/$', DeleteSeqencingFile.as_view(), name='deleteSeqencingFile'),
     
 

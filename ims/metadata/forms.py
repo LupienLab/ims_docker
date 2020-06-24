@@ -31,7 +31,7 @@ class BiosourceForm(ModelForm):
     class Meta:
         model = Biosource
         exclude = ('created_at','created_by','edited_at','edited_by','json_fields')
-        fields = ('choose_existing','name','disease','disease_ontology_uri','source_organism','description','json_type')
+        fields = ('choose_existing','name','disease','source_organism','description','json_type')
 
 class BiosampleForm(ModelForm):
     choose_existing = ModelChoiceField(queryset = Biosample.objects.all(),required=False,help_text='Choose from existing list')
@@ -45,10 +45,10 @@ class BiosampleForm(ModelForm):
     class Meta:
         model = Biosample
         exclude = ('created_at','created_by','edited_at','edited_by','json_fields', 'biosource')
-        fields = ('choose_existing','name','sample_id','sample_ontology_uri','collection_date','modification','treatment','collection_method','delivery_date','lab_name','contact_person','contact_info','description','json_type')
+        fields = ('choose_existing','name','sample_id','collection_date','modification','treatment','collection_method','delivery_date','lab_name','contact_person','contact_info','description','json_type')
         widgets = {
-            'collection_date': forms.DateInput(attrs={'type': 'date'}),
-            'delivery_date': forms.DateInput(attrs={'type': 'date'}),
+            'collection_date': forms.DateInput(),
+            'delivery_date': forms.DateInput(),
             'modification': RelatedFieldWidgetCanAdd(Modification,'addModification'),
             'treatment': RelatedFieldWidgetCanAdd(Treatment,'addTreatment'),
         }
@@ -77,22 +77,28 @@ class SequencingRunForm(ModelForm):
         exclude = ('created_at','created_by','edited_at','edited_by','project',)
         fields = ('name','sequencing_center','sequencing_instrument','experiment','submission_date','retrieval_date','submitted','approved','description',)
         widgets = {
-            'submission_date': forms.DateInput(attrs={'type': 'date'}),
-            'retrieval_date': forms.DateInput(attrs={'type': 'date'}),
+            'submission_date': forms.DateInput(),
+            'retrieval_date': forms.DateInput(),
         }
         
-        def __init__(self, *args, **kwargs):
-            prj_pk = kwargs.get('initial')['prj_pk']
-            super(SequencingRunForm, self).__init__(*args, **kwargs)
-            if prj_pk:
-                self.fields['experiment'].queryset = Experiment.objects.filter(project=prj_pk).order_by('-pk')
+    def __init__(self, *args, **kwargs):
+        prj_pk = kwargs.get('initial')['prj_pk']
+        super(SequencingRunForm, self).__init__(*args, **kwargs)
+        if prj_pk:
+            self.fields['experiment'].queryset = Experiment.objects.filter(project=prj_pk).order_by('-pk')
             
  
 class SeqencingFileForm(ModelForm):
     class Meta:
         model = SeqencingFile
         exclude = ('created_at','created_by','edited_at','edited_by','project','experiment')
-        fields = ('name','paired_end','read_length','cluster_path','sha256sum','md5sum','run','description',)
+        fields = ('name','file_format','paired_end','related_files','read_length','cluster_path','md5sum','run','description',)
+    
+    def __init__(self, *args, **kwargs):
+        prj_pk = kwargs.get('initial')['prj_pk']
+        super(SeqencingFileForm, self).__init__(*args, **kwargs)
+        if prj_pk:
+            self.fields['run'].queryset = SequencingRun.objects.filter(project=prj_pk).order_by('-pk')
         
 
 class FieldsForm(forms.Form): 
@@ -109,7 +115,7 @@ class FieldsForm(forms.Form):
                     #self.fields[key] = getattr(forms, values["data"])(max_length=200, initial=values["old"],help_text=values["help"])
                     self.fields[key] = forms.CharField(max_length=200, initial=values["old"],help_text=values["help"])
                 elif(values["data"]=="DateField"):
-                    self.fields[key] = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), initial=values["old"],help_text=values["help"])
+                    self.fields[key] = forms.DateField(widget=forms.widgets.DateInput(), initial=values["old"],help_text=values["help"])
                 elif(values["data"]=="FloatField"):
                     self.fields[key] = forms.FloatField(initial=values["old"],help_text=values["help"])
                 elif(values["data"]=="IntegerField"):

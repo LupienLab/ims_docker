@@ -19,7 +19,7 @@ class UserLog(models.Model):
         abstract = True
 
 class Choice(models.Model):
-    name = models.CharField(max_length=50, null=False, help_text="Name of the choice")
+    name = models.CharField(max_length=50, null=False, help_text="Name of the choice (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
     class_type = models.CharField(max_length=50, null=False, help_text="Class/type of the choice")
     
     def __str__(self):
@@ -32,7 +32,7 @@ class Contributing_Lab(models.Model):
     def contact_default():
         return ('to1@example.com')
 
-    lab_name = models.ForeignKey(Choice, verbose_name="contributing lab", related_name='lab_name', limit_choices_to={'class_type': "lab_name"}, null=True, blank=True, on_delete=models.SET_NULL, help_text="Name of the contributing lab")
+    lab_name = models.ForeignKey(Choice, verbose_name="contributing lab", related_name='lab_name', limit_choices_to={'class_type': "lab_name"}, null=True, blank=True, on_delete=models.SET_NULL, help_text="Name of the contributing lab (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
     contact_person = models.CharField(max_length=100, null=True, blank=True, help_text="Name of contact person")
     contact_info = models.EmailField(max_length=254, null=True, blank=True, help_text="Email id for contact person")
     delivery_date = models.DateField(null=True, blank=True, help_text="Delivery date for the object")
@@ -46,7 +46,7 @@ class Project(UserLog):
         ('Active', 'Active'),
         ('Archived', 'Archived'),
     )
-    name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the project")
+    name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the project (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
     contributor = models.ManyToManyField(
         User, related_name='project_contibutor', blank=True, help_text="Collaborating members for this project")
     status = models.CharField(choices=STATUS_CHOICES, max_length=10, default="Active",
@@ -61,7 +61,7 @@ class Project(UserLog):
 
 
 class Protocol(UserLog):
-    name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the protocol")
+    name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the protocol (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
     attachment = models.FileField(upload_to='uploads/', null=True, blank=True)
     class_type = models.ForeignKey(Choice, limit_choices_to={'class_type': "protocol_type"}, null=True, blank=True, on_delete=models.SET_NULL, help_text="The category that best describes the protocol or document")
     
@@ -72,7 +72,7 @@ class JsonObj(models.Model):
     def fields_default():
         return {"null": ""}
     
-    name = models.CharField(max_length=500, unique=True, help_text="Name of the object")
+    name = models.CharField(max_length=500, unique=True, help_text="Name of the object (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
     json_type = models.CharField(max_length=50, null=False, help_text="Class/type of the object")
     json_fields = JSONField(default=fields_default) 
     
@@ -80,7 +80,7 @@ class JsonObj(models.Model):
         return self.name
 
 class Modification(UserLog):
-    name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the modification")
+    name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the modification (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
     modification_type = models.ForeignKey(Choice, limit_choices_to={'class_type': "modification_type"}, related_name='modification_type', null=True, blank=True, on_delete=models.SET_NULL, help_text="The method used to make the genomic modification")
     genomic_change = models.ForeignKey(Choice, limit_choices_to={'class_type': "genomic_change"}, related_name='genomic_change', null=True, blank=True, on_delete=models.SET_NULL, help_text="The method used to make the genomic modification")
     guide_rnas = models.CharField(max_length=100, null=True, blank=True, help_text="The guide RNA sequences used in Crispr targetting")
@@ -89,7 +89,7 @@ class Modification(UserLog):
         return self.name
     
 class Treatment(UserLog): 
-    name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the treatment")
+    name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the treatment (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
     json_type = models.ForeignKey(JsonObj, verbose_name="treatment type", limit_choices_to={'json_type': "treatment_type"}, on_delete=models.CASCADE, help_text="The method used to make the treatment")
     json_fields = JSONField(null=True, blank=True)
 
@@ -97,9 +97,8 @@ class Treatment(UserLog):
         return self.name
 
 class Biosource(UserLog):
-    name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the Biosource")
+    name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the Biosource (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
     disease=models.CharField(max_length=500, null=True, blank=True, help_text="Name of the disease")
-    disease_ontology_uri= models.CharField(max_length=500, null=True, blank=True, help_text="disease ontology uri")
     source_organism = models.ForeignKey(Choice, related_name='source_organism', limit_choices_to={'class_type': "source_organism"}, null=True, blank=True, on_delete=models.SET_NULL, help_text="Source of the biomaterial/biosource")
     json_type = models.ForeignKey(JsonObj, verbose_name="biomaterial type" ,related_name='biomaterial_type', limit_choices_to={'json_type': "biomaterial_type"}, on_delete=models.CASCADE, help_text="The categorization of the biomaterial/biosource")
     json_fields = JSONField(null=True, blank=True)
@@ -109,26 +108,24 @@ class Biosource(UserLog):
      
     
 class Biosample(UserLog, Contributing_Lab):
-    name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the biosample")
+    name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the biosample (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
     biosource = models.ForeignKey(Biosource,related_name='sample_source', null=False, on_delete=models.CASCADE, help_text="Related biosource")
-    sample_id = models.CharField(max_length=100, null=False, default="", help_text="Sample id")
-    sample_ontology_uri= models.CharField(max_length=500, null=True, blank=True, help_text="Sample ontology uri")
+    sample_id = models.CharField(max_length=100, null=False, default="", help_text="Sample id / id given on sequencing form.")
     modification = models.ForeignKey(Modification,related_name='exp_modification', null=True, blank=True, on_delete=models.SET_NULL, help_text="Expression or targeting vectors stably transfected to generate Crispr'ed or other genomic modification")
     treatment = models.ForeignKey(Treatment,related_name='exp_treatment', null=True, blank=True, on_delete=models.SET_NULL, help_text="Chemical/RNAi treatment")
     collection_date = models.DateField(help_text="Collection date for this biosample")
     collection_method = models.CharField(max_length=100, null=True, blank=True, help_text="Method of collection for this biosample")
     json_type = models.ForeignKey(JsonObj, verbose_name="cell culture details" ,related_name='cell_culture_details', limit_choices_to={'json_type': "cell_culture_details"}, on_delete=models.CASCADE, help_text="Cell culture details of sample")
-    json_fields = JSONField(null=True, blank=True)
+    json_fields = JSONField(null=True, blank=True) 
     
     def __str__(self):
-        return self.name 
-  
-    
+        return self.name
+
 
  
 class Experiment(UserLog): 
     project = models.ForeignKey(Project,related_name='exp_project', on_delete=models.CASCADE,)
-    name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the experiment")
+    name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the experiment (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
     biosample = models.ForeignKey(Biosample,related_name='exp_biosample', null=False, on_delete=models.CASCADE, help_text="Related biosample")
     biosample_quantity = models.IntegerField(null=False, default=1, help_text="The amount of starting Biological sample going into the experiment")
     biosample_quantity_units = models.ForeignKey(Choice, related_name='biosample_quantity_units', limit_choices_to={'class_type': "quantity_units"}, null=True, blank=True, on_delete=models.SET_NULL, help_text="The units that go along with the biological sample quantity")
@@ -140,9 +137,11 @@ class Experiment(UserLog):
     
     def __str__(self):
         return self.name
+
+  
     
 class SequencingRun(UserLog):
-    name = models.CharField(max_length=300, null=False, default="", validators=[alphanumeric],help_text="Name of the sequencing run")
+    name = models.CharField(max_length=300, null=False, default="", validators=[alphanumeric],help_text="Name of the sequencing run (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
     project = models.ForeignKey(Project, related_name='run_project', on_delete=models.CASCADE,)
     experiment = models.ManyToManyField(Experiment, related_name='run_experiment')
     sequencing_center = models.ForeignKey(Choice, related_name='run_sequencing_center', limit_choices_to={'class_type': "sequencing_center"}, null=True, blank=True, on_delete=models.SET_NULL, help_text="Where the sequencing has been done")
@@ -164,7 +163,7 @@ class SeqencingFile(UserLog):
         ('1', '1'),
         ('2', '2'),
     )
-    name = models.CharField(max_length=300, null=False, default="", validators=[alphanumeric],help_text="Name of the sequencing file")
+    name = models.CharField(max_length=300, null=False, default="", validators=[alphanumeric],help_text="Name of the sequencing file (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
     project = models.ForeignKey(Project, related_name='file_Project', on_delete=models.CASCADE,)
     paired_end = models.CharField(
         max_length=1,
@@ -176,11 +175,15 @@ class SeqencingFile(UserLog):
     )    
     read_length = models.IntegerField(null=True, blank=True, help_text="Length of sequencing reads in base pairs for fastq files")
     cluster_path = models.CharField(max_length=1000, null=False, default="", help_text="Path on the cluster including the file name and extension e.g /mnt/work1/users/lupiengroup/Projects/folder/test.fastq.gz")
-    sha256sum = models.CharField(max_length=64, null=False, default="",help_text="sha256sum" )
     md5sum = models.CharField(max_length=32, null=True, blank=True, default="",help_text="md5sum")
+    related_files = models.ForeignKey('SeqencingFile', null=True, blank=True,on_delete=models.SET_NULL, help_text="Related paired file reference")
     run = models.ForeignKey(SequencingRun, related_name='file_run', on_delete=models.CASCADE)
     experiment = models.ForeignKey(Experiment, related_name='file_exp', on_delete=models.CASCADE)
- 
+    file_format = models.ForeignKey(Choice, on_delete=models.CASCADE, related_name='fileChoice', limit_choices_to={'class_type': "file_format"}, help_text="Type of file format")
+    
     def __str__(self):  
         return self.name
+    
+    class Meta:
+        unique_together = ('project', 'name',)
     

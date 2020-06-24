@@ -2,7 +2,11 @@
 {% block content %} 
 {% if project %}
 <div class="container">
-  <br/> 
+{% load django_bootstrap_breadcrumbs %}
+{% block breadcrumbs %}
+<br/>
+ {% render_breadcrumbs 'django_bootstrap_breadcrumbs/bootstrap4.html' %}
+{% endblock %} 
   <div class="float-right">
   <a href="{% url 'editProject' prj_pk=project.pk %}"><button type="button" class="btn btn-warning float-left">Edit Project</button></a>&nbsp;&nbsp;
   <a href="{% url 'deleteProject' prj_pk=project.pk %}"><button type="button" class="btn btn-danger float-right">Delete Project</button></a><br/><br/>
@@ -90,7 +94,7 @@
 				<td><a href="{% url 'detailSequencingRun' run_pk=project.pk %}">{{ run.name }}</a></td>
 				<td>
 				{% for exp in run.experiment.all %}
-					({{ forloop.counter }}) <a href="{% url 'detailExperiment' exp_pk=exp.pk %}">{{ exp.name }}</a>
+					({{ forloop.counter }}) <a href="{% url 'detailExperiment' exp_pk=exp.pk %}">{{ exp.name }}</a><br/>
 				{% endfor %}
 				</td>
 				<td>{{ run.created_at }}</td>

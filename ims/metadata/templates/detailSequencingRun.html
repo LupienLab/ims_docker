@@ -30,7 +30,7 @@
 		{% if f.label == "json fields" %}
 			<tr><td>
 			<b>specific fields:</b>
-			<table>
+			<table class="table table-bordered">
 			{% json_saved_data object.json_fields as jsonEntry %} 
 			{% for keys, values in jsonEntry.items %}
 			<tr><td>{{ keys|title }}</td><td>{{ values |title  }}</td></tr>
@@ -38,15 +38,25 @@
 			</table>
 			</td></tr>
 		{% else %}
+		     
+		    {% if f.m2m == True %}
+		    <tr><td>{{ f.label |title }}:</td></tr>
+		    <table class="table table-bordered">
+		    {% for item in f.value %}
+		    {% for keys, values in item.items %}
+		    <tr><td><a href="{% url 'detailExperiment' exp_pk=keys %}">{{ values |title  }}</a></td></tr>
+		    {% endfor %}
+		    {% endfor %}
+		    </table>
+		    {% else %}
 			<tr>
 				<td><b>{{ f.label |title }}: </b> {{f.value}}</td>
 			</tr>
+			{% endif %}
 		{% endif %}
-	
 	{% endfor %}
-	</table>
 	</td></tr>
-	</table>
-</div>
 {% endif %} 
 {% endblock %}
+	</table>
+</div>

@@ -21,7 +21,11 @@ from django.views.decorators.csrf import csrf_exempt
 from crispy_forms.utils import render_crispy_form
 from django import forms
 from django.utils.html import escape
+from django.views.generic import DetailView
+from view_breadcrumbs import BaseBreadcrumbMixin, ListBreadcrumbMixin, DetailBreadcrumbMixin
+from django.utils.functional import cached_property
 
+#import metadata.extendSession
 # Create your views here.
 
 
@@ -78,12 +82,12 @@ class ShowProject(LoginRequiredMixin, View):
         
         return render(request, self.template_name, context)
 
-class DetailProject(LoginRequiredMixin, View):
+class DetailProject(LoginRequiredMixin, View, DetailBreadcrumbMixin):
     template_name = 'detailProject.html'
     def get(self,request,prj_pk):
         prj = Project.objects.get(pk=prj_pk)
-        exp = Experiment.objects.filter(project=prj_pk)
-        run = SequencingRun.objects.filter(project=prj_pk)
+        exp = Experiment.objects.filter(project=prj_pk).order_by('-pk')
+        run = SequencingRun.objects.filter(project=prj_pk).order_by('-pk')
         context = {
             'project': prj,
             'experiment': exp,
@@ -92,6 +96,11 @@ class DetailProject(LoginRequiredMixin, View):
         
         return render(request, self.template_name, context)
     
+    @cached_property
+    def crumbs(self):
+        return [('Project:', reverse('detailProject', kwargs={'prj_pk': self.kwargs['prj_pk']}))]
+        
+      
 
 class AddProject(LoginRequiredMixin, CreateView):
     template_name = 'customForm.html'
@@ -154,9 +163,6 @@ class AddBiosource(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         return reverse('addBiosample', kwargs={'prj_pk':self.kwargs['prj_pk'], 'source_pk':self.object.pk})
     
-from django.views.generic import DetailView
-from view_breadcrumbs import BaseBreadcrumbMixin, ListBreadcrumbMixin, DetailBreadcrumbMixin
-from django.utils.functional import cached_property
     
 class DetailBiosource(LoginRequiredMixin, DetailBreadcrumbMixin, DetailView):
     template_name = 'detailClass.html'
@@ -376,7 +382,7 @@ class AddSequencingRun(LoginRequiredMixin, CreateView):
 
 
 class DetailSequencingRun(LoginRequiredMixin, View):
-    template_name = 'detailClass.html'
+    template_name = 'detailSequencingRun.html'
     def get(self,request,run_pk):
         run = SequencingRun.objects.get(pk=run_pk)
         
@@ -391,6 +397,11 @@ class EditSequencingRun(LoginRequiredMixin, UpdateView):
     model = SequencingRun
     template_name = 'editForm.html'
     form_class = SequencingRunForm
+    
+    def get_initial(self):
+        initial = super(EditSequencingRun, self).get_initial()
+        initial.update({'prj_pk': self.kwargs['prj_pk']})
+        return initial
     
     def form_valid(self, form):
         form.instance.edited_by = self.request.user
@@ -423,7 +434,11 @@ class AddSeqencingFile(LoginRequiredMixin, CreateView):
     template_name = 'customForm.html'
     form_class = SeqencingFileForm
     
-
+    def get_initial(self):
+        initial = super(AddSeqencingFile, self).get_initial()
+        initial.update({'prj_pk': self.kwargs['prj_pk']})
+        return initial
+    
     def form_valid(self, form):
         form.instance.created_by = self.request.user
         form.instance.edited_by = self.request.user
@@ -452,6 +467,11 @@ class EditSeqencingFile(LoginRequiredMixin, UpdateView):
     model = SeqencingFile
     template_name = 'editForm.html'
     form_class = SeqencingFileForm
+    
+    def get_initial(self):
+        initial = super(EditSeqencingFile, self).get_initial()
+        initial.update({'prj_pk': self.kwargs['prj_pk']})
+        return initial
     
     def form_valid(self, form):
         form.instance.edited_by = self.request.user
