@@ -49,6 +49,8 @@ urlpatterns = [
     url(r'^addTreatment/$', AddTreatment.as_view(), name='addTreatment'),
     url(r'^addProtocol/$', AddProtocol.as_view(), name='addProtocol'),
     
-    url(r'^addFields/$', views.addFields, name='addFields'), 
+    url(r'^addFields/$', views.addFields, name='addFields'),
+    
+    url(r'^importExperiments/(?P<prj_pk>[0-9]+)/$', views.importExperiments, name='importExperiments'),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)  + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

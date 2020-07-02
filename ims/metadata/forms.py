@@ -129,5 +129,7 @@ class FieldsForm(forms.Form):
                     self.fields[key].required = False
         
         
+class ImportForm(forms.Form):
+    upload_csv=forms.FileField()
     
     

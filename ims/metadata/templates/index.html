@@ -3,7 +3,7 @@
 {% block content %}
 <div class="bodyContent container">
 {% if usr %}
-	<br/><h3>Welcome {{usr}}!</h3><br/>
+	<br/><h3>Welcome {{usr.get_full_name | default:usr.username}}!</h3><br/>
 {% endif %}
 <table class="table table-bordered table-hover data_table">
 <thead>

@@ -50,6 +50,7 @@
 	<br/> 
 	<a href="{% url 'addBiosource' prj_pk=project.pk %}"><button type="button" class="btn btn-success">Add experiment</button></a>
 	<a href="{% url 'addSequencingRun' prj_pk=project.pk %}"><button type="button" class="btn btn-success">Add SequencingRun</button></a>
+	<a href="{% url 'importExperiments' prj_pk=project.pk %}"><button type="button" class="btn btn-success">Import Experiments</button></a>
 	<br/><br/>
 	<hr><br>
 	{% if experiment %}
