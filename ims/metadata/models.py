@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.postgres.fields import JSONField
 from metadata.validators import alphanumeric
+from model_clone import CloneMixin
 
 # Create your models here.
 
@@ -107,7 +108,7 @@ class Biosource(UserLog):
         return self.name
      
     
-class Biosample(UserLog, Contributing_Lab):
+class Biosample(UserLog, Contributing_Lab,CloneMixin):
     name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the biosample (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
     biosource = models.ForeignKey(Biosource,related_name='sample_source', null=False, on_delete=models.CASCADE, help_text="Related biosource")
     sample_id = models.CharField(max_length=100, null=False, default="", help_text="Sample id / id given on sequencing form.")
@@ -120,10 +121,12 @@ class Biosample(UserLog, Contributing_Lab):
     
     def __str__(self):
         return self.name
+    
+    _clone_many_to_many_fields = ['']
 
 
  
-class Experiment(UserLog): 
+class Experiment(UserLog,CloneMixin): 
     project = models.ForeignKey(Project,related_name='exp_project', on_delete=models.CASCADE,)
     name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the experiment (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
     biosample = models.ForeignKey(Biosample,related_name='exp_biosample', null=False, on_delete=models.CASCADE, help_text="Related biosample")
@@ -137,6 +140,8 @@ class Experiment(UserLog):
     
     def __str__(self):
         return self.name
+    
+    _clone_many_to_many_fields = ['']
 
   
     

@@ -5,7 +5,9 @@ function format(value) {
 
 $(document).ready(function () {
 	
-    var table = $('.data_table').DataTable({});
+    var table = $('.data_table').DataTable({
+    	 "order": [],
+    });
 
     // Add event listener for opening and closing details
     $('.data_table').on('click', 'td.details-control', function () {

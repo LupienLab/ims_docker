@@ -52,5 +52,7 @@ urlpatterns = [
     url(r'^addFields/$', views.addFields, name='addFields'),
     
     url(r'^importExperiments/(?P<prj_pk>[0-9]+)/$', views.importExperiments, name='importExperiments'),
+    url(r'^importSequencingFiles/(?P<prj_pk>[0-9]+)/$', views.importSequencingFiles, name='importSequencingFiles'),
+    
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)  + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

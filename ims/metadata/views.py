@@ -93,7 +93,6 @@ class DetailProject(LoginRequiredMixin, View, DetailBreadcrumbMixin):
             'experiment': exp,
             'sequencingRun': run
         }
-        
         return render(request, self.template_name, context)
     
     @cached_property
@@ -585,58 +584,41 @@ class AddProtocol(LoginRequiredMixin, CreateView):
 ##Import Sections
 ########################
 
-# class ImportExperiments(LoginRequiredMixin, View):
-#     template_name = 'customForm.html'
-#     form_class = ImportForm
-#     
-#     def post(self, request, *args, **kwargs):
-#         prj_pk=self.kwargs['prj_pk']
-#         form = self.form_class(request.POST, request.FILES)
-#         if form.is_valid():
-#             handle_uploaded_file(request.FILES['file'])
-#             return HttpResponseRedirect('/success/url/')
-#         else:
-#             form = self.form_class()
-#             
-#         pageContext = {'form': form}
-#         return render(request,self.template_name,pageContext)
-#     
-from metadata.handle_upload import handle_uploaded_experiments
+    
+from metadata.handle_upload import *
 def importExperiments(request,prj_pk):
     if request.method == 'POST':
-        print("post")
         form = ImportForm(request.POST, request.FILES)
-        print(form)
         if form.is_valid():
-            print("hi")
-            handle_uploaded_experiments(request.FILES['upload_csv'])
+            handle_uploaded_experiments(request,request.FILES['upload_csv'])
             return HttpResponseRedirect('/detailProject/'+prj_pk)
     else:
         form = ImportForm()
      
     pageContext = {
         'form': form,
-        'form_name':'Experiments'
+        'form_name':'experiments'
         }
     return render(request, 'upload.html', pageContext)   
 
+def importSequencingFiles(request,prj_pk):
+    if request.method == 'POST':
+        form = ImportForm(request.POST, request.FILES)
+        if form.is_valid():
+            handle_uploaded_sequencingfiles(request,prj_pk, request.FILES['upload_csv'])
+            return HttpResponseRedirect('/detailProject/'+prj_pk)
+    else:
+        form = ImportForm()
+     
+    pageContext = {
+        'form': form,
+        'form_name':'sequencing fastq files'
+        }
+    return render(request, 'upload.html', pageContext)
 
-# class importExperiments(View): 
-#     template_name = 'upload.html'
-#     form_class = ImportForm
-#     
-#     def get(self, *args, **kwargs):
-#         form = self.form_class()
-#         return render(self.request, self.template_name,{'form':form, 'form_class':"Experiments"})
-#     
-#     def post(self, *args, **kwargs):
-#         prj_pk=self.kwargs['prj_pk']
-#         form = self.form_class(self.request.POST, self.request.FILES)
-#         if form.is_valid():
-#             handle_uploaded_experiments(self.request.FILES['file'])
-#             return HttpResponseRedirect('detailProject/'+prj_pk)
-#         else:
-#             return render(request, self.template_name,{'form':form, 'form_class':"Experiments"})
+
+
+
 
 
 
