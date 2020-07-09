@@ -46,8 +46,26 @@ urlpatterns = [
     
 
     url(r'^addModification/$', AddModification.as_view(), name='addModification'),
+    url(r'^detailModification/(?P<obj_pk>[0-9]+)/$', DetailModification.as_view(), name='detailModification'),
+    url(r'^editModification/(?P<obj_pk>[0-9]+)/$', EditModification.as_view(), name='editModification'),
+    url(r'^deleteModification/(?P<obj_pk>[0-9]+)/$', DeleteModification.as_view(), name='deleteModification'),
+    
+    
+    
     url(r'^addTreatment/$', AddTreatment.as_view(), name='addTreatment'),
+    url(r'^detailTreatment/(?P<obj_pk>[0-9]+)/$', DetailTreatment.as_view(), name='detailTreatment'),
+    url(r'^editTreatment/(?P<obj_pk>[0-9]+)/$', EditTreatment.as_view(), name='editTreatment'),
+    url(r'^deleteTreatment/(?P<obj_pk>[0-9]+)/$', DeleteTreatment.as_view(), name='deleteTreatment'),
+    
+    
+    
     url(r'^addProtocol/$', AddProtocol.as_view(), name='addProtocol'),
+    url(r'^detailProtocol/(?P<obj_pk>[0-9]+)/$', DetailProtocol.as_view(), name='detailProtocol'),
+    url(r'^editProtocol/(?P<obj_pk>[0-9]+)/$', EditProtocol.as_view(), name='editProtocol'),
+    url(r'^deleteProtocol/(?P<obj_pk>[0-9]+)/$', DeleteProtocol.as_view(), name='deleteProtocol'),
+    
+    
+    
     
     url(r'^addFields/$', views.addFields, name='addFields'),
     
@@ -55,4 +73,4 @@ urlpatterns = [
     url(r'^importSequencingFiles/(?P<prj_pk>[0-9]+)/$', views.importSequencingFiles, name='importSequencingFiles'),
     
 
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)  + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)  + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) 

@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.postgres.fields import JSONField
 from metadata.validators import alphanumeric
+from django.utils.translation import gettext_lazy as _
 from model_clone import CloneMixin
 
 # Create your models here.
@@ -63,7 +64,7 @@ class Project(UserLog):
 
 class Protocol(UserLog):
     name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the protocol (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
-    attachment = models.FileField(upload_to='uploads/', null=True, blank=True)
+    attachment = models.FileField(upload_to='media/', null=True, blank=True)
     class_type = models.ForeignKey(Choice, limit_choices_to={'class_type': "protocol_type"}, null=True, blank=True, on_delete=models.SET_NULL, help_text="The category that best describes the protocol or document")
     
     def __str__(self):
@@ -85,6 +86,7 @@ class Modification(UserLog):
     modification_type = models.ForeignKey(Choice, limit_choices_to={'class_type': "modification_type"}, related_name='modification_type', null=True, blank=True, on_delete=models.SET_NULL, help_text="The method used to make the genomic modification")
     genomic_change = models.ForeignKey(Choice, limit_choices_to={'class_type': "genomic_change"}, related_name='genomic_change', null=True, blank=True, on_delete=models.SET_NULL, help_text="The method used to make the genomic modification")
     guide_rnas = models.CharField(max_length=100, null=True, blank=True, help_text="The guide RNA sequences used in Crispr targetting")
+    attachment = models.FileField(upload_to='media/', null=True, blank=True)
     
     def __str__(self):
         return self.name
@@ -93,6 +95,7 @@ class Treatment(UserLog):
     name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the treatment (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
     json_type = models.ForeignKey(JsonObj, verbose_name="treatment type", limit_choices_to={'json_type': "treatment_type"}, on_delete=models.CASCADE, help_text="The method used to make the treatment")
     json_fields = JSONField(null=True, blank=True)
+    attachment = models.FileField(upload_to='media/', null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -106,7 +109,8 @@ class Biosource(UserLog):
     
     def __str__(self): 
         return self.name
-     
+    
+
     
 class Biosample(UserLog, Contributing_Lab,CloneMixin):
     name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the biosample (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
@@ -122,7 +126,8 @@ class Biosample(UserLog, Contributing_Lab,CloneMixin):
     def __str__(self):
         return self.name
     
-    _clone_many_to_many_fields = ['']
+    
+#     _clone_many_to_many_fields = ['']
 
 
  
@@ -141,7 +146,8 @@ class Experiment(UserLog,CloneMixin):
     def __str__(self):
         return self.name
     
-    _clone_many_to_many_fields = ['']
+    
+#     _clone_many_to_many_fields = [''] 
 
   
     

@@ -1,6 +1,7 @@
 {% extends 'base.html' %} 
 {% block content %} 
 {% load tags %}
+{% load static %}
 
 <div class="container">
 {% load django_bootstrap_breadcrumbs %}
@@ -37,6 +38,21 @@
 			{% endfor %}
 			</table>
 			</td></tr>
+		{% elif  f.label == "treatment"  or f.label == "modification" or f.label == "protocol" %}
+			{% if f.value %}
+			 {% firstof f.label|capfirst as urlclass %}
+				<tr>
+					<td><b>{{ f.label |title }}: </b> <a href="{% url 'detail'|add:urlclass obj_pk=f.value.pk %}">{{f.value}}</a></td>
+				</tr>
+			{% else %}
+				<tr>
+					<td><b>{{ f.label |title }}: </b> {{f.value}}</td>
+				</tr>
+			{% endif %}
+		{% elif  f.label == "attachment" %}
+		   <tr>
+				<td><b>{{ f.label |title }}: </b> <a href="/media/{{f.value}}">{{f.value}}</a> </td>
+			</tr>
 		{% else %}
 			<tr>
 				<td><b>{{ f.label |title }}: </b> {{f.value}}</td>

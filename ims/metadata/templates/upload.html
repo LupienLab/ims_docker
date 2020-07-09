@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 {% load tags %}
+{% load static %}
 
 
 {% block content %}
@@ -13,6 +14,9 @@
     
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
-
+<br/>
+   <h5>Download example files</h5>
+   <a href="{% static 'import_experiments.csv' %}" class="btn btn-secondary">Experiments sheet</a>
+   <a href="{% static 'import_fastqfiles.csv' %}" class="btn btn-secondary">Fastqfiles sheet</a>
 
 {% endblock %}

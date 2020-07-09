@@ -8,6 +8,7 @@ from django.contrib import messages
 from django.db import IntegrityError
 import json
 import re
+from django.db.models import Q
 import pandas as pd
 
 def get_or_none(classmodel, **kwargs):
@@ -112,60 +113,63 @@ def handle_uploaded_sequencingfiles(request, prj_pk, uploaded_csv):
     errorList=[]
     df = pd.read_csv(uploaded_csv)
     df=df.sort_values(by=['file_path'])
-    
-    for line in uploaded_csv:
-        v=line.decode("utf-8")
-        v=v.rstrip()
-        values=v.split(",")
-        if(c==0):
-            headers=values
-            indx_experiment_name=headers.index("experiment_name")
-            indx_sequencing_run_name=headers.index("sequencing_run_name")
-            indx_file_path=headers.index("file_path")
-            indx_md5sum=headers.index("md5sum")
-            indx_read=headers.index("read_length")
-            c+=1
-        else:
-            exp = get_or_none(Experiment,name=values[indx_experiment_name])
-            run = get_or_none(SequencingRun,name=values[indx_sequencing_run_name])
-            prj = get_or_none(Project,pk=prj_pk)
-            if(values[indx_file_path]):
-                file_name=re.split('.fastq|.fq',values[indx_file_path].split("/")[-1])
-                
-                if(values[indx_md5sum] and len(values[indx_md5sum]==32)):
-                    new_f = SeqencingFile(
-                        name=file_name, 
-                        project = prj,
-                        created_by=request.user,
-                        edited_by=request.user,
-                        file_format=get_or_none(Choice,name='fastq'),
-                        cluster_path=values[indx_file_path],
-                        md5sum=values[indx_md5sum],
-                        run=run,
-                        experiment=exp,
-                        read_length=values[indx_read]
-                        )
+    for index, row in df.iterrows():
+        c=index+1
+        exp = get_or_none(Experiment,name=row['experiment_name'])
+        run = get_or_none(SequencingRun,name=row['sequencing_run_name'])
+        prj = get_or_none(Project,pk=prj_pk)
+        path = row['file_path']
+        read_length = row['read_length']
+        md5sum = row['md5sum']
+        paired = row['paired'].lower()
+        related_file=None
+        if(path):
+                file_name=re.split('.fastq|.fq',path.split("/")[-1])[0]
+                file_name_values=file_name.split("_")
+                if(md5sum and len(md5sum)==32):
+                    try:
+                        if(paired in ["yes","y"]):
+                            if("R1" in file_name_values) or ("1" in file_name_values):
+                                pair="1"
+                            else:
+                                pairfile=re.split('R2|_1',file_name)
+                                query = Q()
+                                for i in range(len(pairfile)):
+                                    query &= Q(name__contains=pairfile[i])
+                                try:
+                                    related_file=SeqencingFile.objects.get(query)
+                                except:
+                                    messages.add_message(request, messages.WARNING, 'Related file query found more than one files in line '+str(c)+". Filename not unique.")
+                                    return
+                                pair="2"
+                        new_f = SeqencingFile(
+                            name=file_name, 
+                            project = prj,
+                            created_by=request.user,
+                            edited_by=request.user,
+                            file_format=get_or_none(Choice,name='fastq'),
+                            cluster_path=path,
+                            md5sum=md5sum,
+                            run=run,
+                            experiment=exp,
+                            read_length=read_length,
+                            paired_end=pair,
+                            related_files=related_file
+                            )
+                        new_f.save()
+                        
+                    except IntegrityError:
+                        messages.add_message(request, messages.WARNING, 'Same file name exists in the database, should be unique name in line '+str(c))
+                        return
                 else:
-                    errorList.append(str(c))
+                    errorList.append(str(index))
                     print("Error in given file md5sum"+ str(c))
                     
-            else:
-                errorList.append(str(c))
-                print("Error in given file path in line "+ str(c))
-        c+=1       
-            
-                
-            
-            
-            
+        else:
+            errorList.append(str(index))
+            print("Error in given file path in line "+ str(c))
+    
     if len(errorList)>0:
         messages.add_message(request, messages.WARNING, 'Error in lines '+",".join(set(errorList)))
     else:
-        messages.add_message(request, messages.SUCCESS, 'All files are added successfully')   
-            
-            
-            
-            
-            
-            
-            
+        messages.add_message(request, messages.SUCCESS, 'All files are added successfully') 

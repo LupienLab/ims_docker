@@ -57,13 +57,13 @@ class ModificationForm(ModelForm):
     class Meta:
         model = Modification
         exclude = ('created_at','created_by','edited_at','edited_by')
-        fields = ('name','modification_type','genomic_change','guide_rnas','description')
+        fields = ('name','attachment','modification_type','genomic_change','guide_rnas','description')
 
 class TreatmentForm(ModelForm):
     class Meta:
         model = Treatment
         exclude = ('created_at','created_by','edited_at','edited_by','json_fields')
-        fields = ('name','json_type','description')
+        fields = ('name','attachment','json_type','description')
 
 class ProtocolForm(ModelForm):
     class Meta:

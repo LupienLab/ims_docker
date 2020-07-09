@@ -24,7 +24,7 @@ from django.utils.html import escape
 from django.views.generic import DetailView
 from view_breadcrumbs import BaseBreadcrumbMixin, ListBreadcrumbMixin, DetailBreadcrumbMixin
 from django.utils.functional import cached_property
-
+from metadata.handle_upload import *
 #import metadata.extendSession
 # Create your views here.
 
@@ -507,7 +507,7 @@ class AddModification(LoginRequiredMixin, CreateView):
     
 
     def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST)
+        form = self.form_class(request.POST,request.FILES)
         if form.is_valid():
             newObject = None
             try:
@@ -526,6 +526,45 @@ class AddModification(LoginRequiredMixin, CreateView):
         else:
             pageContext = {'form': form}
             return render(request,self.template_name,pageContext)
+
+class DetailModification(LoginRequiredMixin, View):
+    template_name = 'detailClass.html'
+    def get(self,request,obj_pk):
+        mod = Modification.objects.get(pk=obj_pk)
+        
+        context = {
+            'object': mod,
+        }
+        
+        return render(request, self.template_name, context)
+
+class EditModification(LoginRequiredMixin, UpdateView):
+    template_name = 'editForm.html'
+    form_class = ModificationForm
+    
+
+    def form_valid(self, form):
+        form.instance.edited_by = self.request.user
+        form.instance.edited_at = timezone.now()
+        return super().form_valid(form)
+    
+    def get_object(self):
+        return get_object_or_404(Modification, pk=self.kwargs['obj_pk'])
+    
+    def get_success_url(self):
+        return reverse('detailModification', kwargs={'obj_pk': self.kwargs['obj_pk']})
+    
+class DeleteModification(LoginRequiredMixin, DeleteView):
+    model = Modification
+    template_name = 'delete.html'
+    
+    def get_object(self):
+        return get_object_or_404(Modification, pk=self.kwargs['obj_pk'])
+    
+    def get_success_url(self):
+        return reverse('showProject')
+    
+
     
 class AddTreatment(LoginRequiredMixin, CreateView):
     template_name = 'customForm.html'
@@ -533,13 +572,14 @@ class AddTreatment(LoginRequiredMixin, CreateView):
     
     
     def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST)
+        form = self.form_class(request.POST,request.FILES)
         if form.is_valid():
             newObject = None
             try:
                 newObject = form.save(commit= False)
                 newObject.created_by = self.request.user
                 newObject.edited_by = self.request.user
+                form.instance.json_fields = createJSON(self.request)
                 newObject.save()
                 
             except(forms.ValidationError):
@@ -552,6 +592,44 @@ class AddTreatment(LoginRequiredMixin, CreateView):
         else:
             pageContext = {'form': form}
             return render(request,self.template_name,pageContext)
+
+class DetailTreatment(LoginRequiredMixin, View):
+    template_name = 'detailClass.html'
+    def get(self,request,obj_pk):
+        treat = Treatment.objects.get(pk=obj_pk)
+        
+        context = {
+            'object': treat,
+        }
+        
+        return render(request, self.template_name, context)
+
+
+class EditTreatment(LoginRequiredMixin, UpdateView):
+    template_name = 'editForm.html'
+    form_class = TreatmentForm
+    
+
+    def form_valid(self, form):
+        form.instance.edited_by = self.request.user
+        form.instance.edited_at = timezone.now()
+        form.instance.json_fields = createJSON(self.request)
+        return super().form_valid(form)
+    
+    def get_object(self):
+        return get_object_or_404(Treatment, pk=self.kwargs['obj_pk'])
+    
+    def get_success_url(self):
+        return reverse('detailTreatment', kwargs={'obj_pk': self.kwargs['obj_pk']})
+
+class DeleteTreatment(LoginRequiredMixin, DeleteView):
+    model = Treatment
+    template_name = 'delete.html'
+    
+    def get_success_url(self):
+        return reverse('showProject')
+    
+    
 
 class AddProtocol(LoginRequiredMixin, CreateView):
     template_name = 'customForm.html'
@@ -579,13 +657,50 @@ class AddProtocol(LoginRequiredMixin, CreateView):
             pageContext = {'form': form}
             return render(request,self.template_name,pageContext)
 
+    
+
+class DetailProtocol(LoginRequiredMixin, View):
+    template_name = 'detailClass.html'
+    def get(self,request,obj_pk):
+        pro = Protocol.objects.get(pk=obj_pk)
+        
+        context = {
+            'object': pro,
+        }
+        
+        return render(request, self.template_name, context)
+
+class EditProtocol(LoginRequiredMixin, UpdateView):
+    template_name = 'editForm.html'
+    form_class = ProtocolForm
+    
+
+    def form_valid(self, form):
+        form.instance.edited_by = self.request.user
+        form.instance.edited_at = timezone.now()
+        return super().form_valid(form)
+    
+    def get_object(self):
+        return get_object_or_404(Protocol, pk=self.kwargs['obj_pk'])
+    
+    def get_success_url(self):
+        return reverse('detailProtocol', kwargs={'obj_pk': self.kwargs['obj_pk']})
+    
+
+class DeleteProtocol(LoginRequiredMixin, DeleteView):
+    model = Protocol
+    template_name = 'delete.html'
+    
+    def get_success_url(self):
+        return reverse('showProject')
+
 ########################
 
 ##Import Sections
 ########################
 
     
-from metadata.handle_upload import *
+
 def importExperiments(request,prj_pk):
     if request.method == 'POST':
         form = ImportForm(request.POST, request.FILES)
