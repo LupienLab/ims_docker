@@ -101,7 +101,7 @@
 		<tbody>
 		{% for run in sequencingRun %}
 			<tr>
-				<td><a href="{% url 'detailSequencingRun' run_pk=project.pk %}">{{ run.name }}</a></td>
+				<td><a href="{% url 'detailSequencingRun' run_pk=run.pk %}">{{ run.name }}</a></td>
 				<td>
 				{% for exp in run.experiment.all %}
 					({{ forloop.counter }}) <a href="{% url 'detailExperiment' exp_pk=exp.pk %}">{{ exp.name }}</a><br/>
