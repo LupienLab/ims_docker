@@ -12,6 +12,7 @@ from metadata.views import *
 
 urlpatterns = [
     url(r'^$', Index.as_view(), name='index'),
+    url(r'^password/$', views.change_password, name='change_password'),
     
     url(r'^showProject/$', ShowProject.as_view(), name='showProject'),
     url(r'^addProject/$', AddProject.as_view(), name='addProject'),

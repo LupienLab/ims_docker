@@ -7,6 +7,7 @@ from model_clone import CloneMixin
 
 # Create your models here.
 
+User.__str__ = lambda user: user.get_full_name()
 
 class UserLog(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, help_text="When this object is added to the system")
@@ -53,12 +54,14 @@ class Project(UserLog):
         User, related_name='project_contibutor', blank=True, help_text="Collaborating members for this project")
     status = models.CharField(choices=STATUS_CHOICES, max_length=10, default="Active",
                               help_text="Is project currently in progress")
+    
 
     def __str__(self):
         return self.name
 
     class Meta:
         ordering = ['-pk']
+        
         
 
 
@@ -158,9 +161,9 @@ class SequencingRun(UserLog):
     sequencing_center = models.ForeignKey(Choice, related_name='run_sequencing_center', limit_choices_to={'class_type': "sequencing_center"}, null=True, blank=True, on_delete=models.SET_NULL, help_text="Where the sequencing has been done")
     sequencing_instrument = models.ForeignKey(Choice, related_name='run_sequencing_instrument', limit_choices_to={'class_type': "sequencing_instrument"}, null=True, blank=True, on_delete=models.SET_NULL, help_text="Instrument used for sequencing")
     submission_date = models.DateField(help_text="Submission date for sample")
-    retrieval_date = models.DateField(null=True, blank=True, help_text="Collection date for sample")
-    submitted = models.BooleanField(default=False,help_text="Is sample submitted for sequencing")
-    approved = models.BooleanField(default=False,help_text="Is sample approved for sequencing")
+    #retrieval_date = models.DateField(null=True, blank=True, help_text="Collection date for sample")
+#     submitted = models.BooleanField(default=False,help_text="Is sample submitted for sequencing") 
+#     approved = models.BooleanField(default=False,help_text="Is sample approved for sequencing")
     
     def __str__(self):
         return self.name

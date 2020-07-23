@@ -75,7 +75,7 @@ class SequencingRunForm(ModelForm):
     class Meta:
         model = SequencingRun
         exclude = ('created_at','created_by','edited_at','edited_by','project',)
-        fields = ('name','sequencing_center','sequencing_instrument','experiment','submission_date','retrieval_date','submitted','approved','description',)
+        fields = ('name','sequencing_center','sequencing_instrument','experiment','submission_date','description',)
         widgets = {
             'submission_date': forms.DateInput(),
             'retrieval_date': forms.DateInput(),

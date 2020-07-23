@@ -109,7 +109,7 @@ def handle_uploaded_experiments(request,uploaded_csv):
         messages.add_message(request, messages.SUCCESS, 'All experiments are added successfully')
                     
 def handle_uploaded_sequencingfiles(request, prj_pk, uploaded_csv):
-    c=0
+    c=1
     errorList=[]
     df = pd.read_csv(uploaded_csv)
     df=df.sort_values(by=['file_path'])
@@ -123,6 +123,7 @@ def handle_uploaded_sequencingfiles(request, prj_pk, uploaded_csv):
         md5sum = row['md5sum']
         paired = row['paired'].lower()
         related_file=None
+        pair=None
         if(path):
                 file_name=re.split('.fastq|.fq',path.split("/")[-1])[0]
                 file_name_values=file_name.split("_")
@@ -132,7 +133,7 @@ def handle_uploaded_sequencingfiles(request, prj_pk, uploaded_csv):
                             if("R1" in file_name_values) or ("1" in file_name_values):
                                 pair="1"
                             else:
-                                pairfile=re.split('R2|_1',file_name)
+                                pairfile=re.split('R2|_2',file_name)
                                 query = Q()
                                 for i in range(len(pairfile)):
                                     query &= Q(name__contains=pairfile[i])
@@ -157,6 +158,9 @@ def handle_uploaded_sequencingfiles(request, prj_pk, uploaded_csv):
                             related_files=related_file
                             )
                         new_f.save()
+                        if(related_file):
+                            related_file.related_files=SeqencingFile.objects.get(pk=new_f.pk)
+                            related_file.save()
                         
                     except IntegrityError:
                         messages.add_message(request, messages.WARNING, 'Same file name exists in the database, should be unique name in line '+str(c))
@@ -172,4 +176,4 @@ def handle_uploaded_sequencingfiles(request, prj_pk, uploaded_csv):
     if len(errorList)>0:
         messages.add_message(request, messages.WARNING, 'Error in lines '+",".join(set(errorList)))
     else:
-        messages.add_message(request, messages.SUCCESS, 'All files are added successfully') 
+        messages.add_message(request, messages.SUCCESS, 'All files are added successfully')

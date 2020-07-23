@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.http.response import HttpResponseRedirect, JsonResponse
 from metadata.forms import *
@@ -14,7 +14,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.core import serializers
 import json
-from django.shortcuts import redirect
 from django.db import models
 import metadata.models as app_models
 from django.views.decorators.csrf import csrf_exempt
@@ -25,6 +24,10 @@ from django.views.generic import DetailView
 from view_breadcrumbs import BaseBreadcrumbMixin, ListBreadcrumbMixin, DetailBreadcrumbMixin
 from django.utils.functional import cached_property
 from metadata.handle_upload import *
+from django.contrib import messages
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
+
 #import metadata.extendSession
 # Create your views here.
 
@@ -44,7 +47,24 @@ class Index(LoginRequiredMixin, View):
         
         return render(request, self.template_name, context)
     
-#######################   
+#######################
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Important!
+            messages.success(request, 'Your password was successfully updated!')
+            return redirect('change_password')
+        else:
+            messages.error(request, 'Please correct the error below.')
+    else:
+        form = PasswordChangeForm(request.user)
+    return render(request, 'change_password.html', {
+        'form': form
+    })
+    
+#######################
 ####JSON FIELDS########
 def createJSON(request):
     json_type_pk = request.POST.get('json_type')
