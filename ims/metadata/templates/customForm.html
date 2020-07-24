@@ -7,6 +7,11 @@
   <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     
+    {% if json_values %}
+	    {% json_saved_data json_values as jsonEntry %}
+	    {{ jsonEntry|json_script:"json-data" }}
+    {% endif %}
+    
     <h1>Add {{form | modelname}}</h1>
      {% include "modelHelpFrag.html" with form=form %}
      {{ form|crispy }}

@@ -116,9 +116,9 @@ class Biosource(UserLog):
 
     
 class Biosample(UserLog, Contributing_Lab,CloneMixin):
-    name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the biosample (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
+    name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the biosample, e.g. HeLa-p14-11302019 (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
     biosource = models.ForeignKey(Biosource,related_name='sample_source', null=False, on_delete=models.CASCADE, help_text="Related biosource")
-    sample_id = models.CharField(max_length=100, null=False, default="", help_text="Sample id / id given on sequencing form.")
+    sample_id = models.CharField(max_length=100, null=False, default="", help_text="Sample id / id given on sequencing form e.g. 080144A")
     modification = models.ForeignKey(Modification,related_name='exp_modification', null=True, blank=True, on_delete=models.SET_NULL, help_text="Expression or targeting vectors stably transfected to generate Crispr'ed or other genomic modification")
     treatment = models.ForeignKey(Treatment,related_name='exp_treatment', null=True, blank=True, on_delete=models.SET_NULL, help_text="Chemical/RNAi treatment")
     collection_date = models.DateField(help_text="Collection date for this biosample")

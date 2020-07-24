@@ -172,6 +172,12 @@ class AddBiosource(LoginRequiredMixin, CreateView):
         else:
             return CreateView.post(self, request, *args, **kwargs)
     
+    def get_context_data(self, **kwargs):
+        context = super(AddBiosource, self).get_context_data(**kwargs)
+        if self.request.method == 'POST':
+            json_values = createJSON(self.request)
+            context['json_values']= json_values
+        return context
     
     def form_valid(self, form):
         form.instance.created_by = self.request.user
@@ -252,6 +258,13 @@ class AddBiosample(LoginRequiredMixin, CreateView):
             return HttpResponseRedirect(reverse('addExperiment', kwargs={'prj_pk':self.kwargs['prj_pk'],'sample_pk':existing_object}))
         else:
             return CreateView.post(self, request, *args, **kwargs)
+    
+    def get_context_data(self, **kwargs):
+        context = super(AddBiosample, self).get_context_data(**kwargs)
+        if self.request.method == 'POST':
+            json_values = createJSON(self.request)
+            context['json_values']= json_values
+        return context
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
@@ -327,6 +340,13 @@ class AddExperiment(LoginRequiredMixin, CreateView):
         form.instance.biosample = Biosample.objects.get(pk=self.kwargs['sample_pk'])
         form.instance.json_fields = createJSON(self.request)
         return super().form_valid(form)
+    
+    def get_context_data(self, **kwargs):
+        context = super(AddExperiment, self).get_context_data(**kwargs)
+        if self.request.method == 'POST':
+            json_values = createJSON(self.request)
+            context['json_values']= json_values
+        return context
     
     def get_success_url(self):
         return reverse('detailProject', kwargs={'prj_pk':self.kwargs['prj_pk']})
@@ -610,7 +630,8 @@ class AddTreatment(LoginRequiredMixin, CreateView):
 
         
         else:
-            pageContext = {'form': form}
+            json_values = createJSON(self.request)
+            pageContext = {'form': form,'json_values':json_values}
             return render(request,self.template_name,pageContext)
 
 class DetailTreatment(LoginRequiredMixin, View):
