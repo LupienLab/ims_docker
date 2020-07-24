@@ -136,7 +136,7 @@ class Biosample(UserLog, Contributing_Lab,CloneMixin):
  
 class Experiment(UserLog,CloneMixin): 
     project = models.ForeignKey(Project,related_name='exp_project', on_delete=models.CASCADE,)
-    name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the experiment (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
+    name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the experiment, e.g. K562-p11-DpnII-02202020-R1-T1 (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
     biosample = models.ForeignKey(Biosample,related_name='exp_biosample', null=False, on_delete=models.CASCADE, help_text="Related biosample")
     biosample_quantity = models.IntegerField(null=False, default=1, help_text="The amount of starting Biological sample going into the experiment")
     biosample_quantity_units = models.ForeignKey(Choice, related_name='biosample_quantity_units', limit_choices_to={'class_type': "quantity_units"}, null=True, blank=True, on_delete=models.SET_NULL, help_text="The units that go along with the biological sample quantity")
