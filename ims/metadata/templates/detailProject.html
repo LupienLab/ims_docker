@@ -94,6 +94,7 @@
 				<th>Name</th>
 				<th>Experiments</th>
 				<th>Created on</th>
+				<th>Created by</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -106,6 +107,7 @@
 				{% endfor %}
 				</td>
 				<td>{{ run.created_at }}</td>
+				<td>{{ run.created_by }}</td>
 			</tr>
 		{% endfor %}	
 		</tbody>
