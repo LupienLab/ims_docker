@@ -102,24 +102,28 @@ class ShowProject(LoginRequiredMixin, View):
         
         return render(request, self.template_name, context)
 
-class DetailProject(LoginRequiredMixin, View, DetailBreadcrumbMixin):
+class DetailProject(LoginRequiredMixin, DetailBreadcrumbMixin, DetailView):
     template_name = 'detailProject.html'
-    def get(self,request,prj_pk):
-        prj = Project.objects.get(pk=prj_pk)
-        exp = Experiment.objects.filter(project=prj_pk).order_by('-pk')
-        run = SequencingRun.objects.filter(project=prj_pk).order_by('-pk')
+    pk_url_kwarg = 'prj_pk'
+    model = Project
+
+    def get_context_data(self, **kwargs):
+        context = super(DetailProject, self).get_context_data(**kwargs)
+        prj = Project.objects.get(pk=self.kwargs['prj_pk'])
+        exp = Experiment.objects.filter(project=self.kwargs['prj_pk']).order_by('-pk')
+        run = SequencingRun.objects.filter(project=self.kwargs['prj_pk']).order_by('-pk')
         context = {
             'project': prj,
             'experiment': exp,
             'sequencingRun': run
         }
-        return render(request, self.template_name, context)
+        return (context)
     
     @cached_property
     def crumbs(self):
-        return [('Project:', reverse('detailProject', kwargs={'prj_pk': self.kwargs['prj_pk']}))]
-        
-      
+        prj = Project.objects.get(pk=self.kwargs['prj_pk'])
+        return [('Project: ' + prj.name, reverse('detailProject', kwargs={'prj_pk': prj.pk}))]
+
 
 class AddProject(LoginRequiredMixin, CreateView):
     template_name = 'customForm.html'
@@ -197,6 +201,7 @@ class DetailBiosource(LoginRequiredMixin, DetailBreadcrumbMixin, DetailView):
 
     @cached_property
     def crumbs(self):
+        print(dir(self.request))
         return [('Biosource:', reverse('detailBiosource', kwargs={'source_pk': self.kwargs['source_pk']}))]
         
          

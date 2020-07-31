@@ -19,13 +19,13 @@ def get_or_none(classmodel, **kwargs):
 
     
 def handle_uploaded_experiments(request,uploaded_csv):
-    c=0
+    c=1
     errorList=[]
     for line in uploaded_csv:
         v=line.decode("utf-8")
         v=v.rstrip()
         values=v.split(",")
-        if(c==0):
+        if(c==1):
             headers=values
             indx_biosource=headers.index("biosource")
             indx_oldbiosample=headers.index("biosampleToClone")
@@ -37,7 +37,6 @@ def handle_uploaded_experiments(request,uploaded_csv):
             indx_newexperiment=headers.index("new_experiment_name")
             indx_date=headers.index("library_preparation_date(yyyy-mm-dd)")
             indx_experiment_description=headers.index("experiment_description")
-            c+=1
         else:
             source = get_or_none(Biosource,name=values[indx_biosource])
             sample = get_or_none(Biosample,name=values[indx_oldbiosample])
@@ -114,10 +113,19 @@ def handle_uploaded_sequencingfiles(request, prj_pk, uploaded_csv):
     df = pd.read_csv(uploaded_csv)
     df=df.sort_values(by=['file_path'])
     for index, row in df.iterrows():
-        c=index+1
+        c+=index+1
         exp = get_or_none(Experiment,name=row['experiment_name'])
         run = get_or_none(SequencingRun,name=row['sequencing_run_name'])
         prj = get_or_none(Project,pk=prj_pk)
+        if(exp==None):
+            messages.add_message(request, messages.WARNING, 'Experiment name does not exist in line '+str(c))
+            return
+        if(run==None):
+            messages.add_message(request, messages.WARNING, 'Sequencing run name does not exist  in line '+str(c))
+            return
+        if(prj==None):
+            messages.add_message(request, messages.WARNING, 'Incorrect project name  in line '+str(c))
+            return
         path = row['file_path']
         read_length = row['read_length']
         md5sum = row['md5sum']
