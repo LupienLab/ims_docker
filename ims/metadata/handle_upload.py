@@ -42,6 +42,17 @@ def handle_uploaded_experiments(request,uploaded_csv):
             sample = get_or_none(Biosample,name=values[indx_oldbiosample])
             exp = get_or_none(Experiment,name=values[indx_oldexperiment])
             
+            if(source==None):
+                messages.add_message(request, messages.WARNING, 'Biosource does not exist in line '+str(c))
+                return
+            if(sample==None):
+                messages.add_message(request, messages.WARNING, 'Biosample to clone is not given in line '+str(c))
+                return
+            if(exp==None):
+                messages.add_message(request, messages.WARNING, 'Experiment to clone is not given in line '+str(c))
+                return
+            
+            
             if(source):
                 if(sample) and (values[indx_newbiosample]):
                     try:
