@@ -64,9 +64,9 @@
 	</td></tr>
 	<tr><td>
 	    <b>Sequencing File details:</b>
-	    <table>
-	    {% for files in experiment.file_exp.all %}
-			<tr><td>({{forloop.counter }}) <a href="{% url 'detailSeqencingFile' file_pk=files.pk %}">{{files}}</a></tr></td><br /> 
+   <table>
+	    {% for files in seqfiles %}
+			<tr><td>({{forloop.counter }}) <a href="{% url 'detailSeqencingFile' file_pk=files.pk %}">{{files}}</a></tr></td>
 	     {% endfor %}
 	     </table>
 	   </td></tr>

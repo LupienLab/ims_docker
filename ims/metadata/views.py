@@ -28,9 +28,13 @@ from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 
+
+
+
+#################################
+
 #import metadata.extendSession
 # Create your views here.
-
 
 ####INDEX############
 
@@ -110,6 +114,7 @@ class DetailProject(LoginRequiredMixin, DetailBreadcrumbMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(DetailProject, self).get_context_data(**kwargs)
         prj = Project.objects.get(pk=self.kwargs['prj_pk'])
+        #self.request.CustomSession['active_project'] = self.kwargs['prj_pk']
         exp = Experiment.objects.filter(project=self.kwargs['prj_pk']).order_by('-pk')
         run = SequencingRun.objects.filter(project=self.kwargs['prj_pk']).order_by('-pk')
         context = {
@@ -201,8 +206,8 @@ class DetailBiosource(LoginRequiredMixin, DetailBreadcrumbMixin, DetailView):
 
     @cached_property
     def crumbs(self):
-        print(dir(self.request))
-        return [('Biosource:', reverse('detailBiosource', kwargs={'source_pk': self.kwargs['source_pk']}))]
+        return [('Project: '+self.request.session["active_project"], reverse('detailProject', kwargs={'prj_pk': self.request.session["active_project"]})),
+                ('Biosource:', reverse('detailBiosource', kwargs={'source_pk': self.kwargs['source_pk']}))]
         
          
 #     
@@ -364,7 +369,13 @@ class DetailExperiment(LoginRequiredMixin, DetailBreadcrumbMixin, DetailView):
     model = Experiment
     pk_url_kwarg = 'exp_pk'
     
-
+    def get_context_data(self, **kwargs):
+        context = super(DetailExperiment, self).get_context_data(**kwargs)
+        seqfiles=context["object"].file_exp.all().order_by('name')
+        context["seqfiles"]=seqfiles
+        return context
+    
+        
     @cached_property
     def crumbs(self):
         return [('Project: ' + self.object.project.name, reverse('detailProject', kwargs={'prj_pk': self.object.project.pk})),
@@ -776,7 +787,6 @@ def importSequencingFiles(request,prj_pk):
         'form_name':'sequencing fastq files'
         }
     return render(request, 'upload.html', pageContext)
-
 
 
 
