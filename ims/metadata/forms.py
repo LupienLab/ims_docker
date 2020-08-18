@@ -114,6 +114,8 @@ class FieldsForm(forms.Form):
                 if(values["data"]=="CharField"):
                     #self.fields[key] = getattr(forms, values["data"])(max_length=200, initial=values["old"],help_text=values["help"])
                     self.fields[key] = forms.CharField(max_length=200, initial=values["old"],help_text=values["help"])
+                elif(values["data"]=="Textarea"):
+                    self.fields[key] = forms.CharField(widget=forms.Textarea, initial=values["old"],help_text=values["help"])
                 elif(values["data"]=="DateField"):
                     self.fields[key] = forms.DateField(widget=forms.widgets.DateInput(), initial=values["old"],help_text=values["help"])
                 elif(values["data"]=="FloatField"):
