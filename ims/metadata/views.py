@@ -193,14 +193,14 @@ class AddBiosource(LoginRequiredMixin, CreateView):
         return reverse('addBiosample', kwargs={'prj_pk':self.kwargs['prj_pk'], 'source_pk':self.object.pk})
     
     
-class DetailBiosource(LoginRequiredMixin, DetailBreadcrumbMixin, DetailView):
+class DetailBiosource(LoginRequiredMixin, DetailView):
     template_name = 'detailClass.html'
     model = Biosource
     pk_url_kwarg = 'source_pk'
     
 
 #     @cached_property
-#     def crumbs(self):
+#    def crumbs(self):
 #         return [('Project: '+self.request.session["active_project"], reverse('detailProject', kwargs={'prj_pk': self.request.session["active_project"]})),
 #                 ('Biosource:', reverse('detailBiosource', kwargs={'source_pk': self.kwargs['source_pk']}))]
 #         
