@@ -96,9 +96,12 @@ class SeqencingFileForm(ModelForm):
     
     def __init__(self, *args, **kwargs):
         prj_pk = kwargs.get('initial')['prj_pk']
+        exp_pk = kwargs.get('initial')['exp_pk']
         super(SeqencingFileForm, self).__init__(*args, **kwargs)
         if prj_pk:
             self.fields['run'].queryset = SequencingRun.objects.filter(project=prj_pk).order_by('-pk')
+        if exp_pk:
+            self.fields['related_files'].queryset = SeqencingFile.objects.filter(experiment=exp_pk).order_by('-pk')
         
 
 class FieldsForm(forms.Form): 

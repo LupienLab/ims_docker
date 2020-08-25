@@ -16,7 +16,11 @@
   </form>
 <br/>
    <h5>Download example files</h5>
-   <a href="{% static 'import_experiments.csv' %}" class="btn btn-secondary">Experiments sheet</a>
-   <a href="{% static 'import_fastqfiles.csv' %}" class="btn btn-secondary">Fastqfiles sheet</a>
+   {% if form_name == "experiments" %}
+   		<a href="{% static 'import_experiments.csv' %}" class="btn btn-secondary">Experiments sheet</a>
+    {% else %}
+		<a href="{% static 'import_fastqfiles.csv' %}" class="btn btn-secondary">Fastqfiles sheet</a>
+	{% endif %}
+   
 
 {% endblock %}

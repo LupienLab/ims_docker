@@ -24,7 +24,7 @@
 			<td><b>Biosource: </b><a href="{% url 'detailBiosource' source_pk=experiment.biosample.biosource.pk %}">{{ experiment.biosample.biosource }}</a></td>
 		</tr>
 		<tr>
-			<td><b>Biosample: </b><a href="{% url 'detailBiosample' sample_pk=experiment.biosample.pk %}">{{ experiment.biosample }}</a></td></td>
+			<td><b>Biosample: </b><a href="{% url 'detailBiosample' sample_pk=experiment.biosample.pk %}">{{ experiment.biosample }}</a></td>
 		</tr>
 		<tr>
 			<td><b>Bio rep_no:</b> {{ experiment.bio_rep_no }}</td>
@@ -36,7 +36,11 @@
 			<td><b>Assay type:</b> {{ experiment.json_type }}</td>
 		</tr>
 		<tr>
-			<td><b>Protocol:</b> {{ experiment.protocol }}</td>
+			<td><b>Protocol:</b>
+			{% if experiment.protocol.pk %}
+			<a href="{% url 'detailProtocol' obj_pk=experiment.protocol.pk %}">{{ experiment.protocol }}</a>
+			{% endif %}
+			</td>
 		</tr>
 		<tr>
 			<td><b>Created by:</b> {{ experiment.created_by }}</td>

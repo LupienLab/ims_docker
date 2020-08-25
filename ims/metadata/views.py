@@ -28,11 +28,6 @@ from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 
-
-
-
-#################################
-
 #import metadata.extendSession
 # Create your views here.
 
@@ -204,11 +199,11 @@ class DetailBiosource(LoginRequiredMixin, DetailBreadcrumbMixin, DetailView):
     pk_url_kwarg = 'source_pk'
     
 
-    @cached_property
-    def crumbs(self):
-        return [('Project: '+self.request.session["active_project"], reverse('detailProject', kwargs={'prj_pk': self.request.session["active_project"]})),
-                ('Biosource:', reverse('detailBiosource', kwargs={'source_pk': self.kwargs['source_pk']}))]
-        
+#     @cached_property
+#     def crumbs(self):
+#         return [('Project: '+self.request.session["active_project"], reverse('detailProject', kwargs={'prj_pk': self.request.session["active_project"]})),
+#                 ('Biosource:', reverse('detailBiosource', kwargs={'source_pk': self.kwargs['source_pk']}))]
+#         
          
 #     
 #         return [('Project: '+self.object.project.name, reverse('detailProject', kwargs={'prj_pk': self.object.project.pk})),
@@ -491,7 +486,7 @@ class AddSeqencingFile(LoginRequiredMixin, CreateView):
     
     def get_initial(self):
         initial = super(AddSeqencingFile, self).get_initial()
-        initial.update({'prj_pk': self.kwargs['prj_pk']})
+        initial.update({'prj_pk': self.kwargs['prj_pk'],'exp_pk':self.kwargs['exp_pk']})
         return initial
     
     def form_valid(self, form):
