@@ -1,0 +1,2 @@
+run_name,sequencing_center,sequencing_instrument,experiment,submission_date,description
+#,(Princess Margaret Genomics Centre),(Illumina HiSeq 4000;PacBio Sequel II;NovaSeq 6000;MiSeq;NextSeq 550),,(YYYY-MM-DD),

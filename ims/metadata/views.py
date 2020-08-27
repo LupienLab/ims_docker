@@ -165,6 +165,17 @@ class DeleteProject(LoginRequiredMixin, DeleteView):
 ######################
 ####Biosource#########
 
+class ShowBiosource(LoginRequiredMixin, View):
+    template_name = 'showBiosource.html'
+    
+    def get(self,request):
+        obj = Biosource.objects.all().order_by('-pk')
+        context = {
+            'object': obj,
+        }
+        
+        return render(request, self.template_name, context)
+
 class AddBiosource(LoginRequiredMixin, CreateView):
     template_name = 'customForm.html'
     form_class = BiosourceForm
@@ -780,6 +791,39 @@ def importSequencingFiles(request,prj_pk):
     pageContext = {
         'form': form,
         'form_name':'sequencing fastq files'
+        }
+    return render(request, 'upload.html', pageContext)
+
+def addData(request):
+    return render(request, 'addData.html')
+
+def bulkAddBiosource(request):
+    if request.method == 'POST':
+        form = ImportForm(request.POST, request.FILES)
+        if form.is_valid():
+            handle_uploaded_biosource(request,request.FILES['upload_csv'])
+            return HttpResponseRedirect('/showBiosource/')
+    else:
+        form = ImportForm()
+     
+    pageContext = {
+        'form': form,
+        'form_name':'biosource'
+        }
+    return render(request, 'upload.html', pageContext)
+
+def bulkAddSequencingRun(request,prj_pk):
+    if request.method == 'POST':
+        form = ImportForm(request.POST, request.FILES)
+        if form.is_valid():
+            handle_uploaded_sequencingruns(request,prj_pk, request.FILES['upload_csv'])
+            return HttpResponseRedirect('/detailProject/'+prj_pk)
+    else:
+        form = ImportForm()
+     
+    pageContext = {
+        'form': form,
+        'form_name':'sequencing run'
         }
     return render(request, 'upload.html', pageContext)
 

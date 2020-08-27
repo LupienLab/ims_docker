@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^deleteExperiment/(?P<exp_pk>[0-9]+)/$', DeleteExperiment.as_view(), name='deleteExperiment'),
     
     url(r'^addBiosource/(?P<prj_pk>[0-9]+)/$', AddBiosource.as_view(), name='addBiosource'),
+    url(r'^showBiosource/$', ShowBiosource.as_view(), name='showBiosource'),
     url(r'^detailBiosource/(?P<source_pk>[0-9]+)/$', DetailBiosource.as_view(), name='detailBiosource'),
     url(r'^editBiosource/(?P<obj_pk>[0-9]+)/$', EditBiosource.as_view(), name='editBiosource'),
     url(r'^deleteBiosource/(?P<obj_pk>[0-9]+)/$', DeleteBiosource.as_view(), name='deleteBiosource'),
@@ -69,9 +70,12 @@ urlpatterns = [
     
     
     url(r'^addFields/$', views.addFields, name='addFields'),
+    url(r'^addData/$', views.addData, name='addData'),
     
     url(r'^importExperiments/(?P<prj_pk>[0-9]+)/$', views.importExperiments, name='importExperiments'),
     url(r'^importSequencingFiles/(?P<prj_pk>[0-9]+)/$', views.importSequencingFiles, name='importSequencingFiles'),
+    url(r'^bulkAddBiosource/$', views.bulkAddBiosource, name='bulkAddBiosource'),
+    url(r'^bulkAddSequencingRun/(?P<prj_pk>[0-9]+)/$', views.bulkAddSequencingRun, name='bulkAddSequencingRun'),
     
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)  + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) 

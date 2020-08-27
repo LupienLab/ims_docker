@@ -121,7 +121,7 @@ class Biosample(UserLog, Contributing_Lab,CloneMixin):
     sample_id = models.CharField(max_length=100, null=False, default="", help_text="Sample id / id given on sequencing form e.g. 080144A")
     modification = models.ForeignKey(Modification,related_name='exp_modification', null=True, blank=True, on_delete=models.SET_NULL, help_text="Expression or targeting vectors stably transfected to generate Crispr'ed or other genomic modification")
     treatment = models.ForeignKey(Treatment,related_name='exp_treatment', null=True, blank=True, on_delete=models.SET_NULL, help_text="Chemical/RNAi treatment")
-    collection_date = models.DateField(help_text="Collection date for this biosample")
+    collection_date = models.DateField(null=True, blank=True, help_text="Collection date for this biosample")
     collection_method = models.CharField(max_length=100, null=True, blank=True, help_text="Method of collection for this biosample")
     json_type = models.ForeignKey(JsonObj, verbose_name="Culture details" ,related_name='culture_details', limit_choices_to={'json_type': "culture_details"}, on_delete=models.CASCADE, help_text="Culture details of sample")
     json_fields = JSONField(null=True, blank=True) 

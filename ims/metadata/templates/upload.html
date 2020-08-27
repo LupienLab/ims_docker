@@ -18,8 +18,12 @@
    <h5>Download example files</h5>
    {% if form_name == "experiments" %}
    		<a href="{% static 'import_experiments.csv' %}" class="btn btn-secondary">Experiments sheet</a>
-    {% else %}
+    {% elif  form_name == "sequencing fastq files"%}
 		<a href="{% static 'import_fastqfiles.csv' %}" class="btn btn-secondary">Fastqfiles sheet</a>
+	{% elif  form_name == "biosource"%}
+		<a href="{% static 'import_biosource.csv' %}" class="btn btn-secondary">Biosource sheet</a>
+	{% elif  form_name == "sequencing run"%}
+		<a href="{% static 'import_SequencingRun.csv' %}" class="btn btn-secondary">SequencingRun sheet</a>
 	{% endif %}
    
 
