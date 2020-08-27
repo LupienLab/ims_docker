@@ -51,11 +51,11 @@
 		
 	</table>
 	<br/> 
-	<a href="{% url 'addBiosource' prj_pk=project.pk %}"><button type="button" class="btn btn-success">Add experiment</button></a>
-	<a href="{% url 'addSequencingRun' prj_pk=project.pk %}"><button type="button" class="btn btn-success">Add SequencingRun</button></a>
+	<a href="{% url 'addBiosource' prj_pk=project.pk %}"><button type="button" class="btn btn-primary">Add experiment</button></a>
+	<a href="{% url 'addSequencingRun' prj_pk=project.pk %}"><button type="button" class="btn btn-secondary">Add SequencingRun</button></a>
 	<a href="{% url 'importExperiments' prj_pk=project.pk %}"><button type="button" class="btn btn-success">Bulk Add Experiments</button></a>
-	<a href="{% url 'bulkAddSequencingRun' prj_pk=project.pk%}"><button type="button" class="btn btn-success">Bulk Add SequencingRun</button></a>
-	<a href="{% url 'importSequencingFiles' prj_pk=project.pk %}"><button type="button" class="btn btn-success">Bulk Add Fastq Files</button></a>
+	<a href="{% url 'bulkAddSequencingRun' prj_pk=project.pk%}"><button type="button" class="btn btn-warning">Bulk Add SequencingRun</button></a>
+	<a href="{% url 'importSequencingFiles' prj_pk=project.pk %}"><button type="button" class="btn btn-info">Bulk Add Fastq Files</button></a>
 	<br/><br/>
 	<hr><br>
 	{% if experiment %}
