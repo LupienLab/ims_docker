@@ -10,4 +10,12 @@
 	
 	<a href="{% url 'bulkAddBiosource' %}"><button type="button" class="btn btn-success">Bulk Add Biosource</button></a><br/><br/>
 	
+	<a href="{% url 'bulkAddBiosample' %}"><button type="button" class="btn btn-success">Bulk Add Biosample</button></a><br/><br/>
+	
+	<a href="{% url 'selectProjectforImport' slug="experiments"%}"><button type="button" class="btn btn-success">Bulk Add Experiments</button></a><br/><br/>
+	
+	<a href="{% url 'selectProjectforImport' slug="sequencingrun"%}"><button type="button" class="btn btn-success">Bulk Add SequencingRun</button></a><br/><br/>
+	
+	<a href="{% url 'selectProjectforImport' slug="files"%}"><button type="button" class="btn btn-success">Bulk Add Fastq Files</button></a>
+	
 {% endblock %}

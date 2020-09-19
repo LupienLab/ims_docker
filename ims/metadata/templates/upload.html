@@ -22,6 +22,9 @@
 		<a href="{% static 'import_fastqfiles.csv' %}" class="btn btn-secondary">Fastqfiles sheet</a>
 	{% elif  form_name == "biosource"%}
 		<a href="{% static 'import_biosource.csv' %}" class="btn btn-secondary">Biosource sheet</a>
+	{% elif  form_name == "biosample"%}
+		<a href="{% static 'import_biosample.csv' %}" class="btn btn-secondary">Biosample sheet</a>
+	
 	{% elif  form_name == "sequencing run"%}
 		<a href="{% static 'import_SequencingRun.csv' %}" class="btn btn-secondary">SequencingRun sheet</a>
 	{% endif %}

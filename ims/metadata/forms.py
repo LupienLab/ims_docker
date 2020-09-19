@@ -8,6 +8,7 @@ from metadata.models import *
 from django import forms
 from django.forms import ModelChoiceField
 from metadata.widgets import *
+from dal import autocomplete
 
 
 class ProjectForm(ModelForm):
@@ -27,14 +28,14 @@ class ExperimentForm(ModelForm):
         
         
 class BiosourceForm(ModelForm):
-    choose_existing = ModelChoiceField(queryset = Biosource.objects.all(),required=False,help_text='Choose from existing list')
+    choose_existing = ModelChoiceField(queryset = Biosource.objects.all(),required=False, widget=autocomplete.ModelSelect2(url='biosourceAutocomplete'), help_text='Choose from existing list')
     class Meta:
         model = Biosource
         exclude = ('created_at','created_by','edited_at','edited_by','json_fields')
         fields = ('choose_existing','name','disease','source_organism','description','json_type')
 
 class BiosampleForm(ModelForm):
-    choose_existing = ModelChoiceField(queryset = Biosample.objects.all(),required=False,help_text='Choose from existing list')
+    choose_existing = ModelChoiceField(queryset = Biosample.objects.all(),required=False,widget=autocomplete.ModelSelect2(url='biosampleAutocomplete'), help_text='Choose from existing list')
     
     def __init__(self, *args, **kwargs):
         source_pk = kwargs.get('initial')['source_pk']
@@ -136,5 +137,10 @@ class FieldsForm(forms.Form):
         
 class ImportForm(forms.Form):
     upload_csv=forms.FileField()
+
+class selectProjectforImportForm(forms.Form):
+    choose_project = ModelChoiceField(queryset = Project.objects.all(),required=False, widget=autocomplete.ModelSelect2(url='projectAutocomplete'), help_text='Choose project from existing list for bulk upload')
+
+
     
     

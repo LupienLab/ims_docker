@@ -9,6 +9,8 @@ from django.conf.urls.static import static
 from django.conf import settings
 from . import views
 from metadata.views import *
+from metadata.autocompleteForeignkey import *
+
 
 urlpatterns = [
     url(r'^$', Index.as_view(), name='index'),
@@ -72,10 +74,17 @@ urlpatterns = [
     url(r'^addFields/$', views.addFields, name='addFields'),
     url(r'^addData/$', views.addData, name='addData'),
     
+    url(r'^bulkAddBiosource/$', views.bulkAddBiosource, name='bulkAddBiosource'),
+    url(r'^bulkAddBiosample/$', views.bulkAddBiosample, name='bulkAddBiosample'),
+    url(r'^selectProjectforImport/(?P<slug>[\w-]+)/$', views.selectProjectforImport, name='selectProjectforImport'),
     url(r'^importExperiments/(?P<prj_pk>[0-9]+)/$', views.importExperiments, name='importExperiments'),
     url(r'^importSequencingFiles/(?P<prj_pk>[0-9]+)/$', views.importSequencingFiles, name='importSequencingFiles'),
-    url(r'^bulkAddBiosource/$', views.bulkAddBiosource, name='bulkAddBiosource'),
     url(r'^bulkAddSequencingRun/(?P<prj_pk>[0-9]+)/$', views.bulkAddSequencingRun, name='bulkAddSequencingRun'),
+    
+    
+    url(r'^biosourceAutocomplete/$',BiosourceAutocomplete.as_view(),name='biosourceAutocomplete'),
+    url(r'^biosampleAutocomplete/$',BiosampleAutocomplete.as_view(),name='biosampleAutocomplete'),
+    url(r'^projectAutocomplete/$',ProjectAutocomplete.as_view(),name='projectAutocomplete'),
     
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)  + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) 

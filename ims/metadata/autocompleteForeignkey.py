@@ -1,0 +1,49 @@
+'''
+Created on Sep. 11, 2020
+
+@author: ankita
+'''
+from dal import autocomplete
+from metadata.models import *
+
+
+class BiosourceAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        # Don't forget to filter out results depending on the visitor !
+        if not self.request.user.is_authenticated:
+            return Biosource.objects.none()
+
+        qs = Biosource.objects.all()
+
+        if self.q:
+            qs = qs.filter(name__istartswith=self.q)
+
+        return qs
+
+
+class BiosampleAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        # Don't forget to filter out results depending on the visitor !
+        if not self.request.user.is_authenticated:
+            return Biosample.objects.none()
+ 
+        qs = Biosample.objects.all()
+ 
+        if self.q:
+            qs = qs.filter(name__istartswith=self.q)
+ 
+        return qs
+
+
+class ProjectAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        # Don't forget to filter out results depending on the visitor !
+        if not self.request.user.is_authenticated:
+            return Project.objects.none()
+ 
+        qs = Project.objects.all()
+ 
+        if self.q:
+            qs = qs.filter(name__istartswith=self.q)
+ 
+        return qs

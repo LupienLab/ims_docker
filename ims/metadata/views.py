@@ -209,7 +209,16 @@ class DetailBiosource(LoginRequiredMixin, DetailView):
     model = Biosource
     pk_url_kwarg = 'source_pk'
     
-
+    def get_context_data(self, **kwargs):
+        context = super(DetailBiosource, self).get_context_data(**kwargs)
+        rel_bisam=self.object.sample_source.all().order_by('-pk')
+        
+        context = {
+            'object': self.object,
+            'rel_bisam': rel_bisam
+        }
+        return (context)
+    
 #     @cached_property
 #    def crumbs(self):
 #         return [('Project: '+self.request.session["active_project"], reverse('detailProject', kwargs={'prj_pk': self.request.session["active_project"]})),
@@ -762,7 +771,23 @@ class DeleteProtocol(LoginRequiredMixin, DeleteView):
 ##Import Sections
 ########################
 
-    
+def selectProjectforImport(request,slug):
+    if request.method == 'POST':
+        form = selectProjectforImportForm(request.POST, request.FILES)
+        if form.is_valid():
+            select_project_pk=request.POST.get('choose_project')
+            if (slug=="experiments"):
+                return HttpResponseRedirect('/importExperiments/'+select_project_pk)
+            elif (slug=="sequencingrun"):
+                return HttpResponseRedirect('/bulkAddSequencingRun/'+select_project_pk)
+            elif (slug=="files"):
+                return HttpResponseRedirect('/importSequencingFiles/'+select_project_pk)
+            
+    else:
+        form = selectProjectforImportForm()
+
+    return render(request, 'selectProject.html',{'form':form}) 
+
 
 def importExperiments(request,prj_pk):
     if request.method == 'POST':
@@ -809,6 +834,21 @@ def bulkAddBiosource(request):
     pageContext = {
         'form': form,
         'form_name':'biosource'
+        }
+    return render(request, 'upload.html', pageContext)
+
+def bulkAddBiosample(request):
+    if request.method == 'POST':
+        form = ImportForm(request.POST, request.FILES)
+        if form.is_valid():
+            handle_uploaded_biosample(request,request.FILES['upload_csv'])
+            return HttpResponseRedirect('/showBiosource/')
+    else:
+        form = ImportForm()
+     
+    pageContext = {
+        'form': form,
+        'form_name':'biosample'
         }
     return render(request, 'upload.html', pageContext)
 

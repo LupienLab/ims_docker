@@ -26,6 +26,8 @@
   	</div>
   	<table class="table table-bordered">
 	<h2>Detail {{model_val}}</h2>
+	
+	
 	{% for f in object|get_fields %}
 	
 		{% if f.label == "json fields" %}
@@ -60,9 +62,20 @@
 		{% endif %}
 	
 	{% endfor %}
+	
 	</table>
 	</td></tr>
 	</table>
+	{% if rel_bisam %}
+	{% if model_val == "Biosource" %}
+	<h5>Related Biosamples</h5>
+	<table class="table table-bordered">
+	{% for sam in rel_bisam %}
+			<tr><td>({{forloop.counter }}) <a href="{% url 'detailBiosample' sample_pk=sam.pk %}">{{sam.name}}</a></tr></td>
+	 {% endfor %}
+	</table>
+	{% endif %}
+	{% endif %}
 </div>
 {% endif %} 
 {% endblock %}

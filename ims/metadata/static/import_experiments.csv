@@ -1,1 +1,2 @@
-biosource,biosampleToClone,new_biosample_name,biosample_description,experimentToClone,bio_rep_no,tec_rep_no,new_experiment_name,library_preparation_date(yyyy-mm-dd),experiment_description
+experiment_name,biosource,biosampleToClone,new_biosample_name,biosample_description,experimentToClone,bio_rep_no,tec_rep_no,library_preparation_date,experiment_description
+#,Item: Biosource,Item: Biosample,,,,,,(YYYY-MM-DD),

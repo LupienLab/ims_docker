@@ -9,3 +9,4 @@ pydotplus==2.0.2
 django-view-breadcrumbs==0.1.0
 django-clone==0.2.0
 pandas==1.0.5
+django-autocomplete-light==3.5.1

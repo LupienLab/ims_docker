@@ -63,12 +63,13 @@ $(document).ready(function () {
 		    $('[name='+key+']').val(value);
 		  });
 		}
-    
-    
-    $( "#id_choose_existing" ).on('change',existingCheck);
-    if($('#id_choose_existing').val()){
+     
+
+	 if($('#id_choose_existing').val()){
     	existingCheck();
     }
+	
+	document.getElementById("id_choose_existing").onchange = function() {existingCheck()};
     	
     function existingCheck() {
     	var prevRequired = []
@@ -79,7 +80,8 @@ $(document).ready(function () {
     	    	  $('#id_json_type').val("");
     	    	  callAjax();
     	    	  $("input").removeAttr("required" );
-    	    	  $( "input[name!='csrfmiddlewaretoken']" ).prop('disabled',true);
+    	    	  $("input[name!='csrfmiddlewaretoken']").prop('disabled',true);
+				  $(".select2-search__field").prop('disabled',false);
     	    	  $("select").removeAttr("required" );
     	    	  $("select:not(#id_choose_existing)").prop('disabled',true);
     	    	  $("textarea").prop('disabled',true);
