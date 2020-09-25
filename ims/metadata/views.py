@@ -101,6 +101,24 @@ class ShowProject(LoginRequiredMixin, View):
         
         return render(request, self.template_name, context)
 
+class BrowseProject(LoginRequiredMixin, View):
+    template_name = 'showProject.html'
+    
+    def get(self,request,slug):
+        obj = Project.objects.filter(created_by__first_name=slug).order_by('-pk')
+        if(len(obj)==0):
+            obj = Project.objects.filter(exp_project__json_type__name=slug).order_by('-pk').distinct()
+        if(len(obj)==0):
+            obj = Project.objects.filter(related__name=slug).order_by('-pk').distinct()
+        if(len(obj)==0):
+            obj = Project.objects.filter(status=slug).order_by('-pk').distinct()
+        context = {
+            'object': obj,
+        }
+        
+        return render(request, self.template_name, context)
+    
+
 class DetailProject(LoginRequiredMixin, DetailBreadcrumbMixin, DetailView):
     template_name = 'detailProject.html'
     pk_url_kwarg = 'prj_pk'
@@ -867,9 +885,29 @@ def bulkAddSequencingRun(request,prj_pk):
         }
     return render(request, 'upload.html', pageContext)
 
+from django.db.models import Count
 
-
-
-
-
+@csrf_exempt                
+def populateCharts(request,slug):
+    if request.method == 'POST' and request.is_ajax():
+        if (slug=="owner"):
+            proj_owner=list(Project.objects.values('created_by__first_name').annotate(dcount=Count('created_by')).order_by())
+            js_project=json.dumps(proj_owner)
+            
+        elif (slug=="assay"):
+            proj_owner=list(Project.objects.values('exp_project__json_type__name').annotate(dcount=Count('exp_project__json_type__name')).order_by())
+            js_project=json.dumps(proj_owner)
+            
+        elif (slug=="disease"):
+            proj_owner=list(Project.objects.values('related__name').annotate(dcount=Count('related__name')).order_by())
+            js_project=json.dumps(proj_owner)
+        
+        elif (slug=="status"):
+            proj_owner=list(Project.objects.values('status').annotate(dcount=Count('status')).order_by())
+            js_project=json.dumps(proj_owner)
+            print(js_project)
+            
+        return JsonResponse(js_project, safe=False)
+    else :
+        return HttpResponse('<h1>Page was found</h1>')
 

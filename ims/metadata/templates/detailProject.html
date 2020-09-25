@@ -20,6 +20,17 @@
 			<td><b>Name:</b> {{ project.name }}</td>
 		</tr>
 		<tr>
+			<td><b>Related:</b> <br /> 
+			{% if project.related.all %} 
+			{% for rel in project.related.all %}
+				({{forloop.counter }}) {{rel}}<br /> 
+			{% endfor %} 
+			{% else %} 
+				No relations added. 
+			{% endif %}
+			</td>
+		</tr>
+		<tr>
 			<td><b>Status:</b> {{ project.status }}</td>
 		</tr>
 		<tr>

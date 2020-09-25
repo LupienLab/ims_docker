@@ -81,7 +81,7 @@ $(document).ready(function () {
     	    	  callAjax();
     	    	  $("input").removeAttr("required" );
     	    	  $("input[name!='csrfmiddlewaretoken']").prop('disabled',true);
-				  $(".select2-search__field").prop('disabled',false);
+				          $(".select2-search__field").prop('disabled',false);
     	    	  $("select").removeAttr("required" );
     	    	  $("select:not(#id_choose_existing)").prop('disabled',true);
     	    	  $("textarea").prop('disabled',true);

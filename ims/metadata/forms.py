@@ -15,7 +15,7 @@ class ProjectForm(ModelForm):
     class Meta:
         model = Project
         exclude = ('created_at','created_by','edited_at','edited_by',)
-        fields = ('name','contributor','status','description',)
+        fields = ('name','related','contributor','status','description',)
 
 class ExperimentForm(ModelForm):
     class Meta:

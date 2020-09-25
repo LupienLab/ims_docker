@@ -21,6 +21,7 @@ urlpatterns = [
     url(r'^detailProject/(?P<prj_pk>[0-9]+)/$', DetailProject.as_view(), name='detailProject'),
     url(r'^editProject/(?P<prj_pk>[0-9]+)/$', EditProject.as_view(), name='editProject'),
     url(r'^deleteProject/(?P<prj_pk>[0-9]+)/$', DeleteProject.as_view(), name='deleteProject'),
+    url(r'^browseProject/(?P<slug>[\w-]+)/$', BrowseProject.as_view(), name='browseProject'),
     
     url(r'^addExperiment/(?P<prj_pk>[0-9]+)/(?P<sample_pk>[0-9]+)/$', AddExperiment.as_view(), name='addExperiment'),
     url(r'^detailExperiment/(?P<exp_pk>[0-9]+)/$', DetailExperiment.as_view(), name='detailExperiment'),
@@ -69,10 +70,10 @@ urlpatterns = [
     url(r'^deleteProtocol/(?P<obj_pk>[0-9]+)/$', DeleteProtocol.as_view(), name='deleteProtocol'),
     
     
-    
-    
     url(r'^addFields/$', views.addFields, name='addFields'),
     url(r'^addData/$', views.addData, name='addData'),
+    url(r'^populateCharts/(?P<slug>[\w-]+)/$', views.populateCharts, name='populateCharts'),
+    
     
     url(r'^bulkAddBiosource/$', views.bulkAddBiosource, name='bulkAddBiosource'),
     url(r'^bulkAddBiosample/$', views.bulkAddBiosample, name='bulkAddBiosample'),

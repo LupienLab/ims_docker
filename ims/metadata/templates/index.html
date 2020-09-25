@@ -1,10 +1,37 @@
 {% extends "base.html" %}
-
+{% load static %}
 {% block content %}
-<div class="bodyContent container">
+
 {% if usr %}
 	<br/><h3>Welcome {{usr.get_full_name | default:usr.username}}!</h3><br/>
 {% endif %}
+
+<h4 class="text-center">Browse projects</h4>
+<div class="container">
+    <div class="row">
+       <div class="col-xs-6 col-sm-6 col-md-6">
+          <canvas id="disease" class="chartjs"></canvas>
+       </div>
+       <div class="col-xs-6 col-sm-6 col-md-6">
+          <canvas id="owner" class="chartjs"></canvas>
+       </div>
+     </div>
+    <hr/>
+     <div class="row">
+       <div class="col-xs-6 col-sm-6 col-md-6">
+          <canvas id="assay" class="chartjs"></canvas>
+       </div>
+       <div class="col-xs-6 col-sm-6 col-md-6">
+          <canvas id="projectlabel" class="chartjs"></canvas>
+       </div>
+     </div>
+</div>
+<hr/><br/>
+
+<script type="text/javascript" src="{% static 'createCharts.js' %}"></script>
+
+
+<div class="bodyContent container">
 <table class="table table-bordered table-hover data_table">
 <thead>
   <tr>

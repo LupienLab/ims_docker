@@ -5,6 +5,7 @@ from metadata.models import *
 
 admin.site.register(Project)
 admin.site.register(Choice)
+admin.site.register(ChoiceDisease)
 admin.site.register(Protocol)
 admin.site.register(Experiment) 
 admin.site.register(JsonObj)
