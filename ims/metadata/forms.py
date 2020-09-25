@@ -16,6 +16,11 @@ class ProjectForm(ModelForm):
         model = Project
         exclude = ('created_at','created_by','edited_at','edited_by',)
         fields = ('name','related','contributor','status','description',)
+    
+    def __init__(self, *args, **kwargs):
+        super(ProjectForm, self).__init__(*args, **kwargs)
+        self.fields['related'].queryset = self.fields['related'].queryset.order_by('name')
+    
 
 class ExperimentForm(ModelForm):
     class Meta:
