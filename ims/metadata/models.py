@@ -187,11 +187,12 @@ class SeqencingFile(UserLog):
         ('', ''),
         ('1', '1'),
         ('2', '2'),
+        ('index', 'index'),
     )
     name = models.CharField(max_length=300, null=False, default="", validators=[alphanumeric],help_text="Name of the sequencing file (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
     project = models.ForeignKey(Project, related_name='file_Project', on_delete=models.CASCADE,)
     paired_end = models.CharField(
-        max_length=1,
+        max_length=8,
         choices=PAIR_CHOICES,
         default='',
         null=True,
@@ -211,4 +212,20 @@ class SeqencingFile(UserLog):
     
     class Meta:
         unique_together = ('project', 'name',)
+
+class ExperimentTag(UserLog):
+    name = models.CharField(max_length=300, null=False, default="", validators=[alphanumeric],help_text="Name of the tags (Unique throughout system. Allowed characters [0-9a-zA-Z-._], no spaces allowed)")
+    project = models.ForeignKey(Project, related_name='tag_project', on_delete=models.CASCADE,)
+    experiment = models.ManyToManyField(Experiment, related_name='tag_experiment')
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        unique_together = ('name',)
+
+
+
+
+
     

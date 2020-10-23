@@ -16,26 +16,16 @@
 {% firstof object|modelname as model_val %}
 <div class="float-right">
 	<div class="float-right">
-	
+	{% if object.project %}
 	<a href="{% url 'edit'|add:model_val prj_pk=object.project.pk obj_pk=object.pk %}"><button type="button" class="btn btn-warning float-left">Edit {{model_val}}</button></a>&nbsp;&nbsp;
-	
+	{% else %} 
+	<a href="{% url 'edit'|add:model_val obj_pk=object.pk %}"><button type="button" class="btn btn-warning float-left">Edit {{model_val}}</button></a>&nbsp;&nbsp;
+	{% endif %} 
   	<a href="{% url 'delete'|add:model_val obj_pk=object.pk %}"><button type="button" class="btn btn-danger float-right">Delete {{model_val}}</button></a><br/><br/>
   	</div>
   	<table class="table table-bordered">
 	<h2>Detail {{model_val}}</h2>
 	{% for f in object|get_fields %}
-	
-		{% if f.label == "json fields" %}
-			<tr><td>
-			<b>specific fields:</b>
-			<table class="table table-bordered">
-			{% json_saved_data object.json_fields as jsonEntry %} 
-			{% for keys, values in jsonEntry.items %}
-			<tr><td>{{ keys|title }}</td><td>{{ values |title  }}</td></tr>
-			{% endfor %}
-			</table>
-			</td></tr>
-		{% else %}
 		     
 		    {% if f.m2m == True %}
 		    <tr><td>{{ f.label |title }}:</td></tr>
@@ -51,10 +41,10 @@
 				<td><b>{{ f.label |title }}: </b> {{f.value}}</td>
 			</tr>
 			{% endif %}
-		{% endif %}
-	{% endfor %}
+	 {% endfor %}
 	</td></tr>
-{% endif %} 
-{% endblock %}
+
 	</table>
 </div>
+{% endif %}
+{% endblock %}

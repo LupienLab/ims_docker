@@ -157,32 +157,17 @@ def handle_uploaded_sequencingfiles(request, prj_pk, uploaded_csv):
             path = row['file_path']
             read_length = row['read_length']
             md5sum = row['md5sum']
-            paired = row['paired'].lower()
+            pair= row['paired']
             related_file=None
-            pair=None
             if(path):
                     file_name=re.split('.fastq|.fq',path.split("/")[-1])[0]
-                    file_name_values=file_name.split("_")
+                    #file_name_values=file_name.split("_")
                     if(checkSanity("md5sum",request,row,c)):
                         if(not(len(md5sum)==32)):
                             messages.add_message(request, messages.WARNING, 'md5sum is incorrect in line '+str(c))
                             return
                     
                     try:
-                        if(paired in ["yes","y","Yes"]):
-                            if("R1" in file_name_values) or ("1" in file_name_values):
-                                pair="1"
-                            else:
-                                pairfile=re.split('R2|_2',file_name)
-                                query = Q()
-                                for i in range(len(pairfile)):
-                                    query &= Q(name__contains=pairfile[i])
-                                try:
-                                    related_file=SeqencingFile.objects.get(query)
-                                except:
-                                    messages.add_message(request, messages.WARNING, 'Related file query found more than one files in line '+str(c)+". Filename not unique.")
-                                    return
-                                pair="2"
                         new_f = SeqencingFile(
                             name=file_name, 
                             project = prj,

@@ -1,6 +1,7 @@
 $(document).ready(function(){
 	
-	var ctx2 = document.getElementById('owner');
+var ctx2 = document.getElementById('owner');
+if(ctx2){	
 	$.ajax({
     url: "/populateCharts/owner/",
     method: "POST",
@@ -53,9 +54,10 @@ $(document).ready(function(){
         console.log(data);
     }
 });
-
+}
 /*##############*/
 var ctx3 = document.getElementById('assay');
+if(ctx3){
 $.ajax({
     url: "/populateCharts/assay/",
     method: "POST",
@@ -105,8 +107,10 @@ var assay = new Chart(ctx3, {
         console.log(data);
     }
 });
+}
 /*##############*/
 var ctx1 = document.getElementById('disease');
+if(ctx1){
 $.ajax({
     url: "/populateCharts/disease/",
     method: "POST",
@@ -156,8 +160,10 @@ var disease = new Chart(ctx1, {
         console.log(data);
     }
 });
+}
 /*##############*/
 var ctx4 = document.getElementById('projectlabel');
+if(ctx4){
 $.ajax({
     url: "/populateCharts/status/",
     method: "POST",
@@ -207,6 +213,61 @@ var projectlabel = new Chart(ctx4, {
         console.log(data);
     }
 });
+}
+/*##############*/
+var ctx5 = document.getElementById('experimenttags');
+if(ctx5){
+var project_id= $("#project_id").val(); 
+$.ajax({
+    url: "/populateCharts/tags_"+project_id+"/",
+    method: "POST",
+    success: function(data) {
+	 d=JSON.parse(data);
+     var chartlabel = [];
+     var chartdata = [];
+     for (var key in d) {
+    var value = d[key]["name"];
+    var ldata = d[key]["dcount"];
+    chartlabel.push(value);
+    chartdata.push(ldata);
+	}
+var experimenttags = new Chart(ctx5, {
+    type: 'pie',
+    data: {
+        labels: chartlabel,
+        datasets: [{
+            data: chartdata
+        }]
+    },
+	  options: {
+		title: {
+            display: true,
+            text: 'Tags chart'
+        },
+		plugins: {
+	      colorschemes: {
+	        scheme: 'tableau.Tableau20'
+	      }
+        },
+	    legend: {
+	        display: false
+	    },
+	    'onClick' : function (evt) {
+		   var activePoints = experimenttags.getElementsAtEventForMode(evt, 'point', experimenttags.options);
+		    var firstPoint = activePoints[0];
+        	var label = experimenttags.data.labels[firstPoint._index];
+       	    var value = experimenttags.data.datasets[firstPoint._datasetIndex].data[firstPoint._index];
+       		 window.location = "/detailExperimentTag/"+label+"/" ;
+		
+	    }
+	}
+});
+},
+    error: function(data) {
+        console.log(data);
+    }
+});
+}
 
 });
 

@@ -15,4 +15,5 @@ admin.site.register(Modification)
 admin.site.register(Treatment)
 admin.site.register(SequencingRun)
 admin.site.register(SeqencingFile)
+admin.site.register(ExperimentTag)
 

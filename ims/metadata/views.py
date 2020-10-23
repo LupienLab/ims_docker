@@ -785,6 +785,78 @@ class DeleteProtocol(LoginRequiredMixin, DeleteView):
         return reverse('showProject')
 
 ########################
+########################
+###Experiment Tags#######
+class AddExperimentTag(LoginRequiredMixin, CreateView):
+    template_name = 'customForm.html'
+    form_class = ExperimentTagForm
+    
+    def get_initial(self):
+        initial = super(AddExperimentTag, self).get_initial()
+        initial.update({'prj_pk': self.kwargs['prj_pk']})
+        return initial
+    
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        form.instance.edited_by = self.request.user
+        form.instance.project=Project.objects.get(pk=self.kwargs['prj_pk'])
+        return super().form_valid(form)
+    
+    def get_success_url(self):
+        return reverse('detailProject', kwargs={'prj_pk':self.kwargs['prj_pk']})
+    
+
+
+class DetailExperimentTag(LoginRequiredMixin, View):
+    template_name = 'detailExperimentTag.html'
+    def get(self,request,slug):
+        tag = ExperimentTag.objects.get(name=slug)
+        
+        context = {
+            'object': tag,
+        }
+        
+        return render(request, self.template_name, context)
+
+
+class EditExperimentTag(LoginRequiredMixin, UpdateView):
+    model = ExperimentTag
+    template_name = 'editForm.html'
+    form_class = ExperimentTagForm
+    
+    def get_initial(self):
+        print("indsie")
+        initial = super(EditExperimentTag, self).get_initial()
+        initial.update({'prj_pk': self.kwargs['prj_pk']})
+        return initial
+    
+    def form_valid(self, form):
+        form.instance.edited_by = self.request.user
+        form.instance.edited_at = timezone.now()
+        return super().form_valid(form)
+    
+    def get_object(self):
+        return get_object_or_404(ExperimentTag, pk=self.kwargs['obj_pk'])
+    
+    def get_success_url(self):
+        return reverse('detailProject', kwargs={'prj_pk': self.kwargs['prj_pk']})
+    
+
+class DeleteExperimentTag(LoginRequiredMixin, DeleteView):
+    model = ExperimentTag
+    template_name = 'delete.html'
+    prj_pk = None
+    
+    def get_object(self):
+        run = get_object_or_404(ExperimentTag, pk=self.kwargs['obj_pk'])
+        self.prj_pk = run.project.pk
+        return run
+    
+    def get_success_url(self):
+        return reverse('detailProject', kwargs={'prj_pk': self.prj_pk})
+
+########################
+
 
 ##Import Sections
 ########################
@@ -905,7 +977,12 @@ def populateCharts(request,slug):
         elif (slug=="status"):
             proj_owner=list(Project.objects.values('status').annotate(dcount=Count('status')).order_by())
             js_project=json.dumps(proj_owner)
-            print(js_project)
+        
+        elif (slug.startswith("tags")):
+            s=slug.split("_")
+            tag_experiments=list(ExperimentTag.objects.filter(project=s[1]).values('name').annotate(dcount=Count('experiment')).order_by())
+            js_project=json.dumps(tag_experiments)
+        
             
         return JsonResponse(js_project, safe=False)
     else :

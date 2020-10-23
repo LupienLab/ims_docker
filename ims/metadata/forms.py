@@ -146,6 +146,15 @@ class ImportForm(forms.Form):
 class selectProjectforImportForm(forms.Form):
     choose_project = ModelChoiceField(queryset = Project.objects.all(),required=False, widget=autocomplete.ModelSelect2(url='projectAutocomplete'), help_text='Choose project from existing list for bulk upload')
 
-
-    
+class ExperimentTagForm(ModelForm):
+    class Meta:
+        model = ExperimentTag
+        exclude = ('created_at','created_by','edited_at','edited_by','project')
+        fields = ('name','experiment','description')
+        
+    def __init__(self, *args, **kwargs):
+        prj_pk = kwargs.get('initial')['prj_pk']
+        super(ExperimentTagForm, self).__init__(*args, **kwargs)
+        if prj_pk:
+            self.fields['experiment'].queryset = Experiment.objects.filter(project=prj_pk).order_by('-pk')
     

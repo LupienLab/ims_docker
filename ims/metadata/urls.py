@@ -87,5 +87,10 @@ urlpatterns = [
     url(r'^biosampleAutocomplete/$',BiosampleAutocomplete.as_view(),name='biosampleAutocomplete'),
     url(r'^projectAutocomplete/$',ProjectAutocomplete.as_view(),name='projectAutocomplete'),
     
+    url(r'^addExperimentTag/(?P<prj_pk>[0-9]+)/$', AddExperimentTag.as_view(), name='addExperimentTag'),
+    url(r'^detailExperimentTag/(?P<slug>[\w-]+)/$', DetailExperimentTag.as_view(), name='detailExperimentTag'),
+    url(r'^editExperimentTag/(?P<prj_pk>[0-9]+)/(?P<obj_pk>[0-9]+)/$', EditExperimentTag.as_view(), name='editExperimentTag'),
+    url(r'^deleteExperimentTag/(?P<obj_pk>[0-9]+)/$', DeleteExperimentTag.as_view(), name='deleteExperimentTag'),
+    
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)  + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) 

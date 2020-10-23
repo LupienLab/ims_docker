@@ -33,6 +33,7 @@ $(document).ready(function () {
     
     function callAjax() {
     	var json_type_pk = $('#id_json_type').val();
+		if(json_type_pk.length>0){
     	$.ajax({
 		    url: "/addFields/",
 		    type: "POST",
@@ -56,6 +57,10 @@ $(document).ready(function () {
 		            console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
 		        }
     });
+	}
+	else{
+		$('#json_form_display').empty();
+	}
     }
     
     function populate(data) {
@@ -68,9 +73,9 @@ $(document).ready(function () {
 	 if($('#id_choose_existing').val()){
     	existingCheck();
     }
-	
+	if(document.getElementById("id_choose_existing")){
 	document.getElementById("id_choose_existing").onchange = function() {existingCheck()};
-    	
+    }
     function existingCheck() {
     	var prevRequired = []
     	$('label.requiredField').each(function(){

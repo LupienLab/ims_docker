@@ -1,2 +1,2 @@
 file_path,experiment_name,sequencing_run_name,read_length,md5sum,paired
-#,Item: Experiment,Item: SequencingRun,,,(yes;no)
+#,Item: Experiment,Item: SequencingRun,,,(1;2;index)
