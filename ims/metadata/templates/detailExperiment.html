@@ -27,6 +27,9 @@
 			<td><b>Biosample: </b><a href="{% url 'detailBiosample' sample_pk=experiment.biosample.pk %}">{{ experiment.biosample }}</a></td>
 		</tr>
 		<tr>
+			<td><b>Biosample quantity: </b>{{ experiment.biosample_quantity }} {{experiment.biosample_quantity_units}}</td>
+		</tr>
+		<tr>
 			<td><b>Bio rep_no:</b> {{ experiment.bio_rep_no }}</td>
 		</tr>
 		<tr>

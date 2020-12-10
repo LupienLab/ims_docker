@@ -157,4 +157,36 @@ class ExperimentTagForm(ModelForm):
         super(ExperimentTagForm, self).__init__(*args, **kwargs)
         if prj_pk:
             self.fields['experiment'].queryset = Experiment.objects.filter(project=prj_pk).order_by('-pk')
+
+
+class SequencingForm(forms.Form):
+    choose_experiments = forms.ModelMultipleChoiceField(queryset = Experiment.objects.all(), help_text="select all experiments to export")
+    data_recipient_contact_name=forms.CharField(max_length=100, help_text="Data recipient contact name")
+    data_recipient_contact_email=forms.EmailField()
+    grant=forms.CharField(max_length=100,required=False, help_text="Grant or PO Number")
+    buffer = forms.CharField(max_length=100, required=False, help_text="Buffer or media EB, PBS, Water, etc")
+    instructions = forms.CharField(widget=forms.Textarea, required=False, help_text="Experimental Conditions and Sequencing Instructions")
+    
+    class Meta:
+        fields = ('choose_experiments','data_recipient_contact_name','data_recipient_contact_email','buffer','instructions')
+    
+    def __init__(self, *args, **kwargs):  
+        prj_pk = kwargs.get('initial')['prj_pk']
+        super(SequencingForm, self).__init__(*args, **kwargs)
+        if prj_pk:
+            self.fields['choose_experiments'].queryset = Experiment.objects.filter(project=prj_pk).order_by('-pk')
+            
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
     

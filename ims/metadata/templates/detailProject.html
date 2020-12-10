@@ -85,7 +85,9 @@
 		<thead>
 			<tr>
 				<th>Name</th>
-				<th>Type</th>
+				<th>Biosource</th>
+				<th>Biosample</th>
+				<th>Assay</th>
 				<th>Created on</th>
 				<th>Created by</th>
 			</tr>
@@ -94,6 +96,8 @@
 		{% for exp in experiment %}
 			<tr>
 				<td><a href="{% url 'detailExperiment' exp_pk=exp.pk %}">{{ exp.name }}</a></td>
+				<td><a href="{% url 'detailBiosource' source_pk=exp.biosample.biosource.pk %}">{{ exp.biosample.biosource.name }}</a></td>
+				<td><a href="{% url 'detailBiosample' sample_pk=exp.biosample.pk %}">{{ exp.biosample.name }}</a></td>
 				<td>{{ exp.json_type }}</td>
 				<td>{{ exp.created_at }}</td>
 				<td>{{ exp.created_by }}</td>
@@ -116,7 +120,9 @@
 	     </div>
 	</div>
 
-	<br><hr><br>
+	<br><hr>
+	<a href="{% url 'exportSequencingform' prj_pk=project.pk %}"><button type="button" class="btn btn-primary">Export Sequencingform</button></a>
+	<br><hr>
 	{% if sequencingRun %}
 	<h3>Sequencing run details</h6>
 	<table class="cell-border table-hover data_table">

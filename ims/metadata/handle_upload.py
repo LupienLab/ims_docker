@@ -42,6 +42,10 @@ def createJSON(json_type,row):
     data = {}
     for keys in json_object:
         formVal = row[keys]
+        if (str(formVal)=="nan" or str(formVal)=="NAN"):
+            formVal=""
+        if((json_object[keys]["data"]=="IntegerField") and (len(str(formVal))>0)):
+            formVal=int(formVal)
         data[keys] = formVal
     json_data = json.dumps(data)
     return(json_data)
@@ -54,14 +58,14 @@ def handle_uploaded_experiments(request,uploaded_csv):
     for index, row in df.iterrows():
         if(not(row['experiment_name'] =="#") and checkSanity("experiment_name",request,row,c)):
             source = get_or_none(Biosource,name=row['biosource'])
-            sample = get_or_none(Biosample,name=row["biosampleToClone"])
+            sample = get_or_none(Biosample,name=row["biosample_name"])
             exp = get_or_none(Experiment,name=row["experimentToClone"])
             
             if(source==None):
                 messages.add_message(request, messages.WARNING, 'Biosource is incorrect in line '+str(c))
                 return
             if(sample==None):
-                messages.add_message(request, messages.WARNING, 'Biosample to clone is incorrect in line '+str(c))
+                messages.add_message(request, messages.WARNING, 'Biosample is incorrect in line '+str(c))
                 return
             if(exp==None):
                 messages.add_message(request, messages.WARNING, 'Experiment to clone is incorrect in line '+str(c))
@@ -69,18 +73,11 @@ def handle_uploaded_experiments(request,uploaded_csv):
             
             
             if(source):
-                if(sample) and (checkSanity("new_biosample_name",request,row,c)):
-                    try:
-                        new_biosample=sample.make_clone(attrs={'name':row["new_biosample_name"],
-                                                               'description': row["biosample_description"]
-                                                               })
-                    except IntegrityError:
-                            messages.add_message(request, messages.WARNING, 'Same biosample name exists in the database, should be unique name.')
-                            return
+                if(sample):
                     if(exp):
                         try:
                             new_exp=exp.make_clone(attrs={'name': row["experiment_name"],
-                                                      'biosample': new_biosample,
+                                                      'biosample': sample,
                                                       'bio_rep_no': row["bio_rep_no"],
                                                       'tec_rep_no': row["tec_rep_no"],
                                                       'created_by': request.user,
@@ -341,6 +338,7 @@ def handle_uploaded_biosample(request, uploaded_csv):
             if(checkSanity("culture_harvest_date",request,row,c) and  not(validate(row['culture_harvest_date']))):
                 messages.add_message(request, messages.WARNING, 'culture_harvest_date is incorrect in line '+str(c))
                 return 
+            
                 
             sample = get_or_none(Biosample,name=row['biosample_name'])
             if(not(sample==None)):
