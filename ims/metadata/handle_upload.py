@@ -325,8 +325,10 @@ def handle_uploaded_biosample(request, uploaded_csv):
                 return
             
             if(checkSanity("collection_date",request,row,c) and  not(validate(row['collection_date']))):
-                messages.add_message(request, messages.WARNING, 'collection_date is incorrect in line '+str(c))
-                return 
+                coll_date=""
+            else:
+                coll_date=row['collection_date']
+            
             
             json_type = get_or_none(JsonObj,name="culture details - Not Available")
             if(checkSanity("culture_details",request,row,c)):
@@ -353,7 +355,7 @@ def handle_uploaded_biosample(request, uploaded_csv):
                         sample_id=row['sample_id'],
                         modification=modification,
                         treatment=treatment,
-                        collection_date=row['collection_date'],
+                        collection_date=coll_date,
                         collection_method=row['collection_method'],
                         description=row['biosample_description'],
                         json_type=json_type,
@@ -368,7 +370,7 @@ def handle_uploaded_biosample(request, uploaded_csv):
                         sample_id=row['sample_id'],
                         modification=modification,
                         treatment=treatment,
-                        collection_date=row['collection_date'],
+                        collection_date=coll_date,
                         collection_method=row['collection_method'],
                         description=row['biosample_description'],
                         json_type=json_type,
