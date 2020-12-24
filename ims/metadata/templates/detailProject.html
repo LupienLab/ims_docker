@@ -90,7 +90,7 @@
 				<th>Biosample</th>
 				<th>Assay</th>
 				<th>Created on</th>
-				<th>Created by</th>
+				<!--<th>Created by</th>-->
 			</tr>
 		</thead>
 		<tbody>
@@ -102,7 +102,7 @@
 				<td><a href="{% url 'detailBiosample' sample_pk=exp.biosample.pk %}">{{ exp.biosample.name }}</a></td>
 				<td>{{ exp.json_type }}</td>
 				<td>{{ exp.created_at }}</td>
-				<td>{{ exp.created_by }}</td>
+				<!--<td>{{ exp.created_by }}</td>-->
 			</tr>
 		{% endfor %}	
 		</tbody>
