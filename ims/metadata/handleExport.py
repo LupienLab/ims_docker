@@ -30,6 +30,11 @@ def handle_exportSequencingform(request,prj_pk):
     data_recipient_contact_name=request.POST.get('data_recipient_contact_name')
     data_recipient_contact_email=request.POST.get('data_recipient_contact_email')
     grant=request.POST.get('grant')
+    bp_length=request.POST.get('bp_length')
+    low_diversity_sample=request.POST.get('low_diversity_sample')
+    sequencing_type=request.POST.get('sequencing_type')
+    multiplexing_sequencing=request.POST.get('multiplexing_sequencing')
+    
     
     
     dt_string = now.strftime("%Y-%m-%d_%H-%M-%S")
@@ -47,7 +52,7 @@ def handle_exportSequencingform(request,prj_pk):
     ws.insert_rows = insert_rows
     
     contributor1 = prj.created_by
-    contributor2 = prj.contributor.all()
+    contributor2 = prj.contributor.all().order_by('first_name')
     
     membersList = []
     membersList.append(contributor1.get_full_name())
@@ -76,17 +81,33 @@ def handle_exportSequencingform(request,prj_pk):
         insert_rows(ws, row_idx= sampleRowNo, cnt = 1, above=False, copy_style=True)
         exp=Experiment.objects.get(pk=int(ep))
         #ws.insert_rows(sampleRowNo, amount=1,)
-        ws.cell(row=sampleRowNo, column=1).value = exp.name[0:24]
+        ws.cell(row=sampleRowNo, column=1).value = exp.uid
         ws.cell(row=sampleRowNo, column=2).value = exp.name
         ws.cell(row=sampleRowNo, column=3).value = exp.json_type.name
-        ws.cell(row=sampleRowNo, column=6).value = str(exp.biosample_quantity)+" "+exp.biosample_quantity_units.name
+        
+        ws.cell(row=sampleRowNo, column=4).value = exp.biosample.biosource.source_organism.name
+        
+        if(exp.biosample.sample_type):
+            ws.cell(row=sampleRowNo, column=5).value = exp.biosample.sample_type.name
+            
+        if(exp.biosample_quantity_units):
+            ws.cell(row=sampleRowNo, column=6).value = str(exp.biosample_quantity)+" "+exp.biosample_quantity_units
+        elif(exp.biosample_quantity):
+            ws.cell(row=sampleRowNo, column=6).value = str(exp.biosample_quantity)
+        else:
+            ws.cell(row=sampleRowNo, column=6).value = "value not filled in db"
+        
         ws.cell(row=sampleRowNo, column=12).value = buffer
+
         
         sampleRowNo += 1
         count += 1
     
-    
-    ws.cell(row=23+count, column=1).value = instructions
+    ws.cell(row=23+count, column=2).value = bp_length
+    ws.cell(row=24+count, column=2).value = low_diversity_sample
+    ws.cell(row=25+count, column=2).value = sequencing_type
+    ws.cell(row=26+count, column=2).value = multiplexing_sequencing
+    ws.cell(row=28+count, column=1).value = instructions
     
     
     wb.save(response)    

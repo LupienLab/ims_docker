@@ -21,6 +21,9 @@
 			<td><b>Experiment name:</b> {{ experiment.name }}</td>
 		</tr>
 		<tr>
+			<td><b>Experiment uid:</b> {{ experiment.uid }}</td>
+		</tr>
+		<tr>
 			<td><b>Biosource: </b><a href="{% url 'detailBiosource' source_pk=experiment.biosample.biosource.pk %}">{{ experiment.biosample.biosource }}</a></td>
 		</tr>
 		<tr>
@@ -28,6 +31,12 @@
 		</tr>
 		<tr>
 			<td><b>Biosample quantity: </b>{{ experiment.biosample_quantity }} {{experiment.biosample_quantity_units}}</td>
+		</tr>
+		<tr>
+			<td><b>Concentration of sample: </b>{{ experiment.concentration_of_sample }}</td>
+		</tr>
+		<tr>
+			<td><b>Volume of sample: </b>{{ experiment.volume_of_sample }}</td>
 		</tr>
 		<tr>
 			<td><b>Bio rep_no:</b> {{ experiment.bio_rep_no }}</td>

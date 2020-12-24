@@ -25,8 +25,8 @@ class ProjectForm(ModelForm):
 class ExperimentForm(ModelForm):
     class Meta:
         model = Experiment 
-        exclude = ('created_at','created_by','edited_at','edited_by','json_fields','biosample')
-        fields = ('name','biosample_quantity','biosample_quantity_units','bio_rep_no','tec_rep_no','json_type','protocol','description')
+        exclude = ('created_at','created_by','edited_at','edited_by','json_fields','biosample','uid')
+        fields = ('name','biosample_quantity','biosample_quantity_units','concentration_of_sample','volume_of_sample','bio_rep_no','tec_rep_no','json_type','protocol','description')
         widgets = {
             'protocol': RelatedFieldWidgetCanAdd(Treatment,'addProtocol'),
         }
@@ -51,7 +51,7 @@ class BiosampleForm(ModelForm):
     class Meta:
         model = Biosample
         exclude = ('created_at','created_by','edited_at','edited_by','json_fields', 'biosource')
-        fields = ('choose_existing','name','sample_id','collection_date','modification','treatment','collection_method','delivery_date','lab_name','contact_person','contact_info','description','json_type')
+        fields = ('choose_existing','name','sample_id','sample_type','collection_date','modification','treatment','collection_method','delivery_date','lab_name','contact_person','contact_info','description','json_type')
         widgets = {
             'collection_date': forms.DateInput(),
             'delivery_date': forms.DateInput(),
@@ -160,11 +160,30 @@ class ExperimentTagForm(ModelForm):
 
 
 class SequencingForm(forms.Form):
+    BP_CHOICES= [ 
+    ('50bp', '50bp'),
+    ('100bp', '100bp'),
+    ('75bp', '75bp'),
+    ('36bp', '36bp')
+    ]
+    SAMPLE_CHOICES=[
+        ('No','No'),
+        ('Yes','Yes')        
+        ]
+    SEQ_CHOICES=[
+        ('Paired-end','Paired-end'),
+        ('Single Read','Single Read')
+        ]
+    
     choose_experiments = forms.ModelMultipleChoiceField(queryset = Experiment.objects.all(), help_text="select all experiments to export")
     data_recipient_contact_name=forms.CharField(max_length=100, help_text="Data recipient contact name")
     data_recipient_contact_email=forms.EmailField()
     grant=forms.CharField(max_length=100,required=False, help_text="Grant or PO Number")
     buffer = forms.CharField(max_length=100, required=False, help_text="Buffer or media EB, PBS, Water, etc")
+    bp_length = forms.CharField(widget=forms.Select(choices=BP_CHOICES),help_text="bp length for sequencing")
+    low_diversity_sample = forms.CharField(widget=forms.Select(choices=SAMPLE_CHOICES),help_text="Low diversity sample")
+    sequencing_type = forms.CharField(widget=forms.Select(choices=SEQ_CHOICES),help_text="Sequencing Type")
+    multiplexing_sequencing = forms.CharField(widget=forms.Select(choices=SAMPLE_CHOICES),help_text="Multiplexing Sequencing")
     instructions = forms.CharField(widget=forms.Textarea, required=False, help_text="Experimental Conditions and Sequencing Instructions")
     
     class Meta:

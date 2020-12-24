@@ -27,7 +27,8 @@ from metadata.handle_upload import *
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
-
+import binascii
+import os
 #import metadata.extendSession
 # Create your views here.
 
@@ -377,6 +378,7 @@ class AddExperiment(LoginRequiredMixin, CreateView):
     form_class = ExperimentForm
     
     def form_valid(self, form):
+        form.instance.uid=binascii.hexlify(os.urandom(3)).decode()
         form.instance.created_by = self.request.user
         form.instance.edited_by = self.request.user
         form.instance.project=Project.objects.get(pk=self.kwargs['prj_pk'])
