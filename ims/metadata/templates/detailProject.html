@@ -85,6 +85,7 @@
 		<thead>
 			<tr>
 				<th>Name</th>
+				<th>UID</th>
 				<th>Biosource</th>
 				<th>Biosample</th>
 				<th>Assay</th>
@@ -96,6 +97,7 @@
 		{% for exp in experiment %}
 			<tr>
 				<td><a href="{% url 'detailExperiment' exp_pk=exp.pk %}">{{ exp.name }}</a></td>
+				<td>{{ exp.uid }}</td>
 				<td><a href="{% url 'detailBiosource' source_pk=exp.biosample.biosource.pk %}">{{ exp.biosample.biosource.name }}</a></td>
 				<td><a href="{% url 'detailBiosample' sample_pk=exp.biosample.pk %}">{{ exp.biosample.name }}</a></td>
 				<td>{{ exp.json_type }}</td>
