@@ -9,6 +9,7 @@ from django import forms
 from django.forms import ModelChoiceField
 from metadata.widgets import *
 from dal import autocomplete
+from dal import forward
 
 
 class ProjectForm(ModelForm):
@@ -40,13 +41,16 @@ class BiosourceForm(ModelForm):
         fields = ('choose_existing','name','disease','source_organism','description','json_type')
 
 class BiosampleForm(ModelForm):
-    choose_existing = ModelChoiceField(queryset = Biosample.objects.all(),required=False,widget=autocomplete.ModelSelect2(url='biosampleAutocomplete'), help_text='Choose from existing list')
+    
+    choose_existing = ModelChoiceField(queryset = Biosample.objects.all(),required=False, help_text='Choose from existing list')
     
     def __init__(self, *args, **kwargs):
         source_pk = kwargs.get('initial')['source_pk']
+        
         super(BiosampleForm, self).__init__(*args, **kwargs)
         if source_pk:
-            self.fields['choose_existing'].queryset = Biosample.objects.filter(biosource=source_pk)
+            
+            self.fields['choose_existing'] = ModelChoiceField(queryset = Biosample.objects.all(),required=False,widget=autocomplete.ModelSelect2(url='biosampleAutocomplete',forward=(forward.Const(source_pk, 'f4'),)), help_text='Choose from existing list')
     
     class Meta:
         model = Biosample

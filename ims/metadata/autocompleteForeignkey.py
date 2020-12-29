@@ -28,10 +28,17 @@ class BiosampleAutocomplete(autocomplete.Select2QuerySetView):
             return Biosample.objects.none()
  
         qs = Biosample.objects.all()
- 
+        
+        source_pk = self.forwarded.get('f4')
+
+        if source_pk:
+            qs = qs.filter(biosource=source_pk)
+        
         if self.q:
+            
             qs = qs.filter(name__istartswith=self.q)
- 
+        
+        
         return qs
 
 
