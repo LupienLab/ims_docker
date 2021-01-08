@@ -79,7 +79,7 @@ def handle_uploaded_experiments(request,uploaded_csv):
                     if(exp):
                         try:
                             new_exp=exp.make_clone(attrs={'name': row["experiment_name"],
-                                                      'uid':binascii.hexlify(os.urandom(3)).decode()
+                                                      'uid':binascii.hexlify(os.urandom(3)).decode(),
                                                       'biosample': sample,
                                                       'bio_rep_no': row["bio_rep_no"],
                                                       'tec_rep_no': row["tec_rep_no"],
