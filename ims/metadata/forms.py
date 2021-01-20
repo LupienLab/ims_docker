@@ -55,7 +55,7 @@ class BiosampleForm(ModelForm):
     class Meta:
         model = Biosample
         exclude = ('created_at','created_by','edited_at','edited_by','json_fields', 'biosource')
-        fields = ('choose_existing','name','sample_id','sample_type','collection_date','modification','treatment','collection_method','delivery_date','lab_name','contact_person','contact_info','description','json_type')
+        fields = ('choose_existing','name','sample_id','collection_date','modification','treatment','collection_method','delivery_date','lab_name','contact_person','contact_info','description','json_type')
         widgets = {
             'collection_date': forms.DateInput(),
             'delivery_date': forms.DateInput(),
