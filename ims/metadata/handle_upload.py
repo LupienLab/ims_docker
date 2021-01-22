@@ -265,12 +265,6 @@ def handle_uploaded_sequencingruns(request, prj_pk, uploaded_csv):
             if(prj==None):
                 messages.add_message(request, messages.WARNING, 'Project does not exist in line '+str(c))
                 return
-            if(center==None):
-                messages.add_message(request, messages.WARNING, 'sequencing_center name does not exist in line '+str(c))
-                return
-            if(instrument==None):
-                messages.add_message(request, messages.WARNING, 'sequencing_instrument name does not exist in line '+str(c))
-                return
             if(exp==None):
                 messages.add_message(request, messages.WARNING, 'experiment name does not exist in line '+str(c))
                 return
