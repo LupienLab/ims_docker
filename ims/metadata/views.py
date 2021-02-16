@@ -560,7 +560,8 @@ class EditSeqencingFile(LoginRequiredMixin, UpdateView):
     
     def get_initial(self):
         initial = super(EditSeqencingFile, self).get_initial()
-        initial.update({'prj_pk': self.kwargs['prj_pk']})
+        exp=SeqencingFile.objects.get(pk=self.kwargs['obj_pk']).experiment.pk
+        initial.update({'prj_pk': self.kwargs['prj_pk'],'exp_pk':exp})
         return initial
     
     def form_valid(self, form):

@@ -201,7 +201,14 @@ class SequencingForm(forms.Form):
             
     
     
+class selectExperimentsForm(forms.Form):
+    choose_experiments = forms.ModelMultipleChoiceField(queryset = Experiment.objects.all(), help_text="select all experiments to be exported")
     
+    def __init__(self, *args, **kwargs):  
+        prj_pk = kwargs.get('initial')['prj_pk']
+        super(selectExperimentsForm, self).__init__(*args, **kwargs)
+        if prj_pk:
+            self.fields['choose_experiments'].queryset = Experiment.objects.filter(project=prj_pk).order_by('-pk')
 
 
 

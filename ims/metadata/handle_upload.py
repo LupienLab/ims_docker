@@ -322,6 +322,8 @@ def handle_uploaded_biosample(request, uploaded_csv):
                 return
             
             if(checkSanity("collection_date",request,row,c) and  not(validate(row['collection_date']))):
+                messages.add_message(request, messages.WARNING, 'collection_date is incorrect in line '+str(c))
+            elif(not(checkSanity("collection_date",request,row,c))):
                 coll_date=""
             else:
                 coll_date=row['collection_date']

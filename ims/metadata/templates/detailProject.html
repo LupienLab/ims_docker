@@ -124,6 +124,10 @@
 
 	<br><hr>
 	<a href="{% url 'exportSequencingform' prj_pk=project.pk %}"><button type="button" class="btn btn-primary">Export Sequencingform</button></a>
+	<a href="{% url 'exportform' prj_pk=project.pk slug='GEO' %}"><button type="button" class="btn btn-primary">Export GEO form</button></a>
+	<a href="{% url 'exportform' prj_pk=project.pk slug='EGA' %}"><button type="button" class="btn btn-primary">Export EGA form</button></a>
+	<a href="{% url 'exportform' prj_pk=project.pk slug='IHEC' %}"><button type="button" class="btn btn-primary">Export IHEC form</button></a>
+	
 	<br><hr>
 	{% if sequencingRun %}
 	<h3>Sequencing run details</h6>

@@ -8,7 +8,8 @@
   <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     
-    <h3>{{form_name}}:</h3><br/>
+    <h3>{{form_name}}</h3><br/>
+	<h5>**Kindly note that all exported sheet from here need some manual input. Hence please complete the form manually before submission.</h5>
      
      {{ form|crispy }}
     

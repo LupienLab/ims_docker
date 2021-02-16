@@ -96,6 +96,7 @@ urlpatterns = [
     
     
     url(r'^exportSequencingform/(?P<prj_pk>[0-9]+)/$', exportSequencingform, name='exportSequencingform'),
+    url(r'^exportform/(?P<prj_pk>[0-9]+)/(?P<slug>[\w-]+)/$', exportform, name='exportform'),
     
     
 
