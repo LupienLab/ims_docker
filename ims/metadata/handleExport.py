@@ -89,8 +89,8 @@ def handle_exportSequencingform(request,prj_pk):
         
         ws.cell(row=sampleRowNo, column=4).value = exp.biosample.biosource.source_organism.name
         
-        if(exp.biosample.sample_type):
-            ws.cell(row=sampleRowNo, column=5).value = exp.biosample.sample_type.name
+#         if(exp.biosample.sample_type):
+#             ws.cell(row=sampleRowNo, column=5).value = exp.biosample.sample_type.name
             
         if(exp.biosample_quantity_units):
             ws.cell(row=sampleRowNo, column=6).value = str(exp.biosample_quantity)+" "+str(exp.biosample_quantity_units.name)
