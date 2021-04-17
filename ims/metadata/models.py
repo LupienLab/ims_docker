@@ -4,6 +4,8 @@ from django.contrib.postgres.fields import JSONField
 from metadata.validators import alphanumeric
 from django.utils.translation import gettext_lazy as _
 from model_clone import CloneMixin
+from email.policy import default
+from django.utils.timezone import now
 
 # Create your models here.
 
@@ -61,7 +63,7 @@ class Project(UserLog):
     )
 
     user_name_string = models.CharField(max_length=8, validators=[alphanumeric], help_text="Max length=8 char, user defined relevant string for the project (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
-    starting_date = models.DateField(help_text="When the project was started")
+    starting_date = models.DateField(help_text="When the project was started", default=now)
     disease_site =  models.ForeignKey(Choice, default=5,limit_choices_to={'class_type': "disease_site"}, related_name='disease_site', on_delete=models.CASCADE, help_text="Type of cancer")
     tissue_type = models.ManyToManyField(Choice, default=5, related_name='tissue_type', limit_choices_to={'class_type': "tissue_type"},help_text="Tissue type of cancer")
     name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="User defined relevant string for the project (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
