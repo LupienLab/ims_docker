@@ -17,7 +17,7 @@ class ProjectForm(ModelForm):
     class Meta:
         model = Project
         exclude = ('name','created_at','created_by','edited_at','edited_by',)
-        fields = ('user_name_string','starting_date','dsite1','tissue_type','contributor','status','description',)
+        fields = ('user_name_string','starting_date','ghut','tissue_type','contributor','status','description',)
     
     def __init__(self, *args, **kwargs):
         super(ProjectForm, self).__init__(*args, **kwargs)
