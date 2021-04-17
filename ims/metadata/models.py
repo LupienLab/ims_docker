@@ -73,13 +73,6 @@ class Project(UserLog):
     status = models.CharField(choices=STATUS_CHOICES, max_length=10, default="Active",
                               help_text="Is project currently in progress")
      
-#     name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the project (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
-#     related = models.ManyToManyField(ChoiceDisease, related_name='project_related', limit_choices_to={'class_type': "project_related"}, blank=True,  help_text="Name of the related body part or disease (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
-#     contributor = models.ManyToManyField(
-#         User, related_name='project_contibutor', blank=True, help_text="Collaborating members for this project")
-#     status = models.CharField(choices=STATUS_CHOICES, max_length=10, default="Active",
-#                               help_text="Is project currently in progress")
-
     def __str__(self):
         return self.name
 

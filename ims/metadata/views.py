@@ -1045,7 +1045,7 @@ def populateCharts(request,slug):
             js_project=json.dumps(tag_experiments)
         
         elif (slug.startswith("grid")):
-            diseaseList=list(Choice.objects.filter(class_type="disease_site").values_list('name', flat=True).order_by('id'))
+            diseaseList=list(ChoiceDisease.objects.filter(class_type="disease_site").values_list('name', flat=True).order_by('id'))
             assayList=list(JsonObj.objects.filter(json_type="experiment_type").values_list('name', flat=True).order_by('id'))
             cancer_matrix = []
             for row in diseaseList:
