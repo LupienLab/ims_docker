@@ -29,6 +29,8 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 import binascii
 import os
+import numpy as np
+from _collections import defaultdict, OrderedDict
 #import metadata.extendSession
 # Create your views here.
 
@@ -110,7 +112,7 @@ class BrowseProject(LoginRequiredMixin, View):
         if(len(obj)==0):
             obj = Project.objects.filter(exp_project__json_type__name=slug).order_by('-pk').distinct()
         if(len(obj)==0):
-            obj = Project.objects.filter(related__name=slug).order_by('-pk').distinct()
+            obj = Project.objects.filter(disease_site__name=slug).order_by('-pk').distinct()
         if(len(obj)==0):
             obj = Project.objects.filter(status=slug).order_by('-pk').distinct()
         context = {
@@ -152,6 +154,14 @@ class AddProject(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.created_by = self.request.user
         form.instance.edited_by = self.request.user
+        disease_site=Choice.objects.get(pk=self.request.POST.get('disease_site')).name
+        tissue_type=Choice.objects.get(pk=self.request.POST.get('tissue_type')).name
+        
+        name_string = "_".join([disease_site,tissue_type,self.request.POST.get('user_name_string'),self.request.user.last_name,self.request.POST.get('starting_date')])
+        
+        
+        form.instance.name = name_string
+        
         return super().form_valid(form)
      
 
@@ -449,6 +459,53 @@ class DeleteExperiment(LoginRequiredMixin, DeleteView):
     def get_success_url(self):
         return reverse('detailProject', kwargs={'prj_pk': self.prj_pk})
 
+class BrowseExperimentGrid(LoginRequiredMixin, View):
+    template_name = 'showExperiments.html'
+    
+    def get(self,request,slug_disease,slug_assay):
+        obj = Experiment.objects.filter(json_type__name=slug_assay, project__disease_site__name=slug_disease).order_by('-pk').distinct()
+        context = {
+            'object': obj,
+        }
+        
+        return render(request, self.template_name, context)
+
+class AddExperimentLabels(LoginRequiredMixin, View):
+    template_name = 'addExperimentLabels.html'
+    form_class = ExperimentLabelsFormSet
+
+    
+    def get(self,request,prj_pk):
+        formset = self.form_class()
+        for form in formset:
+            form.fields["experiments"].queryset = Experiment.objects.filter(project_id=prj_pk)
+        context = {
+            'formset': formset
+            
+        }
+        return render(request, self.template_name,context)
+    
+    def post(self,request,prj_pk):
+        formset = self.form_class(request.POST)
+        if formset.is_valid():
+            for form in formset:
+                cd = form.cleaned_data
+                selected_experiment=cd.get("experiments")
+                label=cd.get("label")
+                exp=Experiment.objects.get(pk=selected_experiment.pk)
+                exp.uid=label
+                exp.save()
+                
+            return HttpResponseRedirect('/detailProject/'+self.kwargs['prj_pk'])
+        else:
+            for form in formset:
+                form.fields["experiments"].queryset = Experiment.objects.filter(project_id=prj_pk)
+            context = {
+            'formset': formset
+            }
+            return render(request, self.template_name,context)
+        
+        
 ########################
 ###SequencingRun#######
 class AddSequencingRun(LoginRequiredMixin, CreateView):
@@ -964,7 +1021,8 @@ from django.db.models import Count
 
 @csrf_exempt                
 def populateCharts(request,slug):
-    if request.method == 'POST' and request.is_ajax():
+    
+    if request.method == 'POST':
         if (slug=="owner"):
             proj_owner=list(Project.objects.values('created_by__first_name').annotate(dcount=Count('created_by')).order_by())
             js_project=json.dumps(proj_owner)
@@ -974,7 +1032,7 @@ def populateCharts(request,slug):
             js_project=json.dumps(proj_owner)
             
         elif (slug=="disease"):
-            proj_owner=list(Project.objects.values('related__name').annotate(dcount=Count('related__name')).order_by())
+            proj_owner=list(Project.objects.values('disease_site__name').annotate(dcount=Count('disease_site__name')).order_by())
             js_project=json.dumps(proj_owner)
         
         elif (slug=="status"):
@@ -986,6 +1044,22 @@ def populateCharts(request,slug):
             tag_experiments=list(ExperimentTag.objects.filter(project=s[1]).values('name').annotate(dcount=Count('experiment')).order_by())
             js_project=json.dumps(tag_experiments)
         
+        elif (slug.startswith("grid")):
+            diseaseList=list(Choice.objects.filter(class_type="disease_site").values_list('name', flat=True).order_by('id'))
+            assayList=list(JsonObj.objects.filter(json_type="experiment_type").values_list('name', flat=True).order_by('id'))
+            cancer_matrix = []
+            for row in diseaseList:
+                new_row=[]
+                new_row.append(row)
+                for col in assayList:
+                    no_of_exp=len(Experiment.objects.filter(json_type__name=col, project__disease_site__name=row))
+                    new_row.append(no_of_exp)
+                    
+                cancer_matrix.append(new_row)
+                
+
+            js_project=cancer_matrix
+            
             
         return JsonResponse(js_project, safe=False)
     else :

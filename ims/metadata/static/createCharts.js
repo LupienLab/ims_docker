@@ -119,7 +119,7 @@ $.ajax({
      var chartlabel = [];
      var chartdata = [];
      for (var key in d) {
-    var value = d[key]["related__name"];
+    var value = d[key]["disease_site__name"];
     var ldata = d[key]["dcount"];
     chartlabel.push(value);
     chartdata.push(ldata);
@@ -268,6 +268,22 @@ var experimenttags = new Chart(ctx5, {
     }
 });
 }
+/*##############*/
+new gridjs.Grid({
+  search: true,
+  columns: ['Disease-site','ATAC-seq', 'Hi-C', 'ChIP-seq', 'RNA-seq', 'BS-seq'],
+  server: {
+	method: 'POST',
+    url: '/populateCharts/grid/',
+    then: data => data.map(card => [ gridjs.html(`${card[0]}`),
+                                     gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/ATAC-seq'>${card[1]}</a>`),
+                                     gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/Hi-C'>${card[2]}</a>`),
+                                     gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/ChIP-seq'>${card[3]}</a>`),
+                                     gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/RNA-seq'>${card[4]}</a>`),
+                                     gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/BS-seq'>${card[5]}</a>`),
+                          ])
+  } 
+}).render(document.getElementById("matrixDataGrid"));
 
+/*##############*/
 });
-

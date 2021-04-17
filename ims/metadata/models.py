@@ -59,8 +59,13 @@ class Project(UserLog):
         ('Active', 'Active'),
         ('Archived', 'Archived'),
     )
-    name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the project (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
-    related = models.ManyToManyField(ChoiceDisease, related_name='project_related', limit_choices_to={'class_type': "project_related"}, blank=True,  help_text="Name of the related body part or disease (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
+
+    user_name_string = models.CharField(max_length=8, validators=[alphanumeric], help_text="Max length=8 char, user defined relevant string for the project (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
+    starting_date = models.DateField(help_text="When the project was started")
+    disease_site =  models.ForeignKey(Choice, default=5,limit_choices_to={'class_type': "disease_site"}, related_name='disease_site', on_delete=models.CASCADE, help_text="Type of cancer")
+    tissue_type = models.ManyToManyField(Choice, default=5, related_name='tissue_type', limit_choices_to={'class_type': "tissue_type"},help_text="Tissue type of cancer")
+    name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="User defined relevant string for the project (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
+    #origin = models.ManyToManyField(ChoiceDisease, related_name='project_related', limit_choices_to={'class_type': "project_related"}, blank=True,  help_text="Name of the related body part or disease")
     contributor = models.ManyToManyField(
         User, related_name='project_contibutor', blank=True, help_text="Collaborating members for this project")
     status = models.CharField(choices=STATUS_CHOICES, max_length=10, default="Active",
@@ -149,7 +154,7 @@ class Biosample(UserLog, Contributing_Lab,CloneMixin):
 class Experiment(UserLog,CloneMixin): 
     project = models.ForeignKey(Project,related_name='exp_project', on_delete=models.CASCADE,)
     name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the experiment, e.g. K562-p11-DpnII-02202020-R1-T1 (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
-    uid = models.CharField(max_length=10, default="G7HXXY", help_text="uid for sequencing form")
+    uid = models.CharField(max_length=10, default="G7HXXY", help_text="Label for sequencing form")
     biosample = models.ForeignKey(Biosample,related_name='exp_biosample', null=False, on_delete=models.CASCADE, help_text="Related biosample")
     biosample_quantity = models.IntegerField(null=False, help_text="The amount of starting Biological sample going into the experiment")
     biosample_quantity_units = models.ForeignKey(Choice, related_name='biosample_quantity_units', limit_choices_to={'class_type': "quantity_units"}, null=True, blank=True, on_delete=models.SET_NULL, help_text="The units that go along with the biological sample quantity")

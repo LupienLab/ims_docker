@@ -22,14 +22,17 @@
 			<td><b>Name:</b> {{ project.name }}</td>
 		</tr>
 		<tr>
-			<td><b>Related:</b> <br /> 
-			{% if project.related.all %} 
-			{% for rel in project.related.all %}
+		    <td><b>Disease site:</b> {{ project.disease_site.name }}</td>
+		</tr>
+		<tr>
+			<td><b>Tissue type:</b>  <br />
+		{% if project.tissue_type.all %} 
+			{% for rel in project.tissue_type.all %}
 				({{forloop.counter }}) {{rel}}<br /> 
 			{% endfor %} 
 			{% else %} 
 				No relations added. 
-			{% endif %}
+			{% endif %}	
 			</td>
 		</tr>
 		<tr>
@@ -85,7 +88,7 @@
 		<thead>
 			<tr>
 				<th>Name</th>
-				<th>UID</th>
+				<th>Labels</th>
 				<th>Biosource</th>
 				<th>Biosample</th>
 				<th>Assay</th>
@@ -108,7 +111,9 @@
 		</tbody>
 		</table>
 	{% endif %} 
-	<br><hr><br>
+	<br>
+	<a href="{% url 'addExperimentLabels' prj_pk=project.pk %}"><button type="button" class="btn btn-primary">Add Experiment Labels</button></a>
+	<hr><br>
 	<h4 class="text-center">Experiment Tags</h4>
 	<input type="hidden" id="project_id"  value={{ project.pk }}>
 	<div class="container">

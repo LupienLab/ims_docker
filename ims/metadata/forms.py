@@ -10,17 +10,19 @@ from django.forms import ModelChoiceField
 from metadata.widgets import *
 from dal import autocomplete
 from dal import forward
-
+from ims import settings
+from django.forms import formset_factory
 
 class ProjectForm(ModelForm):
     class Meta:
         model = Project
-        exclude = ('created_at','created_by','edited_at','edited_by',)
-        fields = ('name','related','contributor','status','description',)
+        exclude = ('name','created_at','created_by','edited_at','edited_by',)
+        fields = ('user_name_string','starting_date','disease_site','tissue_type','contributor','status','description',)
     
     def __init__(self, *args, **kwargs):
         super(ProjectForm, self).__init__(*args, **kwargs)
-        self.fields['related'].queryset = self.fields['related'].queryset.order_by('name')
+        #self.fields['origin'].queryset = self.fields['origin'].queryset.order_by('name')
+        
     
 
 class ExperimentForm(ModelForm):
@@ -211,7 +213,24 @@ class selectExperimentsForm(forms.Form):
             self.fields['choose_experiments'].queryset = Experiment.objects.filter(project=prj_pk).order_by('-pk')
 
 
+class ExperimentLabelsForm(forms.Form):
+    experiments = forms.ModelChoiceField (Experiment.objects.all(), required=True,
+                                                   help_text="Select an experiment.")
+  
+    label = forms.CharField(
+        label='Experiment label',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter experiment label here'
+        })
+    ) 
 
+    def __init__(self, *args, **kwargs):
+        super(ExperimentLabelsForm, self).__init__(*args, **kwargs)
+        self.empty_permitted = False
+        
+        
+ExperimentLabelsFormSet = formset_factory(ExperimentLabelsForm, extra=1)
 
 
 

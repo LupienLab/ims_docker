@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Experiments</h1><br/>
+<div class="container">
+	{% if object %}
+	<table class="cell-border table-hover data_table">
+		<thead>
+			<tr>
+				<th style="width: 5%"></th>
+				<th>Project Name</th>
+				<th>Experiment Name</th>
+				<th>tissue_type</th>
+				<th>Disease-site</th>
+				<th>Assay</th>
+				<th>owner</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for experiment in object %}
+			<tr data-child-value="{{ experiment.description }}">
+				<td style="width: 5%" class="details-control"></td>
+				<td><a href="{% url 'detailProject' experiment.project.pk %}">{{ experiment.project.name }}</a></td>
+				<td><a href="{% url 'detailExperiment' experiment.pk %}">{{ experiment.name }}</a></td>
+				<td>{{ experiment.project.tissue_type.name }}</td>
+				<td>{{ experiment.project.disease_site.name  }}</td>
+				<td>{{ experiment.json_type.name  }}</td>
+				<td>{{ experiment.created_by  }}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	{% else %}
+	<p>No data available.</p>
+</div>
+{% endif %} {% endblock %}
