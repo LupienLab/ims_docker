@@ -61,18 +61,24 @@ class Project(UserLog):
         ('Active', 'Active'),
         ('Archived', 'Archived'),
     )
-
-    user_name_string = models.CharField(max_length=8, validators=[alphanumeric],  default="default" ,help_text="Max length=8 char, user defined relevant string for the project (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
-    starting_date = models.DateField(help_text="When the project was started", default=now)
-    disease_site =  models.ForeignKey(ChoiceDisease, default=5, limit_choices_to={'class_type': "disease_site"}, related_name='disease_site', on_delete=models.CASCADE, help_text="Type of cancer")
-    tissue_type = models.ManyToManyField(Choice, default=5, related_name='tissue_type', limit_choices_to={'class_type': "tissue_type"},help_text="Tissue type of cancer")
-    name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="User defined relevant string for the project (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
-    #origin = models.ManyToManyField(ChoiceDisease, related_name='project_related', limit_choices_to={'class_type': "project_related"}, blank=True,  help_text="Name of the related body part or disease")
+# 
+#     #user_name_string = models.CharField(max_length=8, validators=[alphanumeric],  default="default" ,help_text="Max length=8 char, user defined relevant string for the project (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
+#     starting_date = models.DateField(help_text="When the project was started", default=now)
+#     disease_site =  models.ForeignKey(ChoiceDisease, default=5, limit_choices_to={'class_type': "disease_site"}, related_name='disease_site', on_delete=models.CASCADE, help_text="Type of cancer")
+#     tissue_type = models.ManyToManyField(Choice, default=5, related_name='tissue_type', limit_choices_to={'class_type': "tissue_type"},help_text="Tissue type of cancer")
+#     name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="User defined relevant string for the project (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
+#     #origin = models.ManyToManyField(ChoiceDisease, related_name='project_related', limit_choices_to={'class_type': "project_related"}, blank=True,  help_text="Name of the related body part or disease")
+#     contributor = models.ManyToManyField(
+#         User, related_name='project_contibutor', blank=True, help_text="Collaborating members for this project")
+#     status = models.CharField(choices=STATUS_CHOICES, max_length=10, default="Active",
+#                               help_text="Is project currently in progress")
+#     
+    name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the project (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
+    related = models.ManyToManyField(ChoiceDisease, related_name='project_related', limit_choices_to={'class_type': "project_related"}, blank=True,  help_text="Name of the related body part or disease (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
     contributor = models.ManyToManyField(
         User, related_name='project_contibutor', blank=True, help_text="Collaborating members for this project")
     status = models.CharField(choices=STATUS_CHOICES, max_length=10, default="Active",
                               help_text="Is project currently in progress")
-    
 
     def __str__(self):
         return self.name
