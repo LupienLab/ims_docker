@@ -133,7 +133,7 @@ class Biosource(UserLog):
     
 
     
-class Biosample(UserLog, Contributing_Lab):
+class Biosample(UserLog, Contributing_Lab,CloneMixin):
     name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the biosample, e.g. HeLa-p14-11302019 (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
     biosource = models.ForeignKey(Biosource,related_name='sample_source', null=False, on_delete=models.CASCADE, help_text="Related biosource")
     sample_id = models.CharField(max_length=100, null=False, default="", help_text="Sample id / id given on sequencing form e.g. 080144A")
@@ -153,7 +153,7 @@ class Biosample(UserLog, Contributing_Lab):
 
 
  
-class Experiment(UserLog): 
+class Experiment(UserLog,CloneMixin): 
     project = models.ForeignKey(Project,related_name='exp_project', on_delete=models.CASCADE,)
     name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the experiment, e.g. K562-p11-DpnII-02202020-R1-T1 (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
     uid = models.CharField(max_length=10, default="G7HXXY", help_text="Label for sequencing form")
