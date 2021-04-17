@@ -18,6 +18,7 @@ class ProjectForm(ModelForm):
         model = Project
 #         exclude = ('name','created_at','created_by','edited_at','edited_by',)
 #         fields = ('user_name_string','starting_date','disease_site','tissue_type','contributor','status','description',)
+        fields = ('contributor','status','description',)
     
     def __init__(self, *args, **kwargs):
         super(ProjectForm, self).__init__(*args, **kwargs)
