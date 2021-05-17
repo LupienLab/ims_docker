@@ -28,7 +28,7 @@ urlpatterns = [
     url(r'^detailExperiment/(?P<exp_pk>[0-9]+)/$', DetailExperiment.as_view(), name='detailExperiment'),
     url(r'^editExperiment/(?P<exp_pk>[0-9]+)/$', EditExperiment.as_view(), name='editExperiment'),
     url(r'^deleteExperiment/(?P<exp_pk>[0-9]+)/$', DeleteExperiment.as_view(), name='deleteExperiment'),
-    url(r'^browseExperimentGrid/(?P<slug_disease>[\w-]+)/(?P<slug_assay>[\w-]+)/$', BrowseExperimentGrid.as_view(), name='browseExperimentGrid'),
+    url(r'^browseExperimentGrid/(?P<slug_disease>[\w\ \(\)-]+)/(?P<slug_assay>[\w-]+)/$', BrowseExperimentGrid.as_view(), name='browseExperimentGrid'),
     url(r'^addExperimentLabels/(?P<prj_pk>[0-9]+)/$', AddExperimentLabels.as_view(), name='addExperimentLabels'),
     
     url(r'^addBiosource/(?P<prj_pk>[0-9]+)/$', AddBiosource.as_view(), name='addBiosource'),
