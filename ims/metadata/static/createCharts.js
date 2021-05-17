@@ -271,7 +271,7 @@ var experimenttags = new Chart(ctx5, {
 /*##############*/
 new gridjs.Grid({
   search: true,
-  columns: ['Disease-site','ATAC-seq', 'Hi-C', 'ChIP-seq', 'RNA-seq', 'BS-seq'],
+  columns: ['Disease-site','ATAC-seq', 'Hi-C', 'ChIP-seq', 'RNA-seq', 'scATAC', 'scATAC-RNAseq-multiome', 'BS-seq'],
   server: {
 	method: 'POST',
     url: '/populateCharts/grid/',
@@ -280,9 +280,19 @@ new gridjs.Grid({
                                      gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/Hi-C'>${card[2]}</a>`),
                                      gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/ChIP-seq'>${card[3]}</a>`),
                                      gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/RNA-seq'>${card[4]}</a>`),
-                                     gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/BS-seq'>${card[5]}</a>`),
+                                     gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/scATAC'>${card[5]}</a>`),
+                                     gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/scATAC-RNAseq-multiome'>${card[6]}</a>`),
+                                     gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/BS-seq'>${card[7]}</a>`),
                           ])
-  } 
+  } ,
+    style: {
+    table: {
+      'word-wrap': 'initial',
+	  'text-overflow': 'initial',
+	   'width': 'initial'
+    }
+  }
+
 }).render(document.getElementById("matrixDataGrid"));
 
 /*##############*/
