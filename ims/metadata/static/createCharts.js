@@ -272,9 +272,23 @@ var experimenttags = new Chart(ctx5, {
 new gridjs.Grid({
   search: true,
   columns: ['Disease-site','ATAC-seq', 'Hi-C', 'ChIP-seq', 'RNA-seq', 'scATAC', 'scATAC-RNAseq-multiome', 'BS-seq'],
+  sort: {
+    multiColumn: false,
+    server: {
+      url: (prev, columns) => {
+       if (!columns.length) return prev;
+       
+       const col = columns[0];
+       const dir = col.direction === 1 ? 'True' : 'False';
+       let colName = ['Disease-site','ATAC-seq', 'Hi-C', 'ChIP-seq', 'RNA-seq', 'scATAC', 'scATAC-RNAseq-multiome', 'BS-seq'][col.index];
+       
+       return `${prev}+${colName}+${dir}`;
+     }
+    }
+  },
   server: {
 	method: 'POST',
-    url: '/populateCharts/grid/',
+    url: '/populateCharts/grid',
     then: data => data.map(card => [ gridjs.html(`${card[0]}`),
                                      gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/ATAC-seq'>${card[1]}</a>`),
                                      gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/Hi-C'>${card[2]}</a>`),
@@ -286,11 +300,7 @@ new gridjs.Grid({
                           ])
   } ,
     style: {
-    table: {
-      'word-wrap': 'initial',
-	  'text-overflow': 'initial',
-	   'width': 'initial'
-    }
+   
   }
 
 }).render(document.getElementById("matrixDataGrid"));

@@ -29,7 +29,9 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 import binascii
 import os
+import pandas as pd
 import numpy as np
+import ast
 from _collections import defaultdict, OrderedDict
 #import metadata.extendSession
 # Create your views here.
@@ -155,9 +157,14 @@ class AddProject(LoginRequiredMixin, CreateView):
         form.instance.created_by = self.request.user
         form.instance.edited_by = self.request.user
         disease_site=ChoiceDisease.objects.get(pk=self.request.POST.get('disease_site')).name
+        disease_acr=disease_site.split("(")
+        if(len(disease_acr)>1):
+            site=disease_acr[1].split(")")[0]
+        else:
+            site=disease_acr[0]
         tissue_type=Choice.objects.get(pk=self.request.POST.get('tissue_type')).name
         
-        name_string = "_".join([disease_site,tissue_type,self.request.POST.get('user_name_string'),self.request.user.last_name,self.request.POST.get('starting_date')])
+        name_string = "_".join([site,tissue_type,self.request.POST.get('user_name_string'),self.request.user.last_name,self.request.POST.get('starting_date')])
         
         
         form.instance.name = name_string
@@ -1053,19 +1060,45 @@ def populateCharts(request,slug):
             js_project=json.dumps(tag_experiments)
         
         elif (slug.startswith("grid")):
-            diseaseList=list(ChoiceDisease.objects.filter(class_type="disease_site").values_list('name', flat=True).order_by('id'))
-            assayList=list(JsonObj.objects.filter(json_type="experiment_type").values_list('name', flat=True).order_by('id'))
-            cancer_matrix = []
-            for row in diseaseList:
-                new_row=[]
-                new_row.append(row)
-                for col in assayList:
-                    no_of_exp=len(Experiment.objects.filter(json_type__name=col, project__disease_site__name=row))
-                    new_row.append(no_of_exp)
-                    
-                cancer_matrix.append(new_row)
+            slug_vals=slug.split("+")
+            if(len(slug_vals)==1):
+                diseaseList=list(ChoiceDisease.objects.filter(class_type="disease_site").values_list('name', flat=True).order_by('id'))
+                assayList=list(JsonObj.objects.filter(json_type="experiment_type").values_list('name', flat=True).order_by('id'))
+                cancer_matrix = []
+                for row in diseaseList:
+                    new_row=[]
+                    new_row.append(row)
+                    for col in assayList:
+                        no_of_exp=len(Experiment.objects.filter(json_type__name=col, project__disease_site__name=row))
+                        new_row.append(no_of_exp)
+                        
+                    cancer_matrix.append(new_row)
+            else:
+                diseaseList=list(ChoiceDisease.objects.filter(class_type="disease_site").values_list('name', flat=True).order_by('id'))
+                assayList=list(JsonObj.objects.filter(json_type="experiment_type").values_list('name', flat=True).order_by('id'))
+                cancer_matrix = []
+                for row in diseaseList:
+                    new_row=[]
+                    new_row.append(row)
+                    for col in assayList:
+                        no_of_exp=len(Experiment.objects.filter(json_type__name=col, project__disease_site__name=row))
+                        new_row.append(no_of_exp)
+                        
+                    cancer_matrix.append(new_row)
                 
+                np_cancer=np.array(cancer_matrix)
+                
+                column_values = ['Disease-site','ATAC-seq', 'Hi-C', 'ChIP-seq', 'RNA-seq', 'scATAC', 'scATAC-RNAseq-multiome', 'BS-seq']
+                
+                df = pd.DataFrame(data = np_cancer, columns = column_values)
+                
+                cancer_matrix=df.sort_values(by=slug_vals[1], ascending=ast.literal_eval(slug_vals[2]))
+                result = cancer_matrix.to_json(orient="values")
+                parsed = json.loads(result)
 
+                
+                cancer_matrix=parsed
+                
             js_project=cancer_matrix
             
             
