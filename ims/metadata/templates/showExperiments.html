@@ -21,7 +21,11 @@
 				<td style="width: 5%" class="details-control"></td>
 				<td><a href="{% url 'detailProject' experiment.project.pk %}">{{ experiment.project.name }}</a></td>
 				<td><a href="{% url 'detailExperiment' experiment.pk %}">{{ experiment.name }}</a></td>
-				<td>{{ experiment.project.tissue_type.name }}</td>
+				<td>
+				{% for tissue in experiment.project.tissue_type.all %}
+					({{ forloop.counter }}) {{ tissue.name }}<br/>
+				{% endfor %}
+				</td>
 				<td>{{ experiment.project.disease_site.name  }}</td>
 				<td>{{ experiment.json_type.name  }}</td>
 				<td>{{ experiment.created_by  }}</td>
