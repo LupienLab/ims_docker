@@ -382,15 +382,15 @@ class EditBiosample(LoginRequiredMixin, UpdateView):
 class DeleteBiosample(LoginRequiredMixin, DeleteView):
     model = Biosample
     template_name = 'delete.html'
-    prj_pk = None
+    biosource_pk = None
     
     def get_object(self):
         sample = get_object_or_404(Biosample, pk=self.kwargs['obj_pk'])
-        self.prj_pk = sample.exp_biosample.all()[0].pk
+        self.biosource_pk = sample.biosource.pk
         return sample
     
     def get_success_url(self):
-        return reverse('detailProject', kwargs={'prj_pk': self.prj_pk})
+        return reverse('detailBiosource', kwargs={'source_pk': self.biosource_pk})
 
 
     

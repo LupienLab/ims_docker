@@ -51,10 +51,25 @@ def createJSON(json_type,row):
         data[keys] = formVal
     json_data = json.dumps(data)
     return(json_data)
+
+def removeStar(old_cols):
+    newList=[]
+    for i in old_cols:
+        if("*" in i):
+            newList.append(i[:-1])
+        else:
+            newList.append(i)
+    return newList
     
 def handle_uploaded_experiments(request,uploaded_csv):
     df = pd.read_csv(uploaded_csv)
+    
+    old_cols=list(df.columns)
+    new_cols=removeStar(old_cols)
+    df.columns=new_cols
+    
     df=df.sort_values(by=['experiment_name'])
+    
     c=2
     errorList=[]
     for index, row in df.iterrows():
@@ -62,6 +77,10 @@ def handle_uploaded_experiments(request,uploaded_csv):
             source = get_or_none(Biosource,name=row['biosource'])
             sample = get_or_none(Biosample,name=row["biosample_name"])
             exp = get_or_none(Experiment,name=row["experimentToClone"])
+            if(row["experiment_label"] and not(str(row["experiment_label"])=="nan")):
+                uid = row["experiment_label"]
+            else:
+                uid = binascii.hexlify(os.urandom(3)).decode()
             
             if(source==None):
                 messages.add_message(request, messages.WARNING, 'Biosource is incorrect in line '+str(c))
@@ -79,7 +98,7 @@ def handle_uploaded_experiments(request,uploaded_csv):
                     if(exp):
                         try:
                             new_exp=exp.make_clone(attrs={'name': row["experiment_name"],
-                                                      'uid':binascii.hexlify(os.urandom(3)).decode(),
+                                                      'uid':uid,
                                                       'biosample': sample,
                                                       'bio_rep_no': row["bio_rep_no"],
                                                       'tec_rep_no': row["tec_rep_no"],
@@ -89,9 +108,12 @@ def handle_uploaded_experiments(request,uploaded_csv):
                             json_vals=json.loads(new_exp.json_fields)
                             if(checkSanity("library_preparation_date",request,row,c) and  validate(row['library_preparation_date'])):
                                 json_vals["library_preparation_date"]=row["library_preparation_date"]
+                            if(new_exp.json_type.name=="ChIP-seq") and checkSanity("antibody",request,row,c):
+                                json_vals["antibody"]=row["antibody"]
+                                json_vals["antibody_dilution"]=row["antibody_dilution"]
                             new_exp.json_fields=json.dumps(json_vals)
                             new_exp.save()
-                            print("New experiment cloned pk: "+str(new_exp.pk))
+                            #print("New experiment cloned pk: "+str(new_exp.pk))
                             
                         except IntegrityError:
                             messages.add_message(request, messages.WARNING, 'Same experiment name exists in the database, should be unique name.')
@@ -104,6 +126,7 @@ def handle_uploaded_experiments(request,uploaded_csv):
                     if(exp):    
                         try:
                             new_exp=exp.make_clone(attrs={'name': row["experiment_name"],
+                                                          'uid':uid,
                                                           'bio_rep_no': row["bio_rep_no"],
                                                           'tec_rep_no': row["tec_rep_no"],
                                                           'created_by': request.user,
@@ -112,6 +135,9 @@ def handle_uploaded_experiments(request,uploaded_csv):
                             json_vals=json.loads(new_exp.json_fields)
                             if(checkSanity("library_preparation_date",request,row,c) and  validate(row['library_preparation_date'])):
                                 json_vals["library_preparation_date"]=row["library_preparation_date"]
+                            if(new_exp.json_type.name=="ChIP-seq") and checkSanity("antibody",request,row,c):
+                                json_vals["antibody"]=row["antibody"]
+                                json_vals["antibody_dilution"]=row["antibody_dilution"]
                             new_exp.json_fields=json.dumps(json_vals)
                             new_exp.save()
                             
@@ -137,6 +163,11 @@ def handle_uploaded_experiments(request,uploaded_csv):
                     
 def handle_uploaded_sequencingfiles(request, prj_pk, uploaded_csv):
     df = pd.read_csv(uploaded_csv)
+    
+    old_cols=list(df.columns)
+    new_cols=removeStar(old_cols)
+    df.columns=new_cols
+    
     df=df.sort_values(by=['file_path'])
     c=2
     errorList=[]
@@ -207,6 +238,11 @@ def handle_uploaded_sequencingfiles(request, prj_pk, uploaded_csv):
  
 def handle_uploaded_biosource(request, uploaded_csv):
     df = pd.read_csv(uploaded_csv)
+    
+    old_cols=list(df.columns)
+    new_cols=removeStar(old_cols)
+    df.columns=new_cols
+    
     c=2
     errorList=[]
     for index, row in df.iterrows():
@@ -245,6 +281,12 @@ def handle_uploaded_biosource(request, uploaded_csv):
      
 def handle_uploaded_sequencingruns(request, prj_pk, uploaded_csv):
     df = pd.read_csv(uploaded_csv)
+    
+    old_cols=list(df.columns)
+    new_cols=removeStar(old_cols)
+    df.columns=new_cols
+    
+    
     c=2
     errorList=[]
     
@@ -302,6 +344,12 @@ def handle_uploaded_sequencingruns(request, prj_pk, uploaded_csv):
 
 def handle_uploaded_biosample(request, uploaded_csv):
     df = pd.read_csv(uploaded_csv)
+    
+    old_cols=list(df.columns)
+    new_cols=removeStar(old_cols)
+    df.columns=new_cols
+    
+    
     c=2
     errorList=[]
     for index, row in df.iterrows():
@@ -324,7 +372,7 @@ def handle_uploaded_biosample(request, uploaded_csv):
             if(checkSanity("collection_date",request,row,c) and  not(validate(row['collection_date']))):
                 messages.add_message(request, messages.WARNING, 'collection_date is incorrect in line '+str(c))
             elif(not(checkSanity("collection_date",request,row,c))):
-                coll_date=""
+                coll_date=None
             else:
                 coll_date=row['collection_date']
             

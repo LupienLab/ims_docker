@@ -1,5 +1,8 @@
 {% extends 'base.html' %}
 {% block content %}
+
+{% load tags %}
+
 <h1>Experiments</h1><br/>
 <div class="container">
 	{% if object %}
@@ -12,6 +15,11 @@
 				<th>tissue_type</th>
 				<th>Disease-site</th>
 				<th>Assay</th>
+				{% with object.all|first as assay %}
+				  {% if assay.json_type.name == "ChIP-seq" %}
+					<th>Target</th>
+				  {% endif %}
+				{% endwith %}
 				<th>owner</th>
 			</tr>
 		</thead>
@@ -28,6 +36,14 @@
 				</td>
 				<td>{{ experiment.project.disease_site.name  }}</td>
 				<td>{{ experiment.json_type.name  }}</td>
+				{% if experiment.json_type.name == "ChIP-seq" %}
+				{% json_saved_data experiment.json_fields as jsonEntry %} 
+				{% for keys, values in jsonEntry.items %}
+				    {% if keys == "targeted_factor" %}
+                      <td>{{ values }}</td> 
+                    {% endif %}	
+				{% endfor %}
+				{% endif %}	
 				<td>{{ experiment.created_by  }}</td>
 			</tr>
 			{% endfor %}
