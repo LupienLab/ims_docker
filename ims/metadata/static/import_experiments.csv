@@ -1,2 +1,2 @@
-experiment_name*,biosource*,biosample_name,experimentToClone*,bio_rep_no*,tec_rep_no*,library_preparation_date*,experiment_description,experiment_label,antibody,antibody_dilution
-#,Item: Biosource,Item: Biosample,,,,(YYYY-MM-DD),,,ChIP-seq only,ChIP-seq only
+experiment_name*,biosource*,biosample_name,experimentToClone*,bio_rep_no*,tec_rep_no*,library_preparation_date*,experiment_description,experiment_label,antibody,antibody_dilution,targeted_factor
+#,Item: Biosource,Item: Biosample,,,,(YYYY-MM-DD),,,ChIP-seq only,ChIP-seq only,ChIP-seq only

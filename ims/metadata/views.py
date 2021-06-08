@@ -181,11 +181,16 @@ class EditProject(LoginRequiredMixin, UpdateView):
         form.instance.edited_by = self.request.user
         form.instance.edited_at = timezone.now()
         disease_site=ChoiceDisease.objects.get(pk=self.request.POST.get('disease_site')).name
+        disease_acr=disease_site.split("(")
+        if(len(disease_acr)>1):
+            site=disease_acr[1].split(")")[0]
+        else:
+            site=disease_acr[0]
         tissue_type=Choice.objects.get(pk=self.request.POST.get('tissue_type')).name
         
-        name_string = "_".join([disease_site,tissue_type,self.request.POST.get('user_name_string'),self.request.user.last_name,self.request.POST.get('starting_date')])
+        name_string = "_".join([site,tissue_type,self.request.POST.get('user_name_string'),self.request.user.last_name,self.request.POST.get('starting_date')])
         
-        
+      
         form.instance.name = name_string
         
         return super().form_valid(form)

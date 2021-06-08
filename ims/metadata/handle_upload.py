@@ -111,6 +111,7 @@ def handle_uploaded_experiments(request,uploaded_csv):
                             if(new_exp.json_type.name=="ChIP-seq") and checkSanity("antibody",request,row,c):
                                 json_vals["antibody"]=row["antibody"]
                                 json_vals["antibody_dilution"]=row["antibody_dilution"]
+                                json_vals["targeted_factor"]=row["targeted_factor"]
                             new_exp.json_fields=json.dumps(json_vals)
                             new_exp.save()
                             #print("New experiment cloned pk: "+str(new_exp.pk))
@@ -138,6 +139,7 @@ def handle_uploaded_experiments(request,uploaded_csv):
                             if(new_exp.json_type.name=="ChIP-seq") and checkSanity("antibody",request,row,c):
                                 json_vals["antibody"]=row["antibody"]
                                 json_vals["antibody_dilution"]=row["antibody_dilution"]
+                                json_vals["targeted_factor"]=row["targeted_factor"]
                             new_exp.json_fields=json.dumps(json_vals)
                             new_exp.save()
                             
