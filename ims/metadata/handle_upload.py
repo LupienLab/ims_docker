@@ -188,6 +188,7 @@ def handle_uploaded_sequencingfiles(request, prj_pk, uploaded_csv):
                 messages.add_message(request, messages.WARNING, 'Incorrect project name  in line '+str(c))
                 return
             path = row['file_path']
+            archived_path = row['archived_path']
             read_length = row['read_length']
             md5sum = row['md5sum']
             pair= row['paired']
@@ -208,6 +209,7 @@ def handle_uploaded_sequencingfiles(request, prj_pk, uploaded_csv):
                             edited_by=request.user,
                             file_format=get_or_none(Choice,name='fastq'),
                             cluster_path=path,
+                            archived_path=archived_path,
                             md5sum=md5sum,
                             run=run,
                             experiment=exp,

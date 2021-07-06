@@ -211,6 +211,7 @@ class SeqencingFile(UserLog):
     )    
     read_length = models.IntegerField(null=True, blank=True, help_text="Length of sequencing reads in base pairs for fastq files")
     cluster_path = models.CharField(max_length=1000, null=False, default="", help_text="Path on the cluster including the file name and extension e.g /mnt/work1/users/lupiengroup/Projects/folder/test.fastq.gz")
+    archived_path = models.CharField(max_length=1000, null=True, blank=True,default="", help_text="Path on the S3 if the data is archived")
     md5sum = models.CharField(max_length=32, null=True, blank=True, default="",help_text="md5sum")
     related_files = models.ForeignKey('SeqencingFile', null=True, blank=True,on_delete=models.SET_NULL, help_text="Related paired file reference")
     run = models.ForeignKey(SequencingRun, related_name='file_run', on_delete=models.CASCADE)
