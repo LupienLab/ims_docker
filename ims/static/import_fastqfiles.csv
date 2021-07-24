@@ -1,2 +1,0 @@
-file_path,archived_path,experiment_name,sequencing_run_name,read_length,md5sum,paired
-#,S3 path,Item: Experiment,Item: SequencingRun,,,(1;2;index)
