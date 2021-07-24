@@ -594,6 +594,42 @@ class DeleteSequencingRun(LoginRequiredMixin, DeleteView):
     
     def get_success_url(self):
         return reverse('detailProject', kwargs={'prj_pk': self.prj_pk})
+    
+    
+class ArchiveSequencingRun(LoginRequiredMixin,View):
+    template_name = 'archiveRunForm.html'
+    form_class = ArchiveSequencingRunForm
+    
+    def get(self,request,prj_pk):
+        form = self.form_class()
+        form.fields["run_name"].queryset = SequencingRun.objects.filter(project=self.kwargs['prj_pk']).order_by('-pk')
+        context = {
+            'form': form
+            
+        }
+        return render(request, self.template_name,context)
+    
+    def post(self,request,prj_pk):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            archive_path=cd.get("archive_path")
+            runs=cd.get("run_name")
+            for srun in runs:
+                rfiles=SeqencingFile.objects.filter(run=srun)
+                if(len(rfiles)>0):
+                    for file in rfiles:
+                        file.archived_path=archive_path
+                        file.save()
+            return HttpResponseRedirect('/detailProject/'+self.kwargs['prj_pk'])
+        else:
+            form.fields["run_name"].queryset = SequencingRun.objects.filter(project=self.kwargs['prj_pk']).order_by('-pk')
+            context = {
+            'form': form
+            }
+            return render(request, self.template_name,context)
+        
+    
 
 ########################
 ###SequencingFile#######

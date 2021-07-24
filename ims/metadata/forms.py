@@ -233,6 +233,13 @@ class ExperimentLabelsForm(forms.Form):
         
 ExperimentLabelsFormSet = formset_factory(ExperimentLabelsForm, extra=1)
 
+class ArchiveSequencingRunForm(forms.Form):
+    run_name = forms.ModelMultipleChoiceField(queryset = SequencingRun.objects.all(), help_text="Run to be archived. All related sequencing file path will be updated with the archived path.")
+    archive_path = forms.CharField(max_length=1000, required=False, help_text="S3 path, where files are archived")
+    
+    def __init__(self, *args, **kwargs):
+        super(ArchiveSequencingRunForm, self).__init__(*args, **kwargs)
+        self.empty_permitted = False
 
 
 

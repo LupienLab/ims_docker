@@ -113,6 +113,7 @@
 	{% endif %} 
 	<br>
 	<a href="{% url 'addExperimentLabels' prj_pk=project.pk %}"><button type="button" class="btn btn-primary">Add Experiment Labels</button></a>
+	<a href="{% url 'archiveSequencingRun' prj_pk=project.pk %}"><button type="button" class="btn btn-primary">Archive Run</button></a>
 	<hr><br>
 	<h4 class="text-center">Experiment Tags</h4>
 	<input type="hidden" id="project_id"  value={{ project.pk }}>
