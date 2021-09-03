@@ -16,7 +16,7 @@ from django.forms import formset_factory
 class ProjectForm(ModelForm):
     class Meta:
         model = Project
-        exclude = ('name','created_at','created_by','edited_at','edited_by',)
+        exclude = ('name','created_at','created_by','edited_at','edited_by','lab_name')
         fields = ('user_name_string','starting_date','disease_site','tissue_type','contributor','status','description',)
         #fields = ('contributor','status','description',)
     

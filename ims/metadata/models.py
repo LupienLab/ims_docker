@@ -72,14 +72,17 @@ class Project(UserLog):
         User, related_name='project_contibutor', blank=True, help_text="Collaborating members for this project")
     status = models.CharField(choices=STATUS_CHOICES, max_length=10, default="Active",
                               help_text="Is project currently in progress")
+    
+    lab_name = models.ManyToManyField(Choice, related_name='lab_project', limit_choices_to={'class_type': "lab_name"}, blank=True, help_text="To which the lab project belong")
      
-    def __str__(self):
-        return self.name
+    def __str__(self): 
+        return self.name 
 
     class Meta:
         ordering = ['-pk']
+        unique_together = ('name',)
         
-        
+         
 
 
 class Protocol(UserLog):

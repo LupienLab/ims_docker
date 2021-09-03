@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load tags %}
+{% load static %}
+{% block content %}
+<style>
+
+.mystyle td, th {
+    width: 295px;
+}
+
+</style>
+<script>
+$(document).ready(function() {
+$("#upload").on("click",function(){
+    var jsonstring = JSON.stringify(JSON.parse("{{df|escapejs}}"));
+    $("#htmldf").val(jsonstring);
+  });
+} );
+</script>
+
+<h1>Uploding {{target}}</h1><br/>
+<h5>**Line numbered as 0 will not be added to the database, it is suppose to be an example line.</h5><br/>
+<div class="container">
+   {% if messages %}
+    {% for message in messages %}
+    	<p{% if message.tags %} class="alert-{{ message.tags }} alert"{% endif %}>{{ message }}</p>
+    {% endfor %}
+	{% endif %}
+	
+	<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="gridjs-wrapper" id="tabledata">{{dataFrame|safe}}</div><br/>
+    <input type="hidden" id="htmldf" name="htmldf">
+    <button name="upload" type="submit" id="upload" class="btn btn-primary">Upload</button>
+	<button name="cancel" type="submit" class="btn btn-danger">Cancel</button>
+	
+  </form>
+
+</div>
+ {% endblock %}

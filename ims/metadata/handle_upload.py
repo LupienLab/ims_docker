@@ -13,6 +13,7 @@ import pandas as pd
 import datetime
 import binascii
 import os
+from django.shortcuts import render, get_object_or_404, redirect
 
 def get_or_none(classmodel, **kwargs):
     try:
@@ -61,13 +62,8 @@ def removeStar(old_cols):
             newList.append(i)
     return newList
     
-def handle_uploaded_experiments(request,uploaded_csv):
-    df = pd.read_csv(uploaded_csv)
-    
-    old_cols=list(df.columns)
-    new_cols=removeStar(old_cols)
-    df.columns=new_cols
-    
+def handle_uploaded_experiments(request,inputdf):
+    df = inputdf
     df=df.sort_values(by=['experiment_name'])
     
     c=2
@@ -163,13 +159,8 @@ def handle_uploaded_experiments(request,uploaded_csv):
     else:
         messages.add_message(request, messages.SUCCESS, 'All experiments are added successfully')
                     
-def handle_uploaded_sequencingfiles(request, prj_pk, uploaded_csv):
-    df = pd.read_csv(uploaded_csv)
-    
-    old_cols=list(df.columns)
-    new_cols=removeStar(old_cols)
-    df.columns=new_cols
-    
+def handle_uploaded_sequencingfiles(request, prj_pk, inputdf):
+    df = inputdf
     df=df.sort_values(by=['file_path'])
     c=2
     errorList=[]
@@ -240,13 +231,8 @@ def handle_uploaded_sequencingfiles(request, prj_pk, uploaded_csv):
 
 
  
-def handle_uploaded_biosource(request, uploaded_csv):
-    df = pd.read_csv(uploaded_csv)
-    
-    old_cols=list(df.columns)
-    new_cols=removeStar(old_cols)
-    df.columns=new_cols
-    
+def handle_uploaded_biosource(request, inputdf):
+    df = inputdf
     c=2
     errorList=[]
     for index, row in df.iterrows():
@@ -283,14 +269,8 @@ def handle_uploaded_biosource(request, uploaded_csv):
          
 
      
-def handle_uploaded_sequencingruns(request, prj_pk, uploaded_csv):
-    df = pd.read_csv(uploaded_csv)
-    
-    old_cols=list(df.columns)
-    new_cols=removeStar(old_cols)
-    df.columns=new_cols
-    
-    
+def handle_uploaded_sequencingruns(request,prj_pk,inputdf):
+    df = inputdf
     c=2
     errorList=[]
     
@@ -346,14 +326,8 @@ def handle_uploaded_sequencingruns(request, prj_pk, uploaded_csv):
     
     
 
-def handle_uploaded_biosample(request, uploaded_csv):
-    df = pd.read_csv(uploaded_csv)
-    
-    old_cols=list(df.columns)
-    new_cols=removeStar(old_cols)
-    df.columns=new_cols
-    
-    
+def handle_uploaded_biosample(request, inputdf):
+    df = inputdf
     c=2
     errorList=[]
     for index, row in df.iterrows():
@@ -439,4 +413,11 @@ def handle_uploaded_biosample(request, uploaded_csv):
     else:
         messages.add_message(request, messages.SUCCESS, 'All biosample objects are added successfully')
     
-    
+def getdf(request,uploaded_csv):
+    df = pd.read_csv(uploaded_csv)
+    old_cols=list(df.columns)
+    new_cols=removeStar(old_cols)
+    df.columns=new_cols
+    return(df)
+
+

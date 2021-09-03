@@ -78,4 +78,4 @@ def get_fields(obj):
 
 @register.simple_tag
 def json_saved_data(value):
-   return (json.loads(value))
+    return (json.loads(value))

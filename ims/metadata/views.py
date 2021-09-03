@@ -42,8 +42,12 @@ class Index(LoginRequiredMixin, View):
     template_name = 'index.html'
     
     def get(self,request):
-        obj= Project.objects.filter(status="Active").order_by('-pk')
+        
         usr=self.request.user
+        usrGroup = self.request.user.groups.values_list('name',flat = True) # QuerySet Object
+        usrGroup_as_list = list(usrGroup)
+        labname=[k for k in usrGroup_as_list if 'lab' in k]
+        obj= Project.objects.filter(status="Active").filter(lab_name__name__in=labname).order_by('-pk')
         context = {
             'object': obj,
             'usr':usr,
@@ -99,7 +103,13 @@ class ShowProject(LoginRequiredMixin, View):
     template_name = 'showProject.html'
     
     def get(self,request):
-        obj = Project.objects.all().order_by('-pk')
+        # obj = Project.objects.all().order_by('-pk')
+        usr=self.request.user
+        usrGroup = self.request.user.groups.values_list('name',flat = True) # QuerySet Object
+        usrGroup_as_list = list(usrGroup)
+        labname=[k for k in usrGroup_as_list if 'lab' in k]
+        obj= Project.objects.filter(lab_name__name__in=labname).order_by('-pk')
+        
         context = {
             'object': obj,
         }
@@ -110,13 +120,17 @@ class BrowseProject(LoginRequiredMixin, View):
     template_name = 'showProject.html'
     
     def get(self,request,slug):
-        obj = Project.objects.filter(created_by__first_name=slug).order_by('-pk')
+        usrGroup = self.request.user.groups.values_list('name',flat = True) # QuerySet Object
+        usrGroup_as_list = list(usrGroup)
+        labname=[k for k in usrGroup_as_list if 'lab' in k]
+        
+        obj = Project.objects.filter(created_by__first_name=slug).filter(lab_name__name__in=labname).order_by('-pk')
         if(len(obj)==0):
-            obj = Project.objects.filter(exp_project__json_type__name=slug).order_by('-pk').distinct()
+            obj = Project.objects.filter(exp_project__json_type__name=slug).filter(lab_name__name__in=labname).order_by('-pk').distinct()
         if(len(obj)==0):
-            obj = Project.objects.filter(disease_site__name=slug).order_by('-pk').distinct()
+            obj = Project.objects.filter(disease_site__name=slug).filter(lab_name__name__in=labname).order_by('-pk').distinct()
         if(len(obj)==0):
-            obj = Project.objects.filter(status=slug).order_by('-pk').distinct()
+            obj = Project.objects.filter(status=slug).filter(lab_name__name__in=labname).order_by('-pk').distinct()
         context = {
             'object': obj,
         }
@@ -156,6 +170,7 @@ class AddProject(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.created_by = self.request.user
         form.instance.edited_by = self.request.user
+        
         disease_site=ChoiceDisease.objects.get(pk=self.request.POST.get('disease_site')).name
         disease_acr=disease_site.split("(")
         if(len(disease_acr)>1):
@@ -168,6 +183,16 @@ class AddProject(LoginRequiredMixin, CreateView):
         
         
         form.instance.name = name_string
+        
+        form.save()
+        
+        usrGroup = self.request.user.groups.values_list('name',flat = True) # QuerySet Object
+        usrGroup_as_list = list(usrGroup)
+        labname=[k for k in usrGroup_as_list if 'lab' in k]
+        for l in labname:
+            form.instance.lab_name.add(Choice.objects.get(name=l))
+        
+        form.save()
         
         return super().form_valid(form)
      
@@ -483,7 +508,13 @@ class BrowseExperimentGrid(LoginRequiredMixin, View):
     template_name = 'showExperiments.html'
     
     def get(self,request,slug_disease,slug_assay):
-        obj = Experiment.objects.filter(json_type__name=slug_assay, project__disease_site__name=slug_disease).order_by('-pk').distinct()
+        usrGroup = self.request.user.groups.values_list('name',flat = True) # QuerySet Object
+        usrGroup_as_list = list(usrGroup)
+        labname=[k for k in usrGroup_as_list if 'lab' in k]
+        
+        projects_lab= Project.objects.filter(lab_name__name__in=labname)
+        
+        obj = Experiment.objects.filter(json_type__name=slug_assay, project__disease_site__name=slug_disease, project__in=projects_lab).order_by('-pk').distinct()
         context = {
             'object': obj,
         }
@@ -941,7 +972,6 @@ class EditExperimentTag(LoginRequiredMixin, UpdateView):
     form_class = ExperimentTagForm
     
     def get_initial(self):
-        print("indsie")
         initial = super(EditExperimentTag, self).get_initial()
         initial.update({'prj_pk': self.kwargs['prj_pk']})
         return initial
@@ -999,8 +1029,24 @@ def importExperiments(request,prj_pk):
     if request.method == 'POST':
         form = ImportForm(request.POST, request.FILES)
         if form.is_valid():
-            handle_uploaded_experiments(request,request.FILES['upload_csv'])
-            return HttpResponseRedirect('/detailProject/'+prj_pk)
+            df=getdf(request,request.FILES['upload_csv'])
+            pageContext = {
+            'target': "experiments",
+            'dataFrame':df.to_html(classes='table table-bordered table-hover data_table mystyle gridjs-table'),
+            'df':df.to_json()
+            } 
+            return render(request, 'showDataFrame.html', pageContext)
+            
+        else:
+            if "upload" in request.POST:
+                htmlDf = pd.io.json.read_json(request.POST.get("htmldf"))
+                df=pd.DataFrame.from_dict(htmlDf)
+                handle_uploaded_experiments(request, df)
+                return HttpResponseRedirect('/detailProject/'+prj_pk)
+            
+            elif "cancel" in request.POST:
+                return HttpResponseRedirect('/addData/')
+
     else:
         form = ImportForm()
      
@@ -1014,8 +1060,24 @@ def importSequencingFiles(request,prj_pk):
     if request.method == 'POST':
         form = ImportForm(request.POST, request.FILES)
         if form.is_valid():
-            handle_uploaded_sequencingfiles(request,prj_pk, request.FILES['upload_csv'])
-            return HttpResponseRedirect('/detailProject/'+prj_pk)
+            df=getdf(request,request.FILES['upload_csv'])
+            pageContext = {
+            'target': "sequencing files",
+            'dataFrame':df.to_html(classes='table table-bordered table-hover data_table mystyle gridjs-table'),
+            'df':df.to_json()
+            } 
+            return render(request, 'showDataFrame.html', pageContext)
+            
+        else:
+            if "upload" in request.POST:
+                htmlDf = pd.io.json.read_json(request.POST.get("htmldf"))
+                df=pd.DataFrame.from_dict(htmlDf)
+                handle_uploaded_sequencingfiles(request,prj_pk,df)
+                return HttpResponseRedirect('/detailProject/'+prj_pk)
+            
+            elif "cancel" in request.POST:
+                return HttpResponseRedirect('/addData/')
+           
     else:
         form = ImportForm()
      
@@ -1028,12 +1090,29 @@ def importSequencingFiles(request,prj_pk):
 def addData(request):
     return render(request, 'addData.html')
 
+
 def bulkAddBiosource(request):
-    if request.method == 'POST':
+    if request.method == 'POST':       
         form = ImportForm(request.POST, request.FILES)
         if form.is_valid():
-            handle_uploaded_biosource(request,request.FILES['upload_csv'])
-            return HttpResponseRedirect('/showBiosource/')
+            df=getdf(request,request.FILES['upload_csv'])
+            pageContext = {
+            'target': "biosource",
+            'dataFrame':df.to_html(classes='table table-bordered table-hover data_table mystyle gridjs-table'),
+            'df':df.to_json()
+            } 
+            return render(request, 'showDataFrame.html', pageContext)
+            
+        else:
+            if "upload" in request.POST:
+                htmlDf = pd.io.json.read_json(request.POST.get("htmldf"))
+                df=pd.DataFrame.from_dict(htmlDf)
+                handle_uploaded_biosource(request, df)
+                return HttpResponseRedirect('/showBiosource/')
+            
+            elif "cancel" in request.POST:
+                return HttpResponseRedirect('/addData/')
+            
     else:
         form = ImportForm()
      
@@ -1047,8 +1126,24 @@ def bulkAddBiosample(request):
     if request.method == 'POST':
         form = ImportForm(request.POST, request.FILES)
         if form.is_valid():
-            handle_uploaded_biosample(request,request.FILES['upload_csv'])
-            return HttpResponseRedirect('/showBiosource/')
+            df=getdf(request,request.FILES['upload_csv'])
+            pageContext = {
+            'target': "biosample",
+            'dataFrame':df.to_html(classes='table table-bordered table-hover data_table mystyle gridjs-table'),
+            'df':df.to_json()
+            } 
+            return render(request, 'showDataFrame.html', pageContext)
+            
+        else:
+            if "upload" in request.POST:
+                htmlDf = pd.io.json.read_json(request.POST.get("htmldf"))
+                df=pd.DataFrame.from_dict(htmlDf)
+                handle_uploaded_biosample(request, df)
+                return HttpResponseRedirect('/showBiosource/')
+            
+            elif "cancel" in request.POST:
+                return HttpResponseRedirect('/addData/')
+            
     else:
         form = ImportForm()
      
@@ -1062,8 +1157,24 @@ def bulkAddSequencingRun(request,prj_pk):
     if request.method == 'POST':
         form = ImportForm(request.POST, request.FILES)
         if form.is_valid():
-            handle_uploaded_sequencingruns(request,prj_pk, request.FILES['upload_csv'])
-            return HttpResponseRedirect('/detailProject/'+prj_pk)
+            df=getdf(request,request.FILES['upload_csv'])
+            pageContext = {
+            'target': "sequencing run",
+            'dataFrame':df.to_html(classes='table table-bordered table-hover data_table mystyle gridjs-table'),
+            'df':df.to_json()
+            } 
+            return render(request, 'showDataFrame.html', pageContext)
+            
+        else:
+            if "upload" in request.POST:
+                htmlDf = pd.io.json.read_json(request.POST.get("htmldf"))
+                df=pd.DataFrame.from_dict(htmlDf)
+                handle_uploaded_sequencingruns(request,prj_pk,df)
+                return HttpResponseRedirect('/detailProject/'+prj_pk)
+            
+            elif "cancel" in request.POST:
+                return HttpResponseRedirect('/addData/')
+            
     else:
         form = ImportForm()
      
