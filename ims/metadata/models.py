@@ -200,6 +200,7 @@ class SeqencingFile(UserLog):
         ('', ''),
         ('1', '1'),
         ('2', '2'),
+        ('3', '3'),
         ('index', 'index'),
     )
     name = models.CharField(max_length=300, null=False, default="", validators=[alphanumeric],help_text="Name of the sequencing file (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
