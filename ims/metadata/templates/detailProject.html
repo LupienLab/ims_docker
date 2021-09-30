@@ -74,14 +74,14 @@
 	<a href="{% url 'importSequencingFiles' prj_pk=project.pk %}"><button type="button" class="btn btn-info">Bulk Add Fastq Files</button></a>
 	<br/><br/>
 	<hr><br>
-	{% if experiment %}
-	
-	
 	{% if messages %}
     {% for message in messages %}
     	<p{% if message.tags %} class="alert-{{ message.tags }} alert"{% endif %}>{{ message }}</p>
     {% endfor %}
 	{% endif %}
+	
+	
+	{% if experiment %}
 
 	<h3>Experiment details</h6>
 	<table class="cell-border table-hover data_table">
