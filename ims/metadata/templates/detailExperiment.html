@@ -82,11 +82,14 @@
 	    <b>Sequencing File details:</b>
    <table>
 	    {% for files in seqfiles %}
-			<tr><td>({{forloop.counter }}) <a href="{% url 'detailSeqencingFile' file_pk=files.pk %}">{{files}}</a></tr></td>
+			<tr><td>({{forloop.counter }}) <a href="{% url 'detailSeqencingFile' file_pk=files.pk %}">{{files}}</a></td>
+			<td>{{files.assay}}</td>
+			<td>{{files.paired_end}}</td>
+			</tr>
 	     {% endfor %}
 	     </table>
 	   </td></tr>
 	</table>
 </div>
-{% endif %} 
+{% endif %}
 {% endblock %}

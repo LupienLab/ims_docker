@@ -169,6 +169,7 @@ def handle_uploaded_sequencingfiles(request, prj_pk, inputdf):
             exp = get_or_none(Experiment,name=row['experiment_name'])
             run = get_or_none(SequencingRun,name=row['sequencing_run_name'])
             prj = get_or_none(Project,pk=prj_pk)
+            assay = get_or_none(Choice,name=row['assay'])
             if(exp==None):
                 messages.add_message(request, messages.WARNING, 'Experiment name does not exist in line '+str(c))
                 return
@@ -181,9 +182,12 @@ def handle_uploaded_sequencingfiles(request, prj_pk, inputdf):
             path = row['file_path']
             archived_path = row['archived_path']
             read_length = row['read_length']
+            if( str(read_length)=="nan"):
+                read_length=None
             md5sum = row['md5sum']
             pair= row['paired']
-            related_file=None
+            
+            
             if(path):
                     file_name=re.split('.fastq|.fq',path.split("/")[-1])[0]
                     #file_name_values=file_name.split("_")
@@ -193,6 +197,8 @@ def handle_uploaded_sequencingfiles(request, prj_pk, inputdf):
                             return
                     
                     try:
+                        similar_name=re.split('_I\d|_R\d',file_name)
+                        related_files=SeqencingFile.objects.filter(name__icontains=similar_name[0])
                         new_f = SeqencingFile(
                             name=file_name, 
                             project = prj,
@@ -206,12 +212,16 @@ def handle_uploaded_sequencingfiles(request, prj_pk, inputdf):
                             experiment=exp,
                             read_length=read_length,
                             paired_end=pair,
-                            related_files=related_file
+                            assay=assay
                             )
                         new_f.save()
-                        if(related_file):
-                            related_file.related_files=SeqencingFile.objects.get(pk=new_f.pk)
-                            related_file.save()
+                        
+                        if(len(related_files)>0):
+                            new_f.related_files.set(related_files)
+                            new_f.save()
+                            for f in related_files:
+                                f.related_files.add(SeqencingFile.objects.get(pk=new_f.pk))
+                                f.save()
                         
                     except IntegrityError:
                         messages.add_message(request, messages.WARNING, 'Same file name exists in the database, should be unique name in line '+str(c))

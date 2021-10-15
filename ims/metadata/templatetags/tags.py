@@ -79,3 +79,7 @@ def get_fields(obj):
 @register.simple_tag
 def json_saved_data(value):
     return (json.loads(value))
+
+@register.filter
+def get_list_data(obj):
+    return list(obj)[0]

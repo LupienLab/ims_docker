@@ -55,6 +55,13 @@
 		   <tr>
 				<td><b>{{ f.label |title }}: </b> <a href="/media/{{f.value}}">{{f.value}}</a> </td>
 			</tr>
+		{% elif  f.label == "related files" %}
+		   <tr><td><b>{{ f.label |title }}:</b> <br/>
+                {% for k in f.value %}
+                  ({{forloop.counter }}){{k.values | get_list_data}}<br/>
+	 			{% endfor %}
+			   </td>
+			</tr>
 		{% else %}
 			<tr>
 				<td><b>{{ f.label |title }}: </b> {{f.value}}</td>
@@ -71,7 +78,7 @@
 	<h5>Related Biosamples</h5>
 	<table class="table table-bordered">
 	{% for sam in rel_bisam %}
-			<tr><td>({{forloop.counter }}) <a href="{% url 'detailBiosample' sample_pk=sam.pk %}">{{sam.name}}</a></tr></td>
+			<tr><td>({{forloop.counter }}) <a href="{% url 'detailBiosample' sample_pk=sam.pk %}">{{sam.name}}</a></td></tr>
 	 {% endfor %}
 	</table>
 	{% endif %}
