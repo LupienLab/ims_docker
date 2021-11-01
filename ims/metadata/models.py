@@ -217,7 +217,7 @@ class SeqencingFile(UserLog):
     cluster_path = models.CharField(max_length=1000, null=False, default="", help_text="Path on the cluster including the file name and extension e.g /mnt/work1/users/lupiengroup/Projects/folder/test.fastq.gz")
     archived_path = models.CharField(max_length=1000, null=True, blank=True,default="", help_text="Path on the S3 if the data is archived")
     md5sum = models.CharField(max_length=32, null=True, blank=True, default="",help_text="md5sum")
-    related_files = models.ManyToManyField('SeqencingFile', null=True, blank=True, help_text="Related paired file reference")
+    related_files = models.ManyToManyField('SeqencingFile',blank=True, help_text="Related paired file reference")
     run = models.ForeignKey(SequencingRun, related_name='file_run', on_delete=models.CASCADE)
     experiment = models.ForeignKey(Experiment, related_name='file_exp', on_delete=models.CASCADE)
     file_format = models.ForeignKey(Choice, on_delete=models.SET_NULL, null=True, blank=True, default="", related_name='fileChoice', limit_choices_to={'class_type': "file_format"}, help_text="Type of file format")

@@ -1,2 +1,2 @@
 run_name*,sequencing_center,sequencing_instrument,experiment*,submission_date*,description
-#,(Princess Margaret Genomics Centre;Ontario Institute for Cancer Research;SickKids Centre for Applied Genomics),(Illumina HiSeq X;Illumina MiSeq;Illumina NextSeq 500;Illumina NextSeq 550;Illumina HiSeq 2500;Illumina HiSeq 4000;Illumina NovaSeq 6000;PacBio RS;PacBio Sequel,PacBio Sequel II;Oxford Nanopore MinION),,(YYYY-MM-DD),
+#,(Princess Margaret Genomics Centre;Ontario Institute for Cancer Research;SickKids Centre for Applied Genomics),(Illumina HiSeq X;Illumina MiSeq;Illumina NextSeq 500;Illumina NextSeq 550;Illumina HiSeq 2500;Illumina HiSeq 4000;Illumina NovaSeq 6000;PacBio RS;PacBio Sequel;PacBio Sequel II;Oxford Nanopore MinION),(YYYY-MM-DD),

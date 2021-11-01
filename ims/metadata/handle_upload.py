@@ -281,17 +281,13 @@ def handle_uploaded_biosource(request, inputdf):
      
 def handle_uploaded_sequencingruns(request,prj_pk,inputdf):
     df = inputdf
+    print(df)
     c=2
     errorList=[]
     
     for index, row in df.iterrows():
         if(not(row['run_name'] =="#") and checkSanity("run_name",request,row,c)):
             run_name=get_or_none_multiple(SequencingRun,name=row['run_name'])
-            if(len(run_name)>0):
-                run_in_prj=SequencingRun.objects.filter(name=row['run_name'],project__pk=prj_pk)
-                if(not(len(run_in_prj)==0)):
-                    messages.add_message(request, messages.WARNING, 'Run name not unique in line '+str(c))
-                    return
             prj = get_or_none(Project,pk=prj_pk)
             center = get_or_none(Choice,name=row['sequencing_center'])
             instrument = get_or_none(Choice,name=row['sequencing_instrument'])
@@ -307,6 +303,15 @@ def handle_uploaded_sequencingruns(request,prj_pk,inputdf):
             if(submission_date==None) or not(validate(submission_date)):
                 messages.add_message(request, messages.WARNING, 'submission_date is incorrect in line'+str(c))
                 return
+            if(len(run_name)>0):
+                try:
+                    run_existing=SequencingRun.objects.get(name=row['run_name'],project__pk=prj_pk)
+                except ObjectDoesNotExist:
+                    run_existing=None
+                if(not(run_existing)==None):
+                    run_existing.experiment.add(exp)
+                    run_existing.save()
+                    continue
             try:
                 if(not(isinstance(row['description'], str))):
                     desc=""
