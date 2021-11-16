@@ -10,7 +10,10 @@
 
 3. Inititalize database from dump, if needed.
 4. Run now with one of the following command:
+
 ###For production
   docker-compose -f prod_docker-compose.yml up -d
+  
+ 
 ###For Development
   docker-compose -f dev_docker-compose.yml up -d
