@@ -144,7 +144,7 @@ class Biosample(UserLog, Contributing_Lab,CloneMixin):
     treatment = models.ForeignKey(Treatment,related_name='exp_treatment', null=True, blank=True, on_delete=models.SET_NULL, help_text="Chemical/RNAi treatment")
     collection_date = models.DateField(null=True, blank=True, help_text="Collection date for this biosample")
     collection_method = models.CharField(max_length=100, null=True, blank=True, help_text="Method of collection for this biosample")
-    json_type = models.ForeignKey(JsonObj, verbose_name="Culture details" ,related_name='culture_details', limit_choices_to={'json_type': "culture_details"}, on_delete=models.CASCADE, help_text="Culture details of sample")
+    json_type = models.ForeignKey(JsonObj, verbose_name="Preprocessing details" ,related_name='preprocessing_details', limit_choices_to={'json_type': "preprocessing_details"}, on_delete=models.CASCADE, help_text="Preprocessing details of the sample")
     json_fields = JSONField(null=True, blank=True) 
     
     def __str__(self):
