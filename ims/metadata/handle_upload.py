@@ -224,7 +224,7 @@ def handle_uploaded_sequencingfiles(request, prj_pk, inputdf):
                                 f.save()
                         
                     except IntegrityError:
-                        messages.add_message(request, messages.WARNING, 'Same file name exists in the database, should be unique name in line '+str(c))
+                        messages.add_message(request, messages.WARNING, 'Same file md5sum exists in the database, should be unique md5sum in line '+str(c))
                         return
                     
                         
