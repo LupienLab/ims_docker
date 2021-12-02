@@ -226,7 +226,7 @@ class SeqencingFile(UserLog):
         return self.name 
      
     class Meta:
-        unique_together = ('project', 'md5sum',)
+        unique_together = ('project', 'md5sum','name',)
 
 class ExperimentTag(UserLog):
     name = models.CharField(max_length=300, null=False, default="", validators=[alphanumeric],help_text="Name of the tags (Unique throughout system. Allowed characters [0-9a-zA-Z-._], no spaces allowed)")
