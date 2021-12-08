@@ -370,9 +370,9 @@ def handle_uploaded_biosample(request, inputdf):
                 coll_date=row['collection_date']
             
             
-            json_type = get_or_none(JsonObj,name="culture details - Not Available")
-            if(checkSanity("culture_details",request,row,c)):
-                json_type = get_or_none(JsonObj,name="culture details - "+row['culture_details'])
+            json_type = get_or_none(JsonObj,name="preprocessing details - Not Available")
+            if(checkSanity("preprocessing_details",request,row,c)):
+                json_type = get_or_none(JsonObj,name="preprocessing details - "+row['preprocessing_details'])
             
             if(checkSanity("culture_start_date",request,row,c) and  not(validate(row['culture_start_date']))):
                 messages.add_message(request, messages.WARNING, 'culture_start_date is incorrect in line '+str(c))
@@ -388,7 +388,7 @@ def handle_uploaded_biosample(request, inputdf):
                 return
             elif(sample==None):
                 try:
-                    if(row['culture_details']=="Available"):
+                    if(row['preprocessing_details']=="Available"):
                         new_s = Biosample(
                         name=row['biosample_name'],
                         biosource=biosource,
