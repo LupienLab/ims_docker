@@ -88,6 +88,10 @@ def handle_uploaded_experiments(request,inputdf):
                 messages.add_message(request, messages.WARNING, 'Experiment to clone is incorrect in line '+str(c))
                 return
             
+            if(row["concentration_of_sample"] and not(str(row["concentration_of_sample"])=="nan")):
+                conc=row["concentration_of_sample"] 
+            else:
+                conc=exp.concentration_of_sample
             
             if(source):
                 if(sample):
@@ -96,6 +100,7 @@ def handle_uploaded_experiments(request,inputdf):
                             new_exp=exp.make_clone(attrs={'name': row["experiment_name"],
                                                       'uid':uid,
                                                       'biosample': sample,
+                                                      'concentration_of_sample': conc,
                                                       'bio_rep_no': row["bio_rep_no"],
                                                       'tec_rep_no': row["tec_rep_no"],
                                                       'created_by': request.user,
@@ -124,6 +129,7 @@ def handle_uploaded_experiments(request,inputdf):
                         try:
                             new_exp=exp.make_clone(attrs={'name': row["experiment_name"],
                                                           'uid':uid,
+                                                          'concentration_of_sample': conc,
                                                           'bio_rep_no': row["bio_rep_no"],
                                                           'tec_rep_no': row["tec_rep_no"],
                                                           'created_by': request.user,
