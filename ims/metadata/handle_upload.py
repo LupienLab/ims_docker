@@ -45,7 +45,7 @@ def createJSON(json_type,row):
     data = {}
     for keys in json_object:
         formVal = row[keys]
-        if (str(formVal)=="nan" or str(formVal)=="NAN"):
+        if (str(formVal)=="nan" or str(formVal)=="NAN" or str(formVal)=="NaT"):
             formVal=""
         if((json_object[keys]["data"]=="IntegerField") and (len(str(formVal))>0)):
             formVal=int(formVal)
@@ -376,7 +376,7 @@ def handle_uploaded_biosample(request, inputdf):
                 coll_date=row['collection_date']
             
             
-            json_type = get_or_none(JsonObj,name="preprocessing details - Not Available")
+            #json_type = get_or_none(JsonObj,name="preprocessing details - Not Available")
             if(checkSanity("preprocessing_details",request,row,c)):
                 json_type = get_or_none(JsonObj,name="preprocessing details - "+row['preprocessing_details'])
             
