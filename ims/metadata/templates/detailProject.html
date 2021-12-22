@@ -2,6 +2,7 @@
 {% block content %}
 {% load static %}
 <script type="text/javascript" src="{% static 'createCharts.js' %}"></script>
+
 {% if project %}
 <div class="container">
 
@@ -83,7 +84,8 @@
 	
 	{% if experiment %}
 
-	<h3>Experiment details</h6>
+	<h3>Experiment details</h3>
+	<h7>*Grey colored rows means fastq files are added for that experiment</h7>
 	<table class="cell-border table-hover data_table">
 		<thead>
 			<tr>
@@ -98,7 +100,9 @@
 		</thead>
 		<tbody>
 		{% for exp in experiment %}
-			<tr>
+			
+			<tr class="{% if exp.file_exp.all|length > 0 %}table-secondary{% endif %}">
+				
 				<td><a href="{% url 'detailExperiment' exp_pk=exp.pk %}">{{ exp.name }}</a></td>
 				<td>{{ exp.uid }}</td>
 				<td><a href="{% url 'detailBiosource' source_pk=exp.biosample.biosource.pk %}">{{ exp.biosample.biosource.name }}</a></td>

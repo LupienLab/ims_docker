@@ -461,7 +461,7 @@ class DetailExperiment(LoginRequiredMixin, DetailBreadcrumbMixin, DetailView):
     
     def get_context_data(self, **kwargs):
         context = super(DetailExperiment, self).get_context_data(**kwargs)
-        seqfiles=context["object"].file_exp.all().order_by('name')
+        seqfiles=context["object"].file_exp.all().order_by('pk')
         context["seqfiles"]=seqfiles
         return context
     

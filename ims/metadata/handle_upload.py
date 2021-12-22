@@ -204,7 +204,9 @@ def handle_uploaded_sequencingfiles(request, prj_pk, inputdf):
                     
                     try:
                         similar_name=re.split('_I\d|_R\d',file_name)
-                        related_files=SeqencingFile.objects.filter(name__icontains=similar_name[0])
+                        
+                        related_files=SeqencingFile.objects.filter(name__icontains=similar_name[0],assay__name=assay,run__name=run)
+                        
                         new_f = SeqencingFile(
                             name=file_name, 
                             project = prj,
