@@ -301,6 +301,7 @@ def handle_uploaded_sequencingruns(request,prj_pk,inputdf):
             instrument = get_or_none(Choice,name=row['sequencing_instrument'])
             exp = get_or_none(Experiment,name=row['experiment'])
             submission_date = row['submission_date']
+            retrieval_date = row['retrieval_date']
             
             if(prj==None):
                 messages.add_message(request, messages.WARNING, 'Project does not exist in line '+str(c))
@@ -310,6 +311,9 @@ def handle_uploaded_sequencingruns(request,prj_pk,inputdf):
                 return
             if(submission_date==None) or not(validate(submission_date)):
                 messages.add_message(request, messages.WARNING, 'submission_date is incorrect in line'+str(c))
+                return
+            if(retrieval_date==None) or not(validate(retrieval_date)):
+                messages.add_message(request, messages.WARNING, 'retrieval_date is incorrect in line'+str(c))
                 return
             if(len(run_name)>0):
                 try:
@@ -331,6 +335,7 @@ def handle_uploaded_sequencingruns(request,prj_pk,inputdf):
                         sequencing_center=center,
                         sequencing_instrument=instrument,
                         submission_date=submission_date,
+                        retrieval_date=retrieval_date,
                         created_by=request.user,
                         edited_by=request.user,
                         description=desc
