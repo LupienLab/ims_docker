@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load tags %}
+
+{% block content %}
+      <script>
+         $(document).ready(function() {
+             // Check All
+             $('.checkall').click(function() {
+                 $(":checkbox").attr("checked", true);
+             });
+             // Uncheck All
+             $('.uncheckall').click(function() {
+                 $(":checkbox").attr("checked", false);
+             });
+         });
+      </script>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    
+    
+    <h1>Upload FastQC/MultiQC reports html file</h1>
+     
+     {{ form|crispy }}
+     
+    <div><a class="uncheckall float-right" href="#">/ Uncheck All</a><a class="checkall float-right" href="#"> Check All / </a> </div>
+  
+    <button type="submit" class="btn btn-primary">Submit</button>
+
+  </form>
+{% endblock %}

@@ -47,6 +47,8 @@ urlpatterns = [
     url(r'^editSequencingRun/(?P<prj_pk>[0-9]+)/(?P<obj_pk>[0-9]+)/$', EditSequencingRun.as_view(), name='editSequencingRun'),
     url(r'^deleteSequencingRun/(?P<obj_pk>[0-9]+)/$', DeleteSequencingRun.as_view(), name='deleteSequencingRun'),
     url(r'^archiveSequencingRun/(?P<prj_pk>[0-9]+)/$', ArchiveSequencingRun.as_view(), name='archiveSequencingRun'),
+    url(r'^addFastqcResults/(?P<prj_pk>[0-9]+)/$', AddFastqcResults.as_view(), name='addFastqcResults'),
+    
     
     url(r'^addSeqencingFile/(?P<prj_pk>[0-9]+)/(?P<exp_pk>[0-9]+)/$', AddSeqencingFile.as_view(), name='addSeqencingFile'),
     url(r'^detailSeqencingFile/(?P<file_pk>[0-9]+)/$', DetailSeqencingFile.as_view(), name='detailSeqencingFile'),

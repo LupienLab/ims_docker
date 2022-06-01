@@ -53,7 +53,11 @@
 			{% endif %}
 		{% elif  f.label == "attachment" %}
 		   <tr>
-				<td><b>{{ f.label |title }}: </b> <a href="/media/{{f.value}}">{{f.value}}</a> </td>
+				<td><b>{{ f.label |title }}: </b> <a target="_blank" href="/media/{{f.value}}">{{f.value}}</a> </td>
+			</tr>
+		{% elif  f.label == "fastqc html" %}
+		   <tr>
+				<td><b>{{ f.label |title }}: </b> <a target="_blank" href="/media/{{f.value}}">{{f.value}}</a> </td>
 			</tr>
 		{% elif  f.label == "related files" %}
 		   <tr><td><b>{{ f.label |title }}:</b> <br/>

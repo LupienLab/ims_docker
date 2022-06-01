@@ -660,7 +660,52 @@ class ArchiveSequencingRun(LoginRequiredMixin,View):
             }
             return render(request, self.template_name,context)
         
+
+
+class AddFastqcResults(LoginRequiredMixin, View):
+    template_name = 'addFastQC.html'
+    form_class = AddFastqcResultsForm
+
     
+    def get(self,request,prj_pk):
+        print(SeqencingFile.objects.filter(project=prj_pk))
+        form = self.form_class()
+        form.fields["selected_fastqs"].queryset = SeqencingFile.objects.filter(project=prj_pk).order_by('name')
+        
+        context = {
+            'form': form
+        }
+        return render(request, self.template_name,context)
+    
+    def post(self,request,prj_pk):
+        form = self.form_class(request.POST,request.FILES)
+        if form.is_valid():
+            cd = form.cleaned_data
+            selected_fastqs=cd.get("selected_fastqs")
+            fastqc_html=request.FILES['qc_html']
+            c=0
+            for f in selected_fastqs:
+                if(c==0):
+                    c+=1
+                    seq_file=f
+                    seq_file.fastqc_html=fastqc_html
+                    seq_file.save()
+                else:
+                    seq_file=f
+                    seq_file.fastqc_html=selected_fastqs[0].fastqc_html
+                    seq_file.save()
+                    
+            messages.add_message(request, messages.SUCCESS, 'FastQC/MultiQC reports are added successfully')
+            return HttpResponseRedirect('/detailProject/'+self.kwargs['prj_pk'])
+        else:
+            form.fields["selected_fastqs"].queryset = SeqencingFile.objects.filter(project=prj_pk).order_by('name')
+            
+            context = {
+            'form': form
+            }
+            return render(request, self.template_name,context)
+        
+        
 
 ########################
 ###SequencingFile#######

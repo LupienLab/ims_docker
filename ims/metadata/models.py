@@ -197,7 +197,7 @@ class SequencingRun(UserLog):
      
 class SeqencingFile(UserLog):
     PAIR_CHOICES = (
-        ('', ''),
+        ('', ''), 
         ('1', '1'),
         ('2', '2'),
         ('3', '3'),
@@ -222,6 +222,7 @@ class SeqencingFile(UserLog):
     experiment = models.ForeignKey(Experiment, related_name='file_exp', on_delete=models.CASCADE)
     file_format = models.ForeignKey(Choice, on_delete=models.SET_NULL, null=True, blank=True, default="", related_name='fileChoice', limit_choices_to={'class_type': "file_format"}, help_text="Type of file format")
     assay = models.ForeignKey(Choice, on_delete=models.SET_NULL, null=True, blank=True, default="", related_name='fileassayChoice', limit_choices_to={'class_type': "file_assay"}, help_text="Assay of file format (important in case of multiome experiments)")
+    fastqc_html = models.FileField(upload_to='media/', null=True, blank=True)
     def __str__(self):  
         return self.name 
      

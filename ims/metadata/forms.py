@@ -105,7 +105,7 @@ class SeqencingFileForm(ModelForm):
     class Meta:
         model = SeqencingFile
         exclude = ('created_at','created_by','edited_at','edited_by','project','experiment')
-        fields = ('name','file_format','assay','paired_end','related_files','read_length','cluster_path','archived_path','md5sum','run','description',)
+        fields = ('name','file_format','assay','paired_end','related_files','read_length','cluster_path','archived_path','md5sum','fastqc_html','run','description',)
     
     def __init__(self, *args, **kwargs):
         prj_pk = kwargs.get('initial')['prj_pk']
@@ -243,7 +243,15 @@ class ArchiveSequencingRunForm(forms.Form):
 
 
 
-
+class AddFastqcResultsForm(forms.Form):
+    qc_html=forms.FileField()
+    selected_fastqs = forms.ModelMultipleChoiceField(queryset = SeqencingFile.objects.all(), help_text="select fastqs files for added in these results",
+                                                widget = forms.CheckboxSelectMultiple())
+    
+    
+    def __init__(self, *args, **kwargs):
+        super(AddFastqcResultsForm, self).__init__(*args, **kwargs)
+        self.empty_permitted = False
 
 
     
