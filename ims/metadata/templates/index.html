@@ -34,7 +34,12 @@ width: 295px !important;
      </div>
 </div>
 <hr/><br/>
-<h4 class="text-center">Browse experiments</h4>
+<h5>Export metadata from last 200 days</h5>
+<a href="{% url 'exportSequencingdata' %}"><button type="button" class="btn btn-primary">Sequencing data</button></a>
+<a href="{% url 'exportnoSequencingdata' %}"><button type="button" class="btn btn-primary">Experiments with NO sequencing data added</button></a>
+<hr/><br/>
+<h4 class="text-center">Browse experiments&nbsp; &nbsp;  &#8594;</h4>
+
 <div class="container">
      <div id="matrixDataGrid"></div>
 </div>

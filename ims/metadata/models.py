@@ -185,7 +185,7 @@ class SequencingRun(UserLog):
     sequencing_center = models.ForeignKey(Choice, related_name='run_sequencing_center', limit_choices_to={'class_type': "sequencing_center"}, null=True, blank=True, on_delete=models.SET_NULL, help_text="Where the sequencing has been done")
     sequencing_instrument = models.ForeignKey(Choice, related_name='run_sequencing_instrument', limit_choices_to={'class_type': "sequencing_instrument"}, null=True, blank=True, on_delete=models.SET_NULL, help_text="Instrument used for sequencing")
     submission_date = models.DateField(help_text="Submission date for sample")
-    retrieval_date = models.DateField(null=True, blank=True, help_text="Date when the sequencing run is received")
+    retrieval_date = models.DateField(default=now, help_text="Date when the sequencing run is received")
 #     submitted = models.BooleanField(default=False,help_text="Is sample submitted for sequencing") 
 #     approved = models.BooleanField(default=False,help_text="Is sample approved for sequencing")
     

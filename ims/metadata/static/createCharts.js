@@ -271,7 +271,7 @@ var experimenttags = new Chart(ctx5, {
 /*##############*/
 new gridjs.Grid({
   search: true,
-  columns: ['Disease-site','ATAC-seq', 'Hi-C', 'ChIP-seq', 'RNA-seq', 'scATAC', 'scATAC-RNAseq-multiome', 'BS-seq'],
+  columns: ['Disease-site','ATAC-seq', 'Hi-C', 'ChIP-seq', 'RNA-seq', 'scATAC', 'scATAC-RNAseq-multiome', 'BS-seq','Cut&Run'],
   sort: {
     multiColumn: false,
     server: {
@@ -280,7 +280,7 @@ new gridjs.Grid({
        
        const col = columns[0];
        const dir = col.direction === 1 ? 'True' : 'False';
-       let colName = ['Disease-site','ATAC-seq', 'Hi-C', 'ChIP-seq', 'RNA-seq', 'scATAC', 'scATAC-RNAseq-multiome', 'BS-seq'][col.index];
+       let colName = ['Disease-site','ATAC-seq', 'Hi-C', 'ChIP-seq', 'RNA-seq', 'scATAC', 'scATAC-RNAseq-multiome', 'BS-seq','Cut&Run'][col.index];
        
        return `${prev}+${colName}+${dir}`;
      }
@@ -297,6 +297,7 @@ new gridjs.Grid({
                                      gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/scATAC'>${card[5]}</a>`),
                                      gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/scATAC-RNAseq-multiome'>${card[6]}</a>`),
                                      gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/BS-seq'>${card[7]}</a>`),
+                                     gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/Cut&Run'>${card[8]}</a>`),
                           ])
   } ,
     style: {

@@ -16,11 +16,12 @@ from datetime import date
 from metadata.excelRow import insert_rows
 import json
 import csv
+from datetime import datetime, timedelta
 
 now = datetime.now()
 today = date.today()
 
-ROOTFOLDER="/Users/ankita/Documents/eclipse-workspace/imsDB/ims_docker/ims"
+#ROOTFOLDER="/Users/ankita/Documents/eclipse-workspace/imsDB/ims_docker/ims"
 #ROOTFOLDER="/Users/ankita/Documents/eclipse-workspace/imsDB/ims_docker/ims/"
 dt_string = now.strftime("%Y-%m-%d_%H-%M-%S")
 dt_today = today.strftime("%Y-%m-%d")
@@ -459,3 +460,43 @@ def exportform(request,prj_pk,slug):
     return render(request, 'export.html', pageContext)
 
 
+def exportSequencingdata(request):
+    response = HttpResponse(content_type='text/csv')
+    headerLine=["run_name","user","submission_date","retrieval_date","duration"]
+    response['Content-Disposition'] = "attachment; filename=sequencingdata_"+dt_string+".csv"
+    writer = csv.writer(response)
+            
+    writer.writerow(headerLine)
+    startdate = datetime.today()
+    enddate = startdate - timedelta(days=200)
+    l = SequencingRun.objects.filter(created_at__range=[enddate,startdate]).order_by('pk')
+    for i in l:
+        fields=[]
+        fields.append(i.name)
+        fields.append(i.created_by.first_name)
+        fields.append(i.submission_date)
+        fields.append(i.retrieval_date)
+        fields.append(i.retrieval_date-i.submission_date)
+        writer.writerow(fields)
+    return response
+
+def exportnoSequencingdata(request):
+    response = HttpResponse(content_type='text/csv')
+    headerLine=["experiment_name","user","creation_date","duration till now"]
+    response['Content-Disposition'] = "attachment; filename=experimentswithnodata_"+dt_string+".csv"
+    writer = csv.writer(response)
+            
+    writer.writerow(headerLine)
+    startdate = datetime.today()
+    enddate = startdate - timedelta(days=200)
+    
+    e=Experiment.objects.filter(created_at__range=[enddate,startdate], run_experiment=None).order_by('pk')
+    
+    for i in e:
+        fields=[]
+        fields.append(i.name)
+        fields.append(i.created_by.first_name)
+        fields.append(i.created_at.date())
+        fields.append(now.date()-i.created_at.date())
+        writer.writerow(fields)
+    return response

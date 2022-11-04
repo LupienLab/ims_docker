@@ -1259,8 +1259,10 @@ def populateCharts(request,slug):
         elif (slug.startswith("grid")):
             slug_vals=slug.split("+")
             if(len(slug_vals)==1):
+                
                 diseaseList=list(ChoiceDisease.objects.filter(class_type="disease_site").values_list('name', flat=True).order_by('id'))
                 assayList=list(JsonObj.objects.filter(json_type="experiment_type").values_list('name', flat=True).order_by('id'))
+                
                 cancer_matrix = []
                 for row in diseaseList:
                     new_row=[]
@@ -1269,7 +1271,10 @@ def populateCharts(request,slug):
                         no_of_exp=len(Experiment.objects.filter(json_type__name=col, project__disease_site__name=row))
                         new_row.append(no_of_exp)
                         
-                    cancer_matrix.append(new_row)
+                    if(sum(new_row[1:-1])>0):   
+                        cancer_matrix.append(new_row)
+                    
+                
             else:
                 diseaseList=list(ChoiceDisease.objects.filter(class_type="disease_site").values_list('name', flat=True).order_by('id'))
                 assayList=list(JsonObj.objects.filter(json_type="experiment_type").values_list('name', flat=True).order_by('id'))
@@ -1281,11 +1286,13 @@ def populateCharts(request,slug):
                         no_of_exp=len(Experiment.objects.filter(json_type__name=col, project__disease_site__name=row))
                         new_row.append(no_of_exp)
                         
-                    cancer_matrix.append(new_row)
+                    if(sum(new_row[1:-1])>0):   
+                        cancer_matrix.append(new_row)
+                
                 
                 np_cancer=np.array(cancer_matrix)
                 
-                column_values = ['Disease-site','ATAC-seq', 'Hi-C', 'ChIP-seq', 'RNA-seq', 'scATAC', 'scATAC-RNAseq-multiome', 'BS-seq']
+                column_values = ['Disease-site','ATAC-seq', 'Hi-C', 'ChIP-seq', 'RNA-seq', 'scATAC', 'scATAC-RNAseq-multiome', 'BS-seq','Cut&Run']
                 
                 df = pd.DataFrame(data = np_cancer, columns = column_values)
                 
