@@ -1292,7 +1292,7 @@ def populateCharts(request,slug):
                 
                 np_cancer=np.array(cancer_matrix)
                 
-                column_values = ['Disease-site','ATAC-seq', 'Hi-C', 'ChIP-seq', 'RNA-seq', 'scATAC', 'scATAC-RNAseq-multiome', 'BS-seq','Cut&Run']
+                column_values = ['Disease-site','ATAC-seq', 'Hi-C', 'ChIP-seq', 'RNA-seq', 'scATAC', 'scATAC-RNAseq-multiome', 'BS-seq','Cut-Run']
                 
                 df = pd.DataFrame(data = np_cancer, columns = column_values)
                 

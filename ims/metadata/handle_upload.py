@@ -109,7 +109,7 @@ def handle_uploaded_experiments(request,inputdf):
                             json_vals=json.loads(new_exp.json_fields)
                             if(checkSanity("library_preparation_date",request,row,c) and  validate(row['library_preparation_date'])):
                                 json_vals["library_preparation_date"]=row["library_preparation_date"]
-                            if(new_exp.json_type.name=="ChIP-seq" or new_exp.json_type.name=="Cut&Run") and checkSanity("antibody",request,row,c):
+                            if(new_exp.json_type.name=="ChIP-seq" or new_exp.json_type.name=="Cut-Run") and checkSanity("antibody",request,row,c):
                                 json_vals["antibody"]=row["antibody"]
                                 json_vals["antibody_dilution"]=row["antibody_dilution"]
                                 json_vals["targeted_factor"]=row["targeted_factor"]
@@ -138,7 +138,7 @@ def handle_uploaded_experiments(request,inputdf):
                             json_vals=json.loads(new_exp.json_fields)
                             if(checkSanity("library_preparation_date",request,row,c) and  validate(row['library_preparation_date'])):
                                 json_vals["library_preparation_date"]=row["library_preparation_date"]
-                            if(new_exp.json_type.name=="ChIP-seq" or new_exp.json_type.name=="Cut&Run") and checkSanity("antibody",request,row,c):
+                            if(new_exp.json_type.name=="ChIP-seq" or new_exp.json_type.name=="Cut-Run") and checkSanity("antibody",request,row,c):
                                 json_vals["antibody"]=row["antibody"]
                                 json_vals["antibody_dilution"]=row["antibody_dilution"]
                                 json_vals["targeted_factor"]=row["targeted_factor"]
