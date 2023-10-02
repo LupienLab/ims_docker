@@ -33,36 +33,29 @@
 <p>Your username and password didn't match. Please try again.</p>
 {% endif %}
 
-{% if next %}
-    {% if user.is_authenticated %}
-    <p>Your account doesn't have access to this page. To proceed,
-    please login with an account that has access.</p>
-    {% else %}
-    <p>Please login to see this page.</p>
-    {% endif %}
+{% if messages %}
+    {% for message in messages %}
+    	<p{% if message.tags %} class="alert-{{ message.tags }} alert"{% endif %}>{{ message }}</p>
+    {% endfor %}
 {% endif %}
 
-<form method="post" action="{% url 'login' %}">
-{% csrf_token %}
-<div style="padding:35px;color: green;"><h2><b><u>DUnCAN</u> : Data Unit Commons for Advanced Navigation<b></h2></div>
-<table>
-<tr>
-    <td><b>{{ form.username.label_tag }}</b></td>
-    <td>{{ form.username }}</td>
-</tr>
-<tr>
-    <td><b>{{ form.password.label_tag }}</b></td>
-    <td>{{ form.password }}</td>
-</tr>
-<tr><td></td></tr>
-<tr><td></td>
-<td><input type="submit" class="btn btn-success" value="login"></td>
-</tr>
-</table>
-
-
-<input type="hidden" name="next" value="{{ next }}">
-</form>
+<div style="padding:35px;color:#0066a7;"><h2><b><u>DUnCAN</u> : Data Unit Common for Advanced Navigation<b></h2></div>
+  <div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="text-center">
+                <div class="p-4">
+                    <!-- Content of the first div -->
+                    <h2><p>Login with PMDS Keycloak</p></h2>
+                </div>
+                <div class="p-4 mt-3">
+                    <!-- Content of the second div -->
+                    <a href="{% url 'keycloak_login' %}"><button type="button" class="btn btn-primary btn-block btn-lg">Login</button></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 {% endblock %}

@@ -7,7 +7,7 @@ from django.views.generic.base import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.edit import CreateView, FormView, DeleteView,\
     UpdateView
-from django.utils import timezone
+from django.utils import timezone 
 from django.urls import reverse
 from django.urls.base import reverse_lazy
 from django.contrib.auth.decorators import login_required
@@ -33,44 +33,86 @@ import pandas as pd
 import numpy as np
 import ast
 from _collections import defaultdict, OrderedDict
+from .keycloak_client import keycloak_openid
+from .keycloak_client import *
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.views import LoginView
+from django.contrib.auth.decorators import login_required
+from ims.views import *
 #import metadata.extendSession
 # Create your views here.
 
 ####INDEX############
 
+class KeycloakLoginView(LoginView):
+    def get(self, request):
+        #print("in get")
+        login_url = get_keycloak_url(request)  
+        code = request.GET.get('code')
+        if code:
+            print("inside code")
+            user_token,user_info = get_keycloak_user_token(request)
+            username = user_info["preferred_username"]
+            return reverse('index')
+        return HttpResponseRedirect(login_url)
+    
+class Rview(View):
+    def get(self,request):
+        code = request.GET.get('code')
+        #print("I have code",code)
+        if code:
+            #print("I have code")
+            user_token,user_info = get_keycloak_user_token(request)
+            username = user_info["preferred_username"]
+            print("my username is",username)
+            password = "imsdbuser1"
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                myusername=self.request.user.username
+                request.session['myusername'] = myusername
+                return HttpResponseRedirect(reverse('index'))
+            else:
+                print("calling logout2")
+                logout_view2(request)
+                messages.error(request, 'Unable to authenticate, please try again or contact admin')
+                return HttpResponseRedirect(reverse('login'))
+        else:
+            return HttpResponseRedirect(reverse('index'))  
+        
 class Index(LoginRequiredMixin, View):
     template_name = 'index.html'
-    
-    def get(self,request):
-        
+    #pk_url_kwarg = 'username'
+    def get(self,request,**kwargs):
         usr=self.request.user
-        usrGroup = self.request.user.groups.values_list('name',flat = True) # QuerySet Object
-        usrGroup_as_list = list(usrGroup)
-        labname=[k for k in usrGroup_as_list if 'lab' in k]
-        obj= Project.objects.filter(status="Active").filter(lab_name__name__in=labname).order_by('-pk')
-        context = {
-            'object': obj,
-            'usr':usr,
-        }
-        
+        context = {}
+        if usr:
+            usrGroup = self.request.user.groups.values_list('name',flat = True) # QuerySet Object
+            usrGroup_as_list = list(usrGroup)
+            labname=[k for k in usrGroup_as_list if 'lab' in k]
+            obj= Project.objects.filter(status="Active").filter(lab_name__name__in=labname).order_by('-pk')
+            context = {
+                'object': obj,
+                'usr':usr
+            }
         return render(request, self.template_name, context)
     
 #######################
-def change_password(request):
-    if request.method == 'POST':
-        form = PasswordChangeForm(request.user, request.POST)
-        if form.is_valid():
-            user = form.save()
-            update_session_auth_hash(request, user)  # Important!
-            messages.success(request, 'Your password was successfully updated!')
-            return redirect('change_password')
-        else:
-            messages.error(request, 'Please correct the error below.')
-    else:
-        form = PasswordChangeForm(request.user)
-    return render(request, 'change_password.html', {
-        'form': form
-    })
+# def change_password(request):
+#     if request.method == 'POST':
+#         form = PasswordChangeForm(request.user, request.POST)
+#         if form.is_valid():
+#             user = form.save()
+#             update_session_auth_hash(request, user)  # Important!
+#             messages.success(request, 'Your password was successfully updated!')
+#             return redirect('change_password')
+#         else:
+#             messages.error(request, 'Please correct the error below.')
+#     else:
+#         form = PasswordChangeForm(request.user)
+#     return render(request, 'change_password.html', {
+#         'form': form
+#     })
     
 #######################
 ####JSON FIELDS########
@@ -1051,7 +1093,7 @@ class DeleteExperimentTag(LoginRequiredMixin, DeleteView):
 
 ##Import Sections
 ########################
-
+@login_required
 def selectProjectforImport(request,slug):
     if request.method == 'POST':
         form = selectProjectforImportForm(request.POST, request.FILES)
@@ -1069,7 +1111,7 @@ def selectProjectforImport(request,slug):
 
     return render(request, 'selectProject.html',{'form':form}) 
 
-
+@login_required
 def importExperiments(request,prj_pk):
     if request.method == 'POST':
         form = ImportForm(request.POST, request.FILES)
@@ -1101,6 +1143,7 @@ def importExperiments(request,prj_pk):
         }
     return render(request, 'upload.html', pageContext)   
 
+@login_required
 def importSequencingFiles(request,prj_pk):
     if request.method == 'POST':
         form = ImportForm(request.POST, request.FILES)
@@ -1132,10 +1175,11 @@ def importSequencingFiles(request,prj_pk):
         }
     return render(request, 'upload.html', pageContext)
 
+@login_required
 def addData(request):
     return render(request, 'addData.html')
 
-
+@login_required
 def bulkAddBiosource(request):
     if request.method == 'POST':       
         form = ImportForm(request.POST, request.FILES)
@@ -1167,6 +1211,7 @@ def bulkAddBiosource(request):
         }
     return render(request, 'upload.html', pageContext)
 
+@login_required
 def bulkAddBiosample(request):
     if request.method == 'POST':
         form = ImportForm(request.POST, request.FILES)
@@ -1198,6 +1243,7 @@ def bulkAddBiosample(request):
         }
     return render(request, 'upload.html', pageContext)
 
+@login_required
 def bulkAddSequencingRun(request,prj_pk):
     if request.method == 'POST':
         form = ImportForm(request.POST, request.FILES)

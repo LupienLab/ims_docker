@@ -14,8 +14,11 @@ from metadata.handleExport import *
 
 
 urlpatterns = [
-    url(r'^$', Index.as_view(), name='index'),
-    url(r'^password/$', views.change_password, name='change_password'),
+    url(r'^$', Rview.as_view(), name='rview'),
+    #url(r'^index/(?P<username>[\w-]+)/$', Index.as_view(), name='index'),
+    url(r'^index/$', Index.as_view(), name='index'),
+    url(r'^keycloak_login/$', KeycloakLoginView.as_view(), name='keycloak_login'),
+    # url(r'^password/$', views.change_password, name='change_password'),
     
     url(r'^showProject/$', ShowProject.as_view(), name='showProject'),
     url(r'^addProject/$', AddProject.as_view(), name='addProject'),

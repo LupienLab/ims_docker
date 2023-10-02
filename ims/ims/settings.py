@@ -56,10 +56,12 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    
-    #'metadata.custommiddleware.SessionMiddleware'
+    'django.middleware.clickjacking.XFrameOptionsMiddleware'
 ]
+
+# AUTHENTICATION_BACKENDS = [
+
+# ]
 
 ROOT_URLCONF = 'ims.urls'
 
@@ -130,9 +132,9 @@ USE_L10N = True
 USE_TZ = True
 
 ##url
+LOGIN_URL = 'keycloak_login'
 LOGIN_REDIRECT_URL='index'
-LOGOUT_REDIRECT_URL='/accounts/login'
-
+LOGOUT_REDIRECT_URL='keycloak_login'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
