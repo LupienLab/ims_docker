@@ -11,3 +11,4 @@ django-clone==0.2.0
 pandas==1.0.5
 django-autocomplete-light==3.5.1
 openpyxl==2.5.14
+python-keycloak==3.3.0
