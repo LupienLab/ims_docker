@@ -18,8 +18,8 @@ keycloak_openid = KeycloakOpenID(server_url=KEYCLOAK_SERVER_URL,
 def get_keycloak_url(request):
     # Get WellKnown
     config_well_known = keycloak_openid.well_known()
-    #login_url = keycloak_openid.auth_url('http://172.27.164.206:5050/')
-    login_url = keycloak_openid.auth_url('http://localhost:8000/')
+    login_url = keycloak_openid.auth_url('http://172.27.164.206:5050/')
+    #login_url = keycloak_openid.auth_url('http://localhost:8000/')
     
     return (login_url)
 
@@ -30,7 +30,7 @@ def get_keycloak_user_token(request):
     user_token = keycloak_openid.token(
             grant_type='authorization_code',
             code=code,
-            redirect_uri="http://localhost:8000/")
+            redirect_uri="http://172.27.164.206:5050/")
     
     userinfo = keycloak_openid.userinfo(user_token["access_token"])
 
