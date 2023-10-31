@@ -6,7 +6,7 @@ from keycloak import KeycloakOpenID
 KEYCLOAK_SERVER_URL = 'https://oa.pmgenomics.ca/auth/'
 REALM_NAME = 'Techna'
 CLIENT_ID = 'ankita-dev'
-CLIENT_SECRET = 'ae1fc7b3-8253-479b-8135-33d94ebaacc9'
+CLIENT_SECRET = ''
 
 # Create Keycloak client instance
 keycloak_openid = KeycloakOpenID(server_url=KEYCLOAK_SERVER_URL,
