@@ -173,7 +173,7 @@ def handle_uploaded_sequencingfiles(request, prj_pk, inputdf):
     for index, row in df.iterrows():
         if(not(row['file_path'] =="#") and checkSanity("file_path",request,row,c)):
             exp = get_or_none(Experiment,name=row['experiment_name'])
-            run = get_or_none(SequencingRun,name=row['sequencing_run_name'])
+            run = get_or_none(SequencingRun,name=row['sequencing_run_name'],project=prj_pk)
             prj = get_or_none(Project,pk=prj_pk)
             assay = get_or_none(Choice,name=row['assay'])
             if(exp==None):
@@ -223,7 +223,7 @@ def handle_uploaded_sequencingfiles(request, prj_pk, inputdf):
                             assay=assay
                             )
                         new_f.save()
-                        
+
                         if(len(related_files)>0):
                             new_f.related_files.set(related_files)
                             new_f.save()
@@ -231,9 +231,22 @@ def handle_uploaded_sequencingfiles(request, prj_pk, inputdf):
                                 f.related_files.add(SeqencingFile.objects.get(pk=new_f.pk))
                                 f.save()
                         
-                    except IntegrityError:
-                        messages.add_message(request, messages.WARNING, 'Same file md5sum exists in the database, should be unique md5sum in line '+str(c))
-                        return
+                    except IntegrityError as err:
+                        if("duplicate key value" in str(err)):
+                            print("File already exist in the database. - unique constraint")
+                            existing_file=SeqencingFile.objects.get(md5sum=md5sum)
+                            if(existing_file.duplicate_path == None):
+                                existing_file.duplicate_path=""
+                            if not (path in existing_file.duplicate_path) and not (path in existing_file.cluster_path):
+                                existing_file.duplicate_path=",".join([existing_file.duplicate_path,path])
+                                existing_file.save()
+                                messages.add_message(request, messages.SUCCESS, 'Duplicate files exist, updated in the database.')
+                            else:
+                                messages.add_message(request, messages.WARNING, 'File, path exists in the database, unable to process the line number '+str(c))
+                                return
+                        else:
+                            messages.add_message(request, messages.WARNING, ' Some error found, unable to process the line number '+str(c))
+                            return
                     
                         
             else:
@@ -241,6 +254,7 @@ def handle_uploaded_sequencingfiles(request, prj_pk, inputdf):
                 messages.add_message(request, messages.WARNING, 'Error in given file path in line '+str(c))
                 
             c+=1
+            print("count is", c)
     
     if len(errorList)>0:
         messages.add_message(request, messages.WARNING, 'Error in lines '+",".join(set(errorList)))
@@ -447,5 +461,3 @@ def getdf(request,uploaded_csv):
     new_cols=removeStar(old_cols)
     df.columns=new_cols
     return(df)
-
-
