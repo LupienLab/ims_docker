@@ -105,7 +105,7 @@ class SeqencingFileForm(ModelForm):
     class Meta:
         model = SeqencingFile
         exclude = ('created_at','created_by','edited_at','edited_by','project','experiment')
-        fields = ('name','file_format','assay','paired_end','related_files','read_length','cluster_path','archived_path','md5sum','fastqc_html','run','description',)
+        fields = ('name','file_format','assay','paired_end','related_files','read_length','cluster_path','duplicate_path','archived_path','md5sum','fastqc_html','run','description',)
     
     def __init__(self, *args, **kwargs):
         prj_pk = kwargs.get('initial')['prj_pk']
