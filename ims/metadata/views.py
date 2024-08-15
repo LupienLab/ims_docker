@@ -90,7 +90,7 @@ class Index(LoginRequiredMixin, View):
             usrGroup = self.request.user.groups.values_list('name',flat = True) # QuerySet Object
             usrGroup_as_list = list(usrGroup)
             labname=[k for k in usrGroup_as_list if 'lab' in k]
-            obj= Project.objects.filter(status="Active").filter(lab_name__name__in=labname).order_by('-pk')
+            obj= Project.objects.filter(status="Active").filter(lab_name__name__in=labname).order_by('-pk').distinct('pk')
             context = {
                 'object': obj,
                 'usr':usr
@@ -150,7 +150,7 @@ class ShowProject(LoginRequiredMixin, View):
         usrGroup = self.request.user.groups.values_list('name',flat = True) # QuerySet Object
         usrGroup_as_list = list(usrGroup)
         labname=[k for k in usrGroup_as_list if 'lab' in k]
-        obj= Project.objects.filter(lab_name__name__in=labname).order_by('-pk')
+        obj= Project.objects.filter(lab_name__name__in=labname).order_by('-pk').distinct('pk')
         
         context = {
             'object': obj,
