@@ -61,7 +61,7 @@ width: 295px !important;
 <tbody>
 {% if object %}
   {% for project in object %}
-  <tr> 
+  <tr>
 	<td><a href="{% url 'detailProject' project.pk %}">{{ project.name }}</a></td>
 </tr>
 	{% endfor %}
@@ -71,4 +71,4 @@ width: 295px !important;
 </table>
 </div>
 {% endif %}
-{% endblock %} 
+{% endblock %}

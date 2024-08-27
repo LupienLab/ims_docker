@@ -19,23 +19,23 @@ class ProjectForm(ModelForm):
         exclude = ('name','created_at','created_by','edited_at','edited_by','lab_name')
         fields = ('user_name_string','starting_date','disease_site','tissue_type','contributor','status','description',)
         #fields = ('contributor','status','description',)
-    
+
     def __init__(self, *args, **kwargs):
         super(ProjectForm, self).__init__(*args, **kwargs)
         #self.fields['origin'].queryset = self.fields['origin'].queryset.order_by('name')
-        
-    
+
+
 
 class ExperimentForm(ModelForm):
     class Meta:
-        model = Experiment 
+        model = Experiment
         exclude = ('created_at','created_by','edited_at','edited_by','json_fields','biosample','uid')
         fields = ('name','biosample_quantity','biosample_quantity_units','concentration_of_sample','volume_of_sample','bio_rep_no','tec_rep_no','json_type','protocol','description')
         widgets = {
             'protocol': RelatedFieldWidgetCanAdd(Treatment,'addProtocol'),
         }
-        
-        
+
+
 class BiosourceForm(ModelForm):
     choose_existing = ModelChoiceField(queryset = Biosource.objects.all(),required=False, widget=autocomplete.ModelSelect2(url='biosourceAutocomplete'), help_text='Choose from existing list')
     class Meta:
@@ -44,17 +44,17 @@ class BiosourceForm(ModelForm):
         fields = ('choose_existing','name','disease','source_organism','description','json_type')
 
 class BiosampleForm(ModelForm):
-    
+
     choose_existing = ModelChoiceField(queryset = Biosample.objects.all(),required=False, help_text='Choose from existing list')
-    
+
     def __init__(self, *args, **kwargs):
         source_pk = kwargs.get('initial')['source_pk']
-        
+
         super(BiosampleForm, self).__init__(*args, **kwargs)
         if source_pk:
-            
+
             self.fields['choose_existing'] = ModelChoiceField(queryset = Biosample.objects.all(),required=False,widget=autocomplete.ModelSelect2(url='biosampleAutocomplete',forward=(forward.Const(source_pk, 'f4'),)), help_text='Choose from existing list')
-    
+
     class Meta:
         model = Biosample
         exclude = ('created_at','created_by','edited_at','edited_by','json_fields', 'biosource')
@@ -93,20 +93,20 @@ class SequencingRunForm(ModelForm):
             'submission_date': forms.DateInput(),
             'retrieval_date': forms.DateInput(),
         }
-        
+
     def __init__(self, *args, **kwargs):
         prj_pk = kwargs.get('initial')['prj_pk']
         super(SequencingRunForm, self).__init__(*args, **kwargs)
         if prj_pk:
             self.fields['experiment'].queryset = Experiment.objects.filter(project=prj_pk).order_by('-pk')
-            
- 
+
+
 class SeqencingFileForm(ModelForm):
     class Meta:
         model = SeqencingFile
         exclude = ('created_at','created_by','edited_at','edited_by','project','experiment')
         fields = ('name','file_format','assay','paired_end','related_files','read_length','cluster_path','duplicate_path','archived_path','md5sum','fastqc_html','run','description',)
-    
+
     def __init__(self, *args, **kwargs):
         prj_pk = kwargs.get('initial')['prj_pk']
         exp_pk = kwargs.get('initial')['exp_pk']
@@ -115,12 +115,12 @@ class SeqencingFileForm(ModelForm):
             self.fields['run'].queryset = SequencingRun.objects.filter(project=prj_pk).order_by('-pk')
         if exp_pk:
             self.fields['related_files'].queryset = SeqencingFile.objects.filter(experiment=exp_pk).order_by('-pk')
-        
 
-class FieldsForm(forms.Form): 
+
+class FieldsForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(FieldsForm, self).__init__(*args)
-        
+
         field_values=kwargs.get('initial')
         #print(field_values['field_values'].get("null"))
         null_json=("null" in field_values['field_values'])
@@ -145,8 +145,8 @@ class FieldsForm(forms.Form):
                     self.fields[key] = forms.ChoiceField(choices = VAL_CHOICES, initial=values["old"],help_text=values["help"])
                 if(values["required"]=="no"):
                     self.fields[key].required = False
-        
-        
+
+
 class ImportForm(forms.Form):
     upload_csv=forms.FileField()
 
@@ -158,7 +158,7 @@ class ExperimentTagForm(ModelForm):
         model = ExperimentTag
         exclude = ('created_at','created_by','edited_at','edited_by','project')
         fields = ('name','experiment','description')
-        
+
     def __init__(self, *args, **kwargs):
         prj_pk = kwargs.get('initial')['prj_pk']
         super(ExperimentTagForm, self).__init__(*args, **kwargs)
@@ -167,7 +167,7 @@ class ExperimentTagForm(ModelForm):
 
 
 class SequencingForm(forms.Form):
-    BP_CHOICES= [ 
+    BP_CHOICES= [
     ('50bp', '50bp'),
     ('100bp', '100bp'),
     ('75bp', '75bp'),
@@ -175,13 +175,13 @@ class SequencingForm(forms.Form):
     ]
     SAMPLE_CHOICES=[
         ('No','No'),
-        ('Yes','Yes')        
+        ('Yes','Yes')
         ]
     SEQ_CHOICES=[
         ('Paired-end','Paired-end'),
         ('Single Read','Single Read')
         ]
-    
+
     choose_experiments = forms.ModelMultipleChoiceField(queryset = Experiment.objects.all(), help_text="select all experiments to export")
     data_recipient_contact_name=forms.CharField(max_length=100, help_text="Data recipient contact name")
     data_recipient_contact_email=forms.EmailField()
@@ -192,22 +192,22 @@ class SequencingForm(forms.Form):
     sequencing_type = forms.CharField(widget=forms.Select(choices=SEQ_CHOICES),help_text="Sequencing Type")
     multiplexing_sequencing = forms.CharField(widget=forms.Select(choices=SAMPLE_CHOICES),help_text="Multiplexing Sequencing")
     instructions = forms.CharField(widget=forms.Textarea, required=False, help_text="Experimental Conditions and Sequencing Instructions")
-    
+
     class Meta:
         fields = ('choose_experiments','data_recipient_contact_name','data_recipient_contact_email','buffer','instructions')
-    
-    def __init__(self, *args, **kwargs):  
+
+    def __init__(self, *args, **kwargs):
         prj_pk = kwargs.get('initial')['prj_pk']
         super(SequencingForm, self).__init__(*args, **kwargs)
         if prj_pk:
             self.fields['choose_experiments'].queryset = Experiment.objects.filter(project=prj_pk).order_by('-pk')
-            
-    
-    
+
+
+
 class selectExperimentsForm(forms.Form):
     choose_experiments = forms.ModelMultipleChoiceField(queryset = Experiment.objects.all(), help_text="select all experiments to be exported")
-    
-    def __init__(self, *args, **kwargs):  
+
+    def __init__(self, *args, **kwargs):
         prj_pk = kwargs.get('initial')['prj_pk']
         super(selectExperimentsForm, self).__init__(*args, **kwargs)
         if prj_pk:
@@ -217,26 +217,26 @@ class selectExperimentsForm(forms.Form):
 class ExperimentLabelsForm(forms.Form):
     experiments = forms.ModelChoiceField (Experiment.objects.all(), required=True,
                                                    help_text="Select an experiment.")
-  
+
     label = forms.CharField(
         label='Experiment label',
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'placeholder': 'Enter experiment label here'
         })
-    ) 
+    )
 
     def __init__(self, *args, **kwargs):
         super(ExperimentLabelsForm, self).__init__(*args, **kwargs)
         self.empty_permitted = False
-        
-        
+
+
 ExperimentLabelsFormSet = formset_factory(ExperimentLabelsForm, extra=1)
 
 class ArchiveSequencingRunForm(forms.Form):
     run_name = forms.ModelMultipleChoiceField(queryset = SequencingRun.objects.all(), help_text="Run to be archived. All related sequencing file path will be updated with the archived path.")
     archive_path = forms.CharField(max_length=1000, help_text="S3 path, where files are archived")
-    
+
     def __init__(self, *args, **kwargs):
         super(ArchiveSequencingRunForm, self).__init__(*args, **kwargs)
         self.empty_permitted = False
@@ -247,11 +247,11 @@ class AddFastqcResultsForm(forms.Form):
     qc_html=forms.FileField()
     selected_fastqs = forms.ModelMultipleChoiceField(queryset = SeqencingFile.objects.all(), help_text="select fastqs files for added in these results",
                                                 widget = forms.CheckboxSelectMultiple())
-    
-    
+
+
     def __init__(self, *args, **kwargs):
         super(AddFastqcResultsForm, self).__init__(*args, **kwargs)
         self.empty_permitted = False
 
 
-    
+

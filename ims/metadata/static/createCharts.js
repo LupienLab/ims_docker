@@ -1,7 +1,7 @@
 $(document).ready(function(){
-	
+
 var ctx2 = document.getElementById('owner');
-if(ctx2){	
+if(ctx2){
 	$.ajax({
     url: "/populateCharts/owner/",
     method: "POST",
@@ -15,7 +15,7 @@ if(ctx2){
     chartlabel.push(value);
     chartdata.push(ldata);
 	}
-	
+
 	var owner = new Chart(ctx2, {
     type: 'pie',
     data: {
@@ -43,9 +43,9 @@ if(ctx2){
         	var label = owner.data.labels[firstPoint._index];
        	    var value = owner.data.datasets[firstPoint._datasetIndex].data[firstPoint._index];
             window.location = "/browseProject/"+label+"/" ;
-                             
+
        		// alert(label + ": " + value);
-		
+
 	    }
 	}
 });
@@ -98,7 +98,7 @@ var assay = new Chart(ctx3, {
         	var label = assay.data.labels[firstPoint._index];
        	    var value = assay.data.datasets[firstPoint._datasetIndex].data[firstPoint._index];
        		window.location = "/browseProject/"+label+"/" ;
-		
+
 	    }
 	}
 });
@@ -151,7 +151,7 @@ var disease = new Chart(ctx1, {
         	var label = disease.data.labels[firstPoint._index];
        	    var value = disease.data.datasets[firstPoint._datasetIndex].data[firstPoint._index];
        		 window.location = "/browseProject/"+label+"/" ;
-		
+
 	    }
 	}
 });
@@ -204,7 +204,7 @@ var projectlabel = new Chart(ctx4, {
         	var label = projectlabel.data.labels[firstPoint._index];
        	    var value = projectlabel.data.datasets[firstPoint._datasetIndex].data[firstPoint._index];
        		 window.location = "/browseProject/"+label+"/" ;
-		
+
 	    }
 	}
 });
@@ -217,7 +217,7 @@ var projectlabel = new Chart(ctx4, {
 /*##############*/
 var ctx5 = document.getElementById('experimenttags');
 if(ctx5){
-var project_id= $("#project_id").val(); 
+var project_id= $("#project_id").val();
 $.ajax({
     url: "/populateCharts/tags_"+project_id+"/",
     method: "POST",
@@ -258,7 +258,7 @@ var experimenttags = new Chart(ctx5, {
         	var label = experimenttags.data.labels[firstPoint._index];
        	    var value = experimenttags.data.datasets[firstPoint._datasetIndex].data[firstPoint._index];
        		 window.location = "/detailExperimentTag/"+label+"/" ;
-		
+
 	    }
 	}
 });
@@ -271,39 +271,58 @@ var experimenttags = new Chart(ctx5, {
 /*##############*/
 new gridjs.Grid({
   search: true,
-  columns: ['Disease-site','ATAC-seq', 'Hi-C', 'ChIP-seq', 'RNA-seq', 'scATAC', 'scATAC-RNAseq-multiome', 'BS-seq','Cut-Run'],
+  columns: ['Disease-site','ATAC-seq', 'Hi-C', 'ChIP-seq', 'RNA-seq', 'scATAC', 'scATAC-RNAseq-multiome', 'BS-seq','Cut-Run', 'WGS', 'WES'],
   sort: {
     multiColumn: false,
     server: {
       url: (prev, columns) => {
        if (!columns.length) return prev;
-       
+
        const col = columns[0];
        const dir = col.direction === 1 ? 'True' : 'False';
-       let colName = ['Disease-site','ATAC-seq', 'Hi-C', 'ChIP-seq', 'RNA-seq', 'scATAC', 'scATAC-RNAseq-multiome', 'BS-seq','Cut-Run'][col.index];
-       
+       let colName = ['Disease-site','ATAC-seq', 'Hi-C', 'ChIP-seq', 'RNA-seq', 'scATAC', 'scATAC-RNAseq-multiome', 'BS-seq','Cut-Run','WGS', 'WES'][col.index];
+
        return `${prev}+${colName}+${dir}`;
      }
     }
   },
   server: {
-	method: 'POST',
+	  method: 'POST',
     url: '/populateCharts/grid',
-    then: data => data.map(card => [ gridjs.html(`${card[0]}`),
-                                     gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/ATAC-seq'>${card[1]}</a>`),
-                                     gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/Hi-C'>${card[2]}</a>`),
-                                     gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/ChIP-seq'>${card[3]}</a>`),
-                                     gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/RNA-seq'>${card[4]}</a>`),
-                                     gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/scATAC'>${card[5]}</a>`),
-                                     gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/scATAC-RNAseq-multiome'>${card[6]}</a>`),
-                                     gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/BS-seq'>${card[7]}</a>`),
-                                     gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/Cut-Run'>${card[8]}</a>`),
-                          ])
-  } ,
-    style: {
-   
-  }
+    then: data => data.map((card) => {
 
+      console.log("card:", card)
+
+      return card.map((value, index) => {
+        console.log(value)
+        if(index === 0) {
+          return gridjs.html(`${value}`)
+        } else {
+          return gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/${value['assay']}'>${value['value']}</a>`)
+        }
+      })
+
+      // return [ gridjs.html(`${card[0]}`),
+      //   gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/${card[1]['assay]']}'>${card[1]}</a>`),
+      //   gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/${card[2]['assay]']}'>${card[2]}</a>`),
+      //   gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/${card[3]['assay]']}'>${card[3]}</a>`),
+      //   gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/${card[4]['assay]']}'>${card[4]}</a>`),
+      //   gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/${card[5]['assay]']}'>${card[5]}</a>`),
+      //   gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/${card[6]['assay]']}'>${card[6]}</a>`),
+      //   gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/${card[7]['assay]']}'>${card[7]}</a>`),
+      //   gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/${card[8]['assay]']}'>${card[8]}</a>`),
+      // ]
+
+    }
+    ),
+    handle: (res) => {
+      // no matching records found
+      if (res.status === 404) return {data: []};
+      if (res.ok) return res.json();
+
+      throw Error('oh no :(');
+    },
+  }
 }).render(document.getElementById("matrixDataGrid"));
 
 /*##############*/

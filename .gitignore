@@ -7,3 +7,5 @@ migrations/*
 media/
 .metadata
 .DS_Store
+Docker/config/*.env
+ims/static/*

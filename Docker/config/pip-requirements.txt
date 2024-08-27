@@ -1,14 +1,15 @@
 #pip install
-Django==3.0.3
-six==1.13.0
-psycopg2==2.8.4
-gunicorn==20.0.4
-django-crispy-forms==1.8.1
-django-extensions==2.2.9
+Django==5.0.6
+six==1.16.0
+psycopg2==2.9.9
+gunicorn==22.0.0
+django-crispy-forms==2.2
+django-extensions==3.2.3
 pydotplus==2.0.2
-django-view-breadcrumbs==0.1.0
-django-clone==0.2.0
-pandas==1.0.5
-django-autocomplete-light==3.5.1
-openpyxl==2.5.14
-python-keycloak==3.3.0
+django-view-breadcrumbs==2.5.1
+django-clone==5.3.3
+pandas==2.2.2
+django-autocomplete-light==3.11.0
+openpyxl==3.1.4
+python-keycloak==4.1.0
+pygraphviz==1.13

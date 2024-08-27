@@ -16,12 +16,14 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+print("BASE_DIR:")
+print(BASE_DIR)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'j745#8440so*b$e2xf#@kl2($^h=d=_fv&x%3_ad&6r$6g$4er'
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -43,7 +45,6 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'crispy_forms',
     'metadata',
-    'django_bootstrap_breadcrumbs',
     'view_breadcrumbs',
 ]
 
@@ -141,6 +142,9 @@ LOGOUT_REDIRECT_URL='keycloak_login'
 
 STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 STATIC_URL = '/static/'
+
+print("STATIC_ROOT:")
+print(STATIC_ROOT)
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'

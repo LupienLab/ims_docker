@@ -1,44 +1,50 @@
 <!doctype html>
 {% load static %}
-
+{% load view_breadcrumbs %}
 
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  
-  
-  <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+
+  <!-- Load Bootstrap -->
+  <link rel="stylesheet" href="{% static 'bootstrap.min.css' %}">
+  <script src="{% static 'bootstrap.min.js' %}"></script>
+
+  <!-- Load jquery -->
+  <script src="{% static 'jquery-3.7.1.min.js' %}"></script>
   <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.css">
-  <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css">
-  <link rel="stylesheet" type="text/css" href="{% static 'base.css' %}">
-  
-  
-  <script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-  <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.3/themes/base/jquery-ui.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.3/jquery-ui.min.js"
+    integrity="sha512-Ww1y9OuQ2kehgVWSD/3nhgfrb424O3802QYP/A5gPXoM4+rRjiKrjHdGxQKrMGQykmsJ/86oGdHszfcVgUr4hA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js"></script>
-  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-  <script type="text/javascript" src="{% static 'base.js' %}"></script>
-  <script type="text/javascript" src="{% static 'addlabels.js' %}"></script>
-  
+
   <script type="text/javascript" src="/static/admin/js/vendor/jquery/jquery.min.js"></script>
   <script type="text/javascript" src="/static/admin/js/jquery.init.js"></script>
   <script type="text/javascript" src="/static/admin/js/admin/RelatedObjectLookups.js"></script>
-  
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js" integrity="sha512-vBmx0N/uQOXznm/Nbkp7h0P1RfLSj0HQrFSzV8m7rOGyj30fYAOKHYvCNez+yM8IrfnW0TCodDEjRqf6fodf/Q==" crossorigin="anonymous"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.css" integrity="sha512-SUJFImtiT87gVCOXl3aGC00zfDl6ggYAw5+oheJvRJ8KBXZrr/TMISSdVJ5bBarbQDRC2pR5Kto3xTR0kpZInA==" crossorigin="anonymous" />    
-<script type="text/javascript" src="{% static 'chartjs-plugin-colorschemes.min.js' %}"></script> 
 
-<script src="https://unpkg.com/gridjs/dist/gridjs.production.min.js"></script>
-<link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
+  <!-- Load chart.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.min.js"
+    integrity="sha512-L0Shl7nXXzIlBSUUPpxrokqq4ojqgZFQczTYlGjzONGTDAcLremjwaWv5A+EDLnxhQzY5xUZPWLOLqYRkY0Cbw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+
+  <!-- Load gridjs -->
+  <script src="https://unpkg.com/gridjs/dist/gridjs.production.min.js"></script>
+  <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
+
+  <link rel="stylesheet" type="text/css" href="{% static 'base.css' %}">
+  <script type="text/javascript" src="{% static 'base.js' %}"></script>
+  <script type="text/javascript" src="{% static 'addlabels.js' %}"></script>
 
   <title>DUnCAN</title>
 </head>
 
 <div class="header">
-   <img src="{% static 'img/LogoLupienLab.png' %}" alt="Lupien Lab" style="width:300px;height:100px;"> 
+   <img src="{% static 'img/LogoLupienLab.png' %}" alt="Lupien Lab" style="width:300px;height:100px;">
   <div class="header-right">
-    <a href="{% url 'index'%}">Home</a> 
+    <a href="{% url 'index'%}">Home</a>
     <a href="{% url 'addData' %}">Add data</a>
     <a href="{% url 'showProject' %}">Projects</a>
 	  <a href="{% url 'showBiosource' %}">Biosource</a>

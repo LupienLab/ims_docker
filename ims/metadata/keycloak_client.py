@@ -1,32 +1,27 @@
 from keycloak import KeycloakOpenID
+import os
 #from django.shortcuts import render, get_object_or_404, redirect
 #from keycloak import KeycloakAdmin
 
 # Keycloak configuration
-
-KEYCLOAK_SERVER_URL = 'https://oa.uhnresearch.ca/auth/'
-CLIENT_ID = 'ankita-dev'
-REALM_NAME = 'lupiengroup'
-
-
-#KEYCLOAK_SERVER_URL = 'https://oa.pmgenomics.ca/auth/'
-#REALM_NAME = 'Techna'
-
-CLIENT_SECRET = ''
+KEYCLOAK_SERVER_URL = os.getenv("KEYCLOAK_SERVER_URL")
+REALM_NAME = os.getenv("KEYCLOAK_REALM_NAME")
+CLIENT_ID = os.getenv("KEYCLOAK_CLIENT_ID")
+CLIENT_SECRET = os.getenv("KEYCLOAK_CLIENT_SECRET")
 
 # Create Keycloak client instance
-keycloak_openid = KeycloakOpenID(server_url=KEYCLOAK_SERVER_URL,
+keycloak_openid = KeycloakOpenID(server_url="http://localhost:8080/",
                                  client_id=CLIENT_ID,
                                  realm_name=REALM_NAME,
-                                 client_secret_key=CLIENT_SECRET)
+                                 client_secret_key="Jw1zlfrbsmM7531fGK62PBtGxDXsSm5q")
 
 # Function to get Keycloak user token
 def get_keycloak_url(request):
-    # Get WellKnown
-    config_well_known = keycloak_openid.well_known()
-    login_url = keycloak_openid.auth_url('http://172.27.164.206:5050/',scope='openid')
-    #login_url = keycloak_openid.auth_url('http://localhost:8000/')
-    
+
+    #login_url = keycloak_openid.auth_url('http://172.27.164.206:5050/')
+    login_url = keycloak_openid.auth_url("http://localhost:8000")
+    print(login_url)
+
     return (login_url)
 
 # Function to get Keycloak user token
@@ -36,13 +31,13 @@ def get_keycloak_user_token(request):
     user_token = keycloak_openid.token(
             grant_type='authorization_code',
             code=code,
-            redirect_uri="http://172.27.164.206:5050/",
+            redirect_uri="http://localhost:8000/",
             scope='openid')
-    
+
     userinfo = keycloak_openid.userinfo(user_token["access_token"])
 
-    # print(user_token)
-    # print(user_token["access_token"])
+    print(user_token)
+    print(user_token["access_token"])
     print(userinfo)
     request.session['user_token'] = user_token
     return (user_token,userinfo)

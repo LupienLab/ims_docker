@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.contrib.postgres.fields import JSONField
+from django.db.models import JSONField
 from metadata.validators import alphanumeric
 from django.utils.translation import gettext_lazy as _
 from model_clone import CloneMixin
@@ -19,29 +19,29 @@ class UserLog(models.Model):
     edited_by = models.ForeignKey(User, verbose_name="Last edited by", related_name='%(app_label)s_%(class)s_edited',
                                   on_delete=models.CASCADE, help_text="Who edited this object last")
     description = models.TextField(null=True, blank=True, help_text="Notes for the object")
-    
+
     class Meta:
         abstract = True
 
 class Choice(models.Model):
     name = models.CharField(max_length=50, null=False, help_text="Name of the choice (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
     class_type = models.CharField(max_length=50, null=False, help_text="Class/type of the choice")
-    
+
     def __str__(self):
         return self.name
-    
+
     class Meta:
         ordering = ['class_type']
 
 class ChoiceDisease(models.Model):
     name = models.CharField(max_length=50, null=False, help_text="Name of the choice (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
     class_type = models.CharField(max_length=50, null=False, help_text="Class/type of the choice")
-    
+
     def __str__(self):
         return self.name
-    
+
     class Meta:
-        ordering = ['class_type'] 
+        ordering = ['class_type']
 
 class Contributing_Lab(models.Model):
     def contact_default():
@@ -54,14 +54,14 @@ class Contributing_Lab(models.Model):
 
     class Meta:
         abstract = True
-         
-    
+
+
 class Project(UserLog):
     STATUS_CHOICES = (
         ('Active', 'Active'),
         ('Archived', 'Archived'),
     )
- 
+
     user_name_string = models.CharField(max_length=8, validators=[alphanumeric],  default="default" ,help_text="Max length=8 char, user defined relevant string for the project (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
     starting_date = models.DateField(help_text="When the project was started", default=now)
     disease_site =  models.ForeignKey(ChoiceDisease, default=5, limit_choices_to={'class_type': "disease_site"}, related_name='disease_site', on_delete=models.CASCADE, help_text="Type of cancer")
@@ -72,35 +72,35 @@ class Project(UserLog):
         User, related_name='project_contibutor', blank=True, help_text="Collaborating members for this project")
     status = models.CharField(choices=STATUS_CHOICES, max_length=10, default="Active",
                               help_text="Is project currently in progress")
-    
+
     lab_name = models.ManyToManyField(Choice, related_name='lab_project', limit_choices_to={'class_type': "lab_name"}, blank=True, help_text="To which the lab project belong")
-     
-    def __str__(self): 
-        return self.name 
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         ordering = ['-pk']
         unique_together = ('name',)
-        
-         
+
+
 
 
 class Protocol(UserLog):
     name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the protocol (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
     attachment = models.FileField(upload_to='media/', null=True, blank=True)
     class_type = models.ForeignKey(Choice, limit_choices_to={'class_type': "protocol_type"}, null=True, blank=True, on_delete=models.SET_NULL, help_text="The category that best describes the protocol or document")
-    
+
     def __str__(self):
         return self.name
 
-class JsonObj(models.Model): 
+class JsonObj(models.Model):
     def fields_default():
         return {"null": ""}
-    
+
     name = models.CharField(max_length=500, unique=True, help_text="Name of the object (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
     json_type = models.CharField(max_length=50, null=False, help_text="Class/type of the object")
-    json_fields = JSONField(default=fields_default) 
-    
+    json_fields = JSONField(default=fields_default)
+
     def __str__(self):
         return self.name
 
@@ -110,11 +110,11 @@ class Modification(UserLog):
     genomic_change = models.ForeignKey(Choice, limit_choices_to={'class_type': "genomic_change"}, related_name='genomic_change', null=True, blank=True, on_delete=models.SET_NULL, help_text="The method used to make the genomic modification")
     guide_rnas = models.CharField(max_length=100, null=True, blank=True, help_text="The guide RNA sequences used in Crispr targetting")
     attachment = models.FileField(upload_to='media/', null=True, blank=True)
-    
+
     def __str__(self):
         return self.name
-    
-class Treatment(UserLog): 
+
+class Treatment(UserLog):
     name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the treatment (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
     json_type = models.ForeignKey(JsonObj, verbose_name="treatment type", limit_choices_to={'json_type': "treatment_type"}, on_delete=models.CASCADE, help_text="The method used to make the treatment")
     json_fields = JSONField(null=True, blank=True)
@@ -129,12 +129,12 @@ class Biosource(UserLog):
     source_organism = models.ForeignKey(Choice, related_name='source_organism', limit_choices_to={'class_type': "source_organism"}, null=True, blank=True, on_delete=models.SET_NULL, help_text="Source of the biomaterial/biosource")
     json_type = models.ForeignKey(JsonObj, verbose_name="biomaterial type" ,related_name='biomaterial_type', limit_choices_to={'json_type': "biomaterial_type"}, on_delete=models.CASCADE, help_text="The categorization of the biomaterial/biosource")
     json_fields = JSONField(null=True, blank=True)
-    
-    def __str__(self): 
-        return self.name
-    
 
-    
+    def __str__(self):
+        return self.name
+
+
+
 class Biosample(UserLog, Contributing_Lab,CloneMixin):
     name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the biosample, e.g. HeLa-p14-11302019 (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
     biosource = models.ForeignKey(Biosource,related_name='sample_source', null=False, on_delete=models.CASCADE, help_text="Related biosource")
@@ -145,17 +145,17 @@ class Biosample(UserLog, Contributing_Lab,CloneMixin):
     collection_date = models.DateField(null=True, blank=True, help_text="Collection date for this biosample")
     collection_method = models.CharField(max_length=100, null=True, blank=True, help_text="Method of collection for this biosample")
     json_type = models.ForeignKey(JsonObj, verbose_name="Preprocessing details" ,related_name='preprocessing_details', limit_choices_to={'json_type': "preprocessing_details"}, on_delete=models.CASCADE, help_text="Preprocessing details of the sample")
-    json_fields = JSONField(null=True, blank=True) 
-    
+    json_fields = JSONField(null=True, blank=True)
+
     def __str__(self):
         return self.name
-    
-    
+
+
 #     _clone_many_to_many_fields = ['']
 
 
- 
-class Experiment(UserLog,CloneMixin): 
+
+class Experiment(UserLog,CloneMixin):
     project = models.ForeignKey(Project,related_name='exp_project', on_delete=models.CASCADE,)
     name = models.CharField(max_length=500, unique=True, validators=[alphanumeric], help_text="Name of the experiment, e.g. K562-p11-DpnII-02202020-R1-T1 (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
     uid = models.CharField(max_length=10, default="G7HXXY", help_text="Label for sequencing form")
@@ -166,18 +166,18 @@ class Experiment(UserLog,CloneMixin):
     volume_of_sample=models.CharField(max_length=100, null=True, blank=True, help_text="For Fresh cells, DNA and Libraries, Sample volume (uL or pellet)")
     bio_rep_no = models.IntegerField(null=False, default=1, help_text="Biological replicate number")
     tec_rep_no = models.IntegerField(null=False, default=1, help_text="Technical replicate number")
-    protocol = models.ForeignKey(Protocol,related_name='exp_protocol', null=True, blank=True, on_delete=models.SET_NULL, help_text="Reference protocol document") 
+    protocol = models.ForeignKey(Protocol,related_name='exp_protocol', null=True, blank=True, on_delete=models.SET_NULL, help_text="Reference protocol document")
     json_type = models.ForeignKey(JsonObj, verbose_name="experiment type", limit_choices_to={'json_type': "experiment_type"}, on_delete=models.CASCADE, help_text="The category that best describes the experiment")
-    json_fields = JSONField(null=True, blank=True) 
-    
+    json_fields = JSONField(null=True, blank=True)
+
     def __str__(self):
         return self.name
-    
-    
-#     _clone_many_to_many_fields = [''] 
 
-  
-    
+
+#     _clone_many_to_many_fields = ['']
+
+
+
 class SequencingRun(UserLog):
     name = models.CharField(max_length=300, null=False, default="", validators=[alphanumeric],help_text="Name of the sequencing run (allowed characters [0-9a-zA-Z-._], no spaces allowed)")
     project = models.ForeignKey(Project, related_name='run_project', on_delete=models.CASCADE,)
@@ -186,18 +186,18 @@ class SequencingRun(UserLog):
     sequencing_instrument = models.ForeignKey(Choice, related_name='run_sequencing_instrument', limit_choices_to={'class_type': "sequencing_instrument"}, null=True, blank=True, on_delete=models.SET_NULL, help_text="Instrument used for sequencing")
     submission_date = models.DateField(help_text="Submission date for sample")
     retrieval_date = models.DateField(default=now, help_text="Date when the sequencing run is received")
-#     submitted = models.BooleanField(default=False,help_text="Is sample submitted for sequencing") 
+#     submitted = models.BooleanField(default=False,help_text="Is sample submitted for sequencing")
 #     approved = models.BooleanField(default=False,help_text="Is sample approved for sequencing")
-    
+
     def __str__(self):
         return self.name
-    
+
     class Meta:
         unique_together = ('project', 'name',)
-     
+
 class SeqencingFile(UserLog):
     PAIR_CHOICES = (
-        ('', ''), 
+        ('', ''),
         ('1', '1'),
         ('2', '2'),
         ('3', '3'),
@@ -212,7 +212,7 @@ class SeqencingFile(UserLog):
         null=True,
         blank=True,
         help_text="Which pair the file belongs to (if paired end library)"
-    )    
+    )
     read_length = models.IntegerField(null=True, blank=True, help_text="Length of sequencing reads in base pairs for fastq files")
     cluster_path = models.CharField(max_length=1000, null=False, default="", help_text="Path on the cluster including the file name and extension e.g /mnt/work1/users/lupiengroup/Projects/folder/test.fastq.gz")
     duplicate_path = models.CharField(max_length=1000, null=True, blank=True, default="", help_text="Duplicate path on the cluster including the file name and extension e.g /mnt/work1/users/lupiengroup/Projects/folder/test.fastq.gz")
@@ -224,9 +224,9 @@ class SeqencingFile(UserLog):
     file_format = models.ForeignKey(Choice, on_delete=models.SET_NULL, null=True, blank=True, default="", related_name='fileChoice', limit_choices_to={'class_type': "file_format"}, help_text="Type of file format")
     assay = models.ForeignKey(Choice, on_delete=models.SET_NULL, null=True, blank=True, default="", related_name='fileassayChoice', limit_choices_to={'class_type': "file_assay"}, help_text="Assay of file format (important in case of multiome experiments)")
     fastqc_html = models.FileField(upload_to='media/', null=True, blank=True)
-    def __str__(self):  
-        return self.name 
-     
+    def __str__(self):
+        return self.name
+
     class Meta:
         unique_together = ('project', 'md5sum','name',)
 
@@ -245,4 +245,4 @@ class ExperimentTag(UserLog):
 
 
 
-    
+
