@@ -10,16 +10,16 @@ CLIENT_ID = os.getenv("KEYCLOAK_CLIENT_ID")
 CLIENT_SECRET = os.getenv("KEYCLOAK_CLIENT_SECRET")
 
 # Create Keycloak client instance
-keycloak_openid = KeycloakOpenID(server_url="http://localhost:8080/",
+keycloak_openid = KeycloakOpenID(server_url=KEYCLOAK_SERVER_URL,
                                  client_id=CLIENT_ID,
                                  realm_name=REALM_NAME,
-                                 client_secret_key="Jw1zlfrbsmM7531fGK62PBtGxDXsSm5q")
+                                 client_secret_key=CLIENT_SECRET)
 
 # Function to get Keycloak user token
 def get_keycloak_url(request):
 
     #login_url = keycloak_openid.auth_url('http://172.27.164.206:5050/')
-    login_url = keycloak_openid.auth_url("http://localhost:8000")
+    login_url = keycloak_openid.auth_url("http://localhost:8000/",scope='openid')
     print(login_url)
 
     return (login_url)
@@ -35,10 +35,6 @@ def get_keycloak_user_token(request):
             scope='openid')
 
     userinfo = keycloak_openid.userinfo(user_token["access_token"])
-
-    print(user_token)
-    print(user_token["access_token"])
-    print(userinfo)
     request.session['user_token'] = user_token
     return (user_token,userinfo)
 

@@ -15,7 +15,7 @@ services:
     environment:
        - DEVELOPMENT=1
     env_file:
-       - ./config/db_variables.env
+       - ./config/.env
     command: bash /code/start_django_server.sh
     volumes:
       - ../ims:/ims

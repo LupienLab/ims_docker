@@ -1,14 +1,9 @@
-{% extends 'base.html' %} 
-{% block content %} 
+{% extends 'base.html' %}
+{% block content %}
 {% load tags %}
 
 <div class="container">
-{% load django_bootstrap_breadcrumbs %}
-{% block breadcrumbs %}
-<br/>
- {% render_breadcrumbs 'django_bootstrap_breadcrumbs/bootstrap4.html' %}
- 
-{% endblock %}
+
 
 {% if object %}
 
@@ -16,27 +11,27 @@
 {% firstof object|modelname as model_val %}
 <div class="float-right">
 	<div class="float-right">
-	
+
 	<a href="{% url 'edit'|add:model_val prj_pk=object.project.pk obj_pk=object.pk %}"><button type="button" class="btn btn-warning float-left">Edit {{model_val}}</button></a>&nbsp;&nbsp;
-	
+
   	<a href="{% url 'delete'|add:model_val obj_pk=object.pk %}"><button type="button" class="btn btn-danger float-right">Delete {{model_val}}</button></a><br/><br/>
   	</div>
   	<table class="table table-bordered">
 	<h2>Detail {{model_val}}</h2>
 	{% for f in object|get_fields %}
-	
+
 		{% if f.label == "json fields" %}
 			<tr><td>
 			<b>specific fields:</b>
 			<table class="table table-bordered">
-			{% json_saved_data object.json_fields as jsonEntry %} 
+			{% json_saved_data object.json_fields as jsonEntry %}
 			{% for keys, values in jsonEntry.items %}
 			<tr><td>{{ keys|title }}</td><td>{{ values |title  }}</td></tr>
 			{% endfor %}
 			</table>
 			</td></tr>
 		{% else %}
-		     
+
 		    {% if f.m2m == True %}
 		    <tr><td>{{ f.label |title }}:</td></tr>
 		    <table class="table table-bordered">
@@ -54,7 +49,7 @@
 		{% endif %}
 	{% endfor %}
 	</td></tr>
-{% endif %} 
+{% endif %}
 {% endblock %}
 	</table>
 </div>

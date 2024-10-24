@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% load static %}
-{% block content %}
 
+{% block content %}
+<script type="text/javascript" src="{% static 'createCharts.js' %}"></script>
 {% if usr %}
 	<br/><h3>Welcome {{usr.get_full_name | default:usr.username}}!</h3><br/>
 {% endif %}
@@ -46,7 +47,7 @@ width: 295px !important;
 <hr/><br/>
 
 
-<script type="text/javascript" src="{% static 'createCharts.js' %}"></script>
+
 
 
 <div class="bodyContent container">
@@ -72,3 +73,4 @@ width: 295px !important;
 </div>
 {% endif %}
 {% endblock %}
+

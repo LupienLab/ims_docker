@@ -1,14 +1,9 @@
-{% extends 'base.html' %} 
-{% block content %} 
+{% extends 'base.html' %}
+{% block content %}
 {% load tags %}
 
 <div class="container">
-{% load django_bootstrap_breadcrumbs %}
-{% block breadcrumbs %}
-<br/>
- {% render_breadcrumbs 'django_bootstrap_breadcrumbs/bootstrap4.html' %}
- 
-{% endblock %}
+
 
 {% if object %}
 
@@ -18,15 +13,15 @@
 	<div class="float-right">
 	{% if object.project %}
 	<a href="{% url 'edit'|add:model_val prj_pk=object.project.pk obj_pk=object.pk %}"><button type="button" class="btn btn-warning float-left">Edit {{model_val}}</button></a>&nbsp;&nbsp;
-	{% else %} 
+	{% else %}
 	<a href="{% url 'edit'|add:model_val obj_pk=object.pk %}"><button type="button" class="btn btn-warning float-left">Edit {{model_val}}</button></a>&nbsp;&nbsp;
-	{% endif %} 
+	{% endif %}
   	<a href="{% url 'delete'|add:model_val obj_pk=object.pk %}"><button type="button" class="btn btn-danger float-right">Delete {{model_val}}</button></a><br/><br/>
   	</div>
   	<table class="table table-bordered">
 	<h2>Detail {{model_val}}</h2>
 	{% for f in object|get_fields %}
-		     
+
 		    {% if f.m2m == True %}
 		    <tr><td>{{ f.label |title }}:</td></tr>
 		    <table class="table table-bordered">
