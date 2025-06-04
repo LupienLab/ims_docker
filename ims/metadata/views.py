@@ -21,7 +21,7 @@ from crispy_forms.utils import render_crispy_form
 from django import forms
 from django.utils.html import escape
 from django.views.generic import DetailView
-from view_breadcrumbs import DetailBreadcrumbMixin
+from view_breadcrumbs import DetailBreadcrumbMixin, BaseBreadcrumbMixin
 from django.utils.functional import cached_property
 from metadata.handle_upload import *
 from django.contrib import messages
@@ -39,6 +39,9 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.decorators import login_required
 from ims.views import *
+from pprint import pprint
+from user_profiles.utils import get_user_lab
+from .utils import get_projects_for_user
 #import metadata.extendSession
 # Create your views here.
 
@@ -87,10 +90,13 @@ class Index(LoginRequiredMixin, View):
         usr=self.request.user
         context = {}
         if usr:
-            usrGroup = self.request.user.groups.values_list('name',flat = True) # QuerySet Object
-            usrGroup_as_list = list(usrGroup)
-            labname=[k for k in usrGroup_as_list if 'lab' in k]
-            obj= Project.objects.filter(status="Active").filter(lab_name__name__in=labname).order_by('-pk').distinct('pk')
+            lab = get_user_lab(usr)
+            print(lab)
+            projects = get_projects_for_user(usr)
+
+            # Filter projects associated with the lab
+            obj = projects.filter(status="Active").order_by('-pk').distinct('pk')
+            # obj= Project.objects.filter(status="Active").filter(lab_name__name__in=labname).order_by('-pk').distinct('pk')
             context = {
                 'object': obj,
                 'usr':usr
@@ -147,11 +153,9 @@ class ShowProject(LoginRequiredMixin, View):
     def get(self,request):
         # obj = Project.objects.all().order_by('-pk')
         usr=self.request.user
-        usrGroup = self.request.user.groups.values_list('name',flat = True) # QuerySet Object
-        usrGroup_as_list = list(usrGroup)
-        labname=[k for k in usrGroup_as_list if 'lab' in k]
+        lab = get_user_lab(usr)
 
-        obj= Project.objects.filter(lab_name__name__in=labname).order_by('-pk')
+        obj= Project.objects.filter(labs=lab).order_by('-pk')
 
         context = {
             'object': obj,
@@ -321,7 +325,7 @@ class AddBiosource(LoginRequiredMixin, CreateView):
         return reverse('addBiosample', kwargs={'prj_pk':self.kwargs['prj_pk'], 'source_pk':self.object.pk})
 
 
-class DetailBiosource(LoginRequiredMixin, DetailView):
+class DetailBiosource(LoginRequiredMixin, BaseBreadcrumbMixin, DetailView):
     template_name = 'detailClass.html'
     model = Biosource
     pk_url_kwarg = 'source_pk'
@@ -329,12 +333,22 @@ class DetailBiosource(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(DetailBiosource, self).get_context_data(**kwargs)
         rel_bisam=self.object.sample_source.all().order_by('-pk')
-
         context = {
             'object': self.object,
             'rel_bisam': rel_bisam
         }
         return (context)
+
+    @cached_property
+    def crumbs(self):
+
+      pprint(self.object.__dict__)
+
+      return [
+          {'title': 'Home', 'url': reverse('index')},
+          {'title': 'Project', 'url': reverse('detailProject', args=[self.object.pk])},
+          {'title': str(self.object), 'url': reverse('detailBiosource', args=[self.object.pk])},
+      ]
 
 #     @cached_property
 #    def crumbs(self):
@@ -507,7 +521,6 @@ class DetailExperiment(LoginRequiredMixin, DetailBreadcrumbMixin, DetailView):
         seqfiles=context["object"].file_exp.all().order_by('pk')
         context["seqfiles"]=seqfiles
         return context
-
 
     @cached_property
     def crumbs(self):

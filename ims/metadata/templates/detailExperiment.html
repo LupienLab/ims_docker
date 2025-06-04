@@ -1,95 +1,116 @@
-{% extends 'base.html' %} 
+{% extends 'base.html' %}
+{% load view_breadcrumbs %}
 {% block content %}
 {% load tags %}
 {% if experiment %}
 <div class="container">
-{% load django_bootstrap_breadcrumbs %}
-{% block breadcrumbs %}
-<br/>
- {% render_breadcrumbs 'django_bootstrap_breadcrumbs/bootstrap4.html' %}
-{% endblock %}
+  {% block breadcrumbs %}
+  <br />
+  {% render_breadcrumbs 'view_breadcrumbs/bootstrap4.html' %}
+  {% endblock %}
 
-<div class="float-right">
-  <a href="{% url 'addSeqencingFile' prj_pk=experiment.project.pk exp_pk=experiment.pk %}"><button type="button" class="btn btn-primary ">Add SeqencingFile</button></a>&nbsp;&nbsp;
-  <a href="{% url 'editExperiment' exp_pk=experiment.pk %}"><button type="button" class="btn btn-warning">Edit Experiment</button></a>&nbsp;&nbsp;
-  <a href="{% url 'deleteExperiment' exp_pk=experiment.pk %}"><button type="button" class="btn btn-danger">Delete Experiment</button></a><br/><br/>
+  <div class="float-right">
+    <a href="{% url 'addSeqencingFile' prj_pk=experiment.project.pk exp_pk=experiment.pk %}"><button type="button"
+        class="btn btn-primary ">Add SeqencingFile</button></a>&nbsp;&nbsp;
+    <a href="{% url 'editExperiment' exp_pk=experiment.pk %}"><button type="button" class="btn btn-warning">Edit
+        Experiment</button></a>&nbsp;&nbsp;
+    <a href="{% url 'deleteExperiment' exp_pk=experiment.pk %}"><button type="button" class="btn btn-danger">Delete
+        Experiment</button></a><br /><br />
   </div>
-  
-	
-	<table class="table table-bordered">
-		<tr>
-			<td><b>Experiment name:</b> {{ experiment.name }}</td>
-		</tr>
-		<tr>
-			<td><b>Experiment uid:</b> {{ experiment.uid }}</td>
-		</tr>
-		<tr>
-			<td><b>Biosource: </b><a href="{% url 'detailBiosource' source_pk=experiment.biosample.biosource.pk %}">{{ experiment.biosample.biosource }}</a></td>
-		</tr>
-		<tr>
-			<td><b>Biosample: </b><a href="{% url 'detailBiosample' sample_pk=experiment.biosample.pk %}">{{ experiment.biosample }}</a></td>
-		</tr>
-		<tr>
-			<td><b>Biosample quantity: </b>{{ experiment.biosample_quantity }} {{experiment.biosample_quantity_units}}</td>
-		</tr>
-		<tr>
-			<td><b>Concentration of sample: </b>{{ experiment.concentration_of_sample }}</td>
-		</tr>
-		<tr>
-			<td><b>Volume of sample: </b>{{ experiment.volume_of_sample }}</td>
-		</tr>
-		<tr>
-			<td><b>Bio rep_no:</b> {{ experiment.bio_rep_no }}</td>
-		</tr>
-		<tr>
-			<td><b>Tech rep_no:</b> {{ experiment.tec_rep_no }}</td>
-		</tr>
-		<tr>
-			<td><b>Assay type:</b> {{ experiment.json_type }}</td>
-		</tr>
-		<tr>
-			<td><b>Protocol:</b>
-			{% if experiment.protocol.pk %}
-			<a href="{% url 'detailProtocol' obj_pk=experiment.protocol.pk %}">{{ experiment.protocol }}</a>
-			{% endif %}
-			</td>
-		</tr>
-		<tr>
-			<td><b>Created by:</b> {{ experiment.created_by }}</td>
-		</tr>
-		<tr>
-			<td><b>Created on:</b> {{ experiment.created_at }}</td>
-		</tr>
-		<tr>
-			<td><b>Last edited by:</b> {{ experiment.edited_by }}</td>
-		</tr>
-		<tr>
-			<td><b>Last edited on:</b> {{ experiment.edited_at }}</td>
-		</tr>
-		<tr>
-			<td><b>Description:</b> {{ experiment.description }}</td>
-		</tr>
-		<tr><td>
-		<b>{{ experiment.json_type }} specific fields:</b><button type="button" class="hide-show float-right">Show/Hide</button>
-		<table class="jsontable">
-		{% json_saved_data experiment.json_fields as jsonEntry %} 
-		{% for keys, values in jsonEntry.items %}
-		<tr><td><b>{{ keys|title }}</b></td><td>{{ values |title  }}</td></tr>
-		{% endfor %}
-		</table>
-	</td></tr>
-	<tr><td>
-	    <b>Sequencing File details:</b>
-   <table>
-	    {% for files in seqfiles %}
-			<tr><td>({{forloop.counter }}) <a href="{% url 'detailSeqencingFile' file_pk=files.pk %}">{{files}}</a></td>
-			<td>{{files.assay}}</td>
-			<td>{{files.paired_end}}</td>
-			</tr>
-	     {% endfor %}
-	     </table>
-	   </td></tr>
-	</table>
+
+  <table class="table table-bordered">
+    <tr>
+      <td><b>Experiment name:</b> {{ experiment.name }}</td>
+    </tr>
+    <tr>
+      <td><b>Experiment uid:</b> {{ experiment.uid }}</td>
+    </tr>
+    <tr>
+      <td>
+        <b>Biosource: </b>
+        <a href="{% url 'detailBiosource' source_pk=experiment.biosample.biosource.pk %}">
+          {{ experiment.biosample.biosource }}
+        </a>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <b>Biosample: </b>
+        <a href="{% url 'detailBiosample' sample_pk=experiment.biosample.pk %}">
+          {{ experiment.biosample }}
+        </a>
+      </td>
+    </tr>
+    <tr>
+      <td><b>Biosample quantity: </b>{{ experiment.biosample_quantity }} {{experiment.biosample_quantity_units}}</td>
+    </tr>
+    <tr>
+      <td><b>Concentration of sample: </b>{{ experiment.concentration_of_sample }}</td>
+    </tr>
+    <tr>
+      <td><b>Volume of sample: </b>{{ experiment.volume_of_sample }}</td>
+    </tr>
+    <tr>
+      <td><b>Bio rep_no:</b> {{ experiment.bio_rep_no }}</td>
+    </tr>
+    <tr>
+      <td><b>Tech rep_no:</b> {{ experiment.tec_rep_no }}</td>
+    </tr>
+    <tr>
+      <td><b>Assay type:</b> {{ experiment.json_type }}</td>
+    </tr>
+    <tr>
+      <td><b>Protocol:</b>
+        {% if experiment.protocol.pk %}
+        <a href="{% url 'detailProtocol' obj_pk=experiment.protocol.pk %}">{{ experiment.protocol }}</a>
+        {% endif %}
+      </td>
+    </tr>
+    <tr>
+      <td><b>Created by:</b> {{ experiment.created_by }}</td>
+    </tr>
+    <tr>
+      <td><b>Created on:</b> {{ experiment.created_at }}</td>
+    </tr>
+    <tr>
+      <td><b>Last edited by:</b> {{ experiment.edited_by }}</td>
+    </tr>
+    <tr>
+      <td><b>Last edited on:</b> {{ experiment.edited_at }}</td>
+    </tr>
+    <tr>
+      <td><b>Description:</b> {{ experiment.description }}</td>
+    </tr>
+    <tr>
+      <td>
+        <b>{{ experiment.json_type }} specific fields:</b><button type="button"
+          class="hide-show float-right">Show/Hide</button>
+        <table class="jsontable">
+          {% json_saved_data experiment.json_fields as jsonEntry %}
+          {% for keys, values in jsonEntry.items %}
+          <tr>
+            <td><b>{{ keys|title }}</b></td>
+            <td>{{ values |title }}</td>
+          </tr>
+          {% endfor %}
+        </table>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <b>Sequencing File details:</b>
+        <table>
+          {% for files in seqfiles %}
+          <tr>
+            <td>({{forloop.counter }}) <a href="{% url 'detailSeqencingFile' file_pk=files.pk %}">{{files}}</a></td>
+            <td>{{files.assay}}</td>
+            <td>{{files.paired_end}}</td>
+          </tr>
+          {% endfor %}
+        </table>
+      </td>
+    </tr>
+  </table>
 </div>
 {% endif %}
 {% endblock %}

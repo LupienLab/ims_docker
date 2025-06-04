@@ -1,0 +1,37 @@
+<!-- lab/templates/lab_list.html -->
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Lab List</title>
+</head>
+
+<body>
+  {% if user.is_authenticated %}
+    <p>Welcome, {{ user.username }}!</p>
+    {% if is_supervisor %}
+      <p>You are a supervisor.</p>
+      <a href="{% url 'supervisor_view' %}">Go to Supervisor Dashboard</a>
+    {% elif is_admin %}
+      <p>You are an admin.</p>
+    {% else %}
+      <p>You are a regular user.</p>
+    {% endif %}
+    {% if user_lab %}
+      Your lab is: {{ user_lab.name }}
+    {% else %}
+      No Lab Assigned
+    {% endif %}
+  {% else %}
+    <p>You are not logged in. <a href="{% url 'login' %}">Login</a></p>
+  {% endif %}
+
+  <h1>Labs</h1>
+  <ul>
+    {% for lab in labs %}
+    <li>{{ lab.name }} - Supervisor: {{ lab.supervisor.get_full_name }}</li>
+    {% endfor %}
+  </ul>
+</body>
+
+</html>

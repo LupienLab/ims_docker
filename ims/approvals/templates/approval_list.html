@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+  <h2 class="mt-3">Approval Requests</h2>
+  <br>
+  <div class="container">
+    {% if approvals %}
+      <table class="table table-bordered table-hover">
+          <tr>
+            <th>Title</th>
+            <th>User</th>
+            <th>Document</th>
+            <th>Created At</th>
+            <th>Status</th>
+            <th>Approved/Disapproved By</th>
+            <th>Approved/Disapproved At</th>
+            <th>Actions</th>
+          </tr>
+          {% for approval in approvals %}
+          <tr>
+              <td>{{ approval.title }}</td>
+              <td>{{ approval.created_by.get_full_name }}</td>
+              <td><a href="{{ approval.document.url }}" target="_blank">Download</a></td>
+              <td>{{ approval.created_at|date:"Y-m-d H:i" }}</td>
+              <td class="{% if approval.status == 'approved' %}table-success{% elif approval.status == 'disapproved' %} table-danger {% else %} {% endif %}">{{ approval.get_status_display }}</td>
+              <td>
+                {% if approval.approved_by %}
+                  {{ approval.approved_by.get_full_name }}
+                {% else %}
+                  N/A
+                {% endif %}
+              </td>
+              <td>
+                {% if approval.approved_by %}
+                  {{ approval.approved_at|date:"Y-m-d H:i" }}
+                {% else %}
+                  N/A
+                {% endif %}
+              </td>
+              <td>
+                {% if is_supervisor %}
+                  {% if approval.status == 'pending' %}
+                    <div class="d-grid gap-2">
+                      <a href="{% url 'approve_request' approval.pk %}" class="btn btn-outline-success">
+                        Approve
+                      </a>
+                      <a href="{% url 'disapprove_request' approval.pk %}" class="btn btn-outline-danger">
+                        Disapprove
+                      </a>
+                    </div>
+                  {% endif %}
+                {% endif %}
+              </td>
+          </tr>
+          {% endfor %}
+      </table>
+    {% else %}
+      <p>No approval requests available for your lab.</p>
+    {% endif %}
+    <br>
+    <a href="{% url 'create_approval_request' %}"><button type="button" class="btn btn-primary">Create New Approval Request</button></a>
+  </div>
+{% endblock %}

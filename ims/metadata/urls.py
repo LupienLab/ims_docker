@@ -3,7 +3,7 @@ Created on Feb. 26, 2020
 
 @author: ankita
 '''
-from django.urls import re_path
+from django.urls import re_path, path, include
 from django.conf.urls.static import static
 from django.conf import settings
 from . import views
@@ -17,6 +17,7 @@ urlpatterns = [
     #url(r'^index/(?P<username>[\w-]+)/$', Index.as_view(), name='index'),
     re_path(r'^index/$', Index.as_view(), name='index'),
     re_path(r'^keycloak_login/$', KeycloakLoginView.as_view(), name='keycloak_login'),
+    path('accounts/', include('accounts.urls')),
     # url(r'^password/$', views.change_password, name='change_password'),
 
     re_path(r'^showProject/$', ShowProject.as_view(), name='showProject'),

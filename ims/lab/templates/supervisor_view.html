@@ -1,0 +1,21 @@
+<!-- lab/templates/supervisor_view.html -->
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Supervisor Dashboard</title>
+</head>
+
+<body>
+  <h1>Supervisor Dashboard</h1>
+  <h2>Your Labs</h2>
+  <ul>
+    {% for lab in labs %}
+    <li>{{ lab.name }} - Location: {{ lab.location }}</li>
+    {% endfor %}
+  </ul>
+  <a href="{% url 'lab_list' %}">Back to Lab List</a>
+  <a href="{% url 'logout' %}">Logout</a>
+</body>
+
+</html>

@@ -44,9 +44,18 @@ INSTALLED_APPS = [
     'dal_select2',
     'django.contrib.admin',
     'crispy_forms',
+    'crispy_bootstrap4',
+    'accounts',
     'metadata',
+    'approvals',
+    'notifications',
+    'lab',                  # Your lab app
+    'user_profiles',        # Your user profiles app
     'view_breadcrumbs',
+
 ]
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
@@ -148,3 +157,19 @@ print(STATIC_ROOT)
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
+# Email settings
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'mailcatcher'
+EMAIL_PORT = 1025
+DEFAULT_FROM_EMAIL = 'noreply@mailcatcher.com'
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")  # Your email address
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")  # Your email password
+
+# Keycloak settings
+KEYCLOAK_SERVER_URL = os.getenv("KEYCLOAK_SERVER_URL")
+KEYCLOAK_REALM = os.getenv("KEYCLOAK_REALM_NAME")
+KEYCLOAK_CLIENT_ID = os.getenv("KEYCLOAK_CLIENT_ID")
+KEYCLOAK_CLIENT_SECRET = os.getenv("KEYCLOAK_CLIENT_SECRET")
+KEYCLOAK_REDIRECT_URI = 'http://localhost:8000/auth/callback/'

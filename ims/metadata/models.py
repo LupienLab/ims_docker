@@ -1,11 +1,12 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.db.models import JSONField
 from metadata.validators import alphanumeric
 from django.utils.translation import gettext_lazy as _
 from model_clone import CloneMixin
 from email.policy import default
 from django.utils.timezone import now
+from lab.models import Lab
 
 # Create your models here.
 
@@ -74,6 +75,7 @@ class Project(UserLog):
                               help_text="Is project currently in progress")
 
     lab_name = models.ManyToManyField(Choice, related_name='lab_project', limit_choices_to={'class_type': "lab_name"}, blank=True, help_text="To which the lab project belong")
+    labs = models.ManyToManyField(Lab, related_name='projects', blank=True)  # Many-to-many relationship
 
     def __str__(self):
         return self.name

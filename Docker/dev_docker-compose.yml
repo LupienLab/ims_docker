@@ -15,7 +15,7 @@ services:
     environment:
        - DEVELOPMENT=1
     env_file:
-       - ./config/db_variables.env
+       - ./config/.env
     command: bash /code/start_django_server.sh
     volumes:
       - ../ims:/ims
@@ -24,3 +24,9 @@ services:
       - "8000:8000"
     depends_on:
       - db
+
+  mailcatcher:
+    image: schickling/mailcatcher
+    ports:
+      - "1080:1080"
+      - "1025:1025"

@@ -1,91 +1,105 @@
 {% extends 'base.html' %}
+{% load view_breadcrumbs %}
 {% block content %}
 {% load tags %}
 {% load static %}
 
 <div class="container">
-{% block breadcrumbs %}
-<br/>
- {% render_breadcrumbs 'view_breadcrumbs/bootstrap4.html' %}
+  {% block breadcrumbs %}
+  <br />
+  {% render_breadcrumbs 'view_breadcrumbs/bootstrap4.html' %}
 
-{% endblock %}
+  {% endblock %}
 
-{% if object %}
+  {% if object %}
 
-<br/>
-{% firstof object|modelname as model_val %}
-<div class="float-right">
-	<div class="float-right">
-	{% if object.project %}
-	<a href="{% url 'edit'|add:model_val prj_pk=object.project.pk obj_pk=object.pk %}"><button type="button" class="btn btn-warning float-left">Edit {{model_val}}</button></a>&nbsp;&nbsp;
-	{% else %}
-	<a href="{% url 'edit'|add:model_val obj_pk=object.pk %}"><button type="button" class="btn btn-warning float-left">Edit {{model_val}}</button></a>&nbsp;&nbsp;
-	{% endif %}
-  	<a href="{% url 'delete'|add:model_val obj_pk=object.pk %}"><button type="button" class="btn btn-danger float-right">Delete {{model_val}}</button></a><br/><br/>
-  	</div>
-  	<table class="table table-bordered">
-	<h2>Detail {{model_val}}</h2>
+  <br />
+  {% firstof object|modelname as model_val %}
+  <div class="float-right">
+    <div class="float-right">
+      {% if object.project %}
+      <a href="{% url 'edit'|add:model_val prj_pk=object.project.pk obj_pk=object.pk %}"><button type="button"
+          class="btn btn-warning float-left">Edit {{model_val}}</button></a>&nbsp;&nbsp;
+      {% else %}
+      <a href="{% url 'edit'|add:model_val obj_pk=object.pk %}"><button type="button"
+          class="btn btn-warning float-left">Edit {{model_val}}</button></a>&nbsp;&nbsp;
+      {% endif %}
+      <a href="{% url 'delete'|add:model_val obj_pk=object.pk %}"><button type="button"
+          class="btn btn-danger float-right">Delete {{model_val}}</button></a><br /><br />
+    </div>
+    <table class="table table-bordered">
+      <h2>Detail {{model_val}}</h2>
 
 
-	{% for f in object|get_fields %}
+      {% for f in object|get_fields %}
 
-		{% if f.label == "json fields" %}
-			<tr><td>
-			<b>specific fields:</b>
-			<table>
-			{% json_saved_data object.json_fields as jsonEntry %}
-			{% for keys, values in jsonEntry.items %}
-			<tr><td>{{ keys|title }}</td><td>{{ values |title  }}</td></tr>
-			{% endfor %}
-			</table>
-			</td></tr>
-		{% elif  f.label == "treatment"  or f.label == "modification" or f.label == "protocol" %}
-			{% if f.value %}
-			 {% firstof f.label|capfirst as urlclass %}
-				<tr>
-					<td><b>{{ f.label |title }}: </b> <a href="{% url 'detail'|add:urlclass obj_pk=f.value.pk %}">{{f.value}}</a></td>
-				</tr>
-			{% else %}
-				<tr>
-					<td><b>{{ f.label |title }}: </b> {{f.value}}</td>
-				</tr>
-			{% endif %}
-		{% elif  f.label == "attachment" %}
-		   <tr>
-				<td><b>{{ f.label |title }}: </b> <a target="_blank" href="/media/{{f.value}}">{{f.value}}</a> </td>
-			</tr>
-		{% elif  f.label == "fastqc html" %}
-		   <tr>
-				<td><b>{{ f.label |title }}: </b> <a target="_blank" href="/media/{{f.value}}">{{f.value}}</a> </td>
-			</tr>
-		{% elif  f.label == "related files" %}
-		   <tr><td><b>{{ f.label |title }}:</b> <br/>
-                {% for k in f.value %}
-                  ({{forloop.counter }}){{k.values | get_list_data}}<br/>
-	 			{% endfor %}
-			   </td>
-			</tr>
-		{% else %}
-			<tr>
-				<td><b>{{ f.label |title }}: </b> {{f.value}}</td>
-			</tr>
-		{% endif %}
+      {% if f.label == "json fields" %}
+      <tr>
+        <td>
+          <b>specific fields:</b>
+          <table>
+            {% json_saved_data object.json_fields as jsonEntry %}
+            {% for keys, values in jsonEntry.items %}
+            <tr>
+              <td>{{ keys|title }}</td>
+              <td>{{ values |title }}</td>
+            </tr>
+            {% endfor %}
+          </table>
+        </td>
+      </tr>
+      {% elif f.label == "treatment" or f.label == "modification" or f.label == "protocol" %}
+      {% if f.value %}
+      {% firstof f.label|capfirst as urlclass %}
+      <tr>
+        <td><b>{{ f.label |title }}: </b> <a href="{% url 'detail'|add:urlclass obj_pk=f.value.pk %}">{{f.value}}</a>
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td><b>{{ f.label |title }}: </b> {{f.value}}</td>
+      </tr>
+      {% endif %}
+      {% elif f.label == "attachment" %}
+      <tr>
+        <td><b>{{ f.label |title }}: </b> <a target="_blank" href="/media/{{f.value}}">{{f.value}}</a> </td>
+      </tr>
+      {% elif f.label == "fastqc html" %}
+      <tr>
+        <td><b>{{ f.label |title }}: </b> <a target="_blank" href="/media/{{f.value}}">{{f.value}}</a> </td>
+      </tr>
+      {% elif f.label == "related files" %}
+      <tr>
+        <td><b>{{ f.label |title }}:</b> <br />
+          {% for k in f.value %}
+          ({{forloop.counter }}){{k.values | get_list_data}}<br />
+          {% endfor %}
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td><b>{{ f.label |title }}: </b> {{f.value}}</td>
+      </tr>
+      {% endif %}
 
-	{% endfor %}
+      {% endfor %}
 
-	</table>
-	</td></tr>
-	</table>
-	{% if rel_bisam %}
-	{% if model_val == "Biosource" %}
-	<h5>Related Biosamples</h5>
-	<table class="table table-bordered">
-	{% for sam in rel_bisam %}
-			<tr><td>({{forloop.counter }}) <a href="{% url 'detailBiosample' sample_pk=sam.pk %}">{{sam.name}}</a></td></tr>
-	 {% endfor %}
-	</table>
-	{% endif %}
-	{% endif %}
-</div>
-{% endif %}
-{% endblock %}
+    </table>
+    </td>
+    </tr>
+    </table>
+    {% if rel_bisam %}
+    {% if model_val == "Biosource" %}
+    <h5>Related Biosamples</h5>
+    <table class="table table-bordered">
+      {% for sam in rel_bisam %}
+      <tr>
+        <td>({{forloop.counter }}) <a href="{% url 'detailBiosample' sample_pk=sam.pk %}">{{sam.name}}</a></td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% endif %}
+    {% endif %}
+  </div>
+  {% endif %}
+  {% endblock %}

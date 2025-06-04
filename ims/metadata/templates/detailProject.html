@@ -1,173 +1,194 @@
-{% extends 'base.html' %} 
+{% extends 'base.html' %}
+{% load view_breadcrumbs %}
 {% block content %}
 {% load static %}
-<script type="text/javascript" src="{% static 'createCharts.js' %}"></script>
+
 
 {% if project %}
 <div class="container">
 
-{% load django_bootstrap_breadcrumbs %}
-{% block breadcrumbs %}
-<br/>
- {% render_breadcrumbs 'django_bootstrap_breadcrumbs/bootstrap4.html' %}
-{% endblock %}
+  {% block breadcrumbs %}
+  <br />
+  {% render_breadcrumbs 'view_breadcrumbs/bootstrap4.html' %}
+  {% endblock %}
 
 
   <div class="float-right">
-  <a href="{% url 'editProject' prj_pk=project.pk %}"><button type="button" class="btn btn-warning float-left">Edit Project</button></a>&nbsp;&nbsp;
-  <a href="{% url 'deleteProject' prj_pk=project.pk %}"><button type="button" class="btn btn-danger float-right">Delete Project</button></a><br/><br/>
+    <a href="{% url 'editProject' prj_pk=project.pk %}"><button type="button" class="btn btn-warning float-left">Edit
+        Project</button></a>&nbsp;&nbsp;
+    <a href="{% url 'deleteProject' prj_pk=project.pk %}"><button type="button"
+        class="btn btn-danger float-right">Delete Project</button></a><br /><br />
   </div>
   <h3>Project Details</h6>
-	<table class="table table-bordered">
-		<tr>
-			<td><b>Name:</b> {{ project.name }}</td>
-		</tr>
-		<tr>
-		    <td><b>Disease site:</b> {{ project.disease_site.name }}</td>
-		</tr>
-		<tr>
-			<td><b>Tissue type:</b>  <br />
-		{% if project.tissue_type.all %} 
-			{% for rel in project.tissue_type.all %}
-				({{forloop.counter }}) {{rel}}<br /> 
-			{% endfor %} 
-			{% else %} 
-				No relations added. 
-			{% endif %}	
-			</td>
-		</tr>
-		<tr>
-			<td><b>Status:</b> {{ project.status }}</td>
-		</tr>
-		<tr>
-			<td><b>Created by:</b> {{ project.created_by }}</td>
-		</tr>
-		<tr>
-			<td><b>Contributors:</b> <br /> 
-			{% if project.contributor.all %} 
-			{% for contributor in project.contributor.all %}
-				({{forloop.counter }}) {{contributor}}<br /> 
-			{% endfor %} 
-			{% else %} 
-				No contributors added. 
-			{% endif %}
-			</td>
-		</tr>
-		<tr>
-			<td><b>Created on:</b> {{ project.created_at }}</td>
-		</tr>
-		<tr>
-			<td><b>Last edited by:</b> {{ project.edited_by }}</td>
-		</tr>
-		<tr>
-			<td><b>Last edited on:</b> {{ project.edited_at }}</td>
-		</tr>
-		<tr>
-			<td><b>Description:</b> {{ project.description }}</td>
-		</tr>
-		
-	</table>
-	<br/> 
-	<a href="{% url 'addBiosource' prj_pk=project.pk %}"><button type="button" class="btn btn-primary">Add experiment</button></a>
-	<a href="{% url 'addSequencingRun' prj_pk=project.pk %}"><button type="button" class="btn btn-secondary">Add SequencingRun</button></a>
-	<a href="{% url 'importExperiments' prj_pk=project.pk %}"><button type="button" class="btn btn-success">Bulk Add Experiments</button></a>
-	<a href="{% url 'bulkAddSequencingRun' prj_pk=project.pk%}"><button type="button" class="btn btn-warning">Bulk Add SequencingRun</button></a>
-	<a href="{% url 'importSequencingFiles' prj_pk=project.pk %}"><button type="button" class="btn btn-info">Bulk Add Fastq Files</button></a>
-	<br/><br/>
-	<hr><br>
-	{% if messages %}
+    <table class="table table-bordered">
+      <tr>
+        <td><b>Name:</b> {{ project.name }}</td>
+      </tr>
+      <tr>
+        <td><b>Disease site:</b> {{ project.disease_site.name }}</td>
+      </tr>
+      <tr>
+        <td><b>Tissue type:</b> <br />
+          {% if project.tissue_type.all %}
+          {% for rel in project.tissue_type.all %}
+          ({{forloop.counter }}) {{rel}}<br />
+          {% endfor %}
+          {% else %}
+          No relations added.
+          {% endif %}
+        </td>
+      </tr>
+      <tr>
+        <td><b>Status:</b> {{ project.status }}</td>
+      </tr>
+      <tr>
+        <td><b>Created by:</b> {{ project.created_by }}</td>
+      </tr>
+      <tr>
+        <td><b>Contributors:</b> <br />
+          {% if project.contributor.all %}
+          {% for contributor in project.contributor.all %}
+          ({{forloop.counter }}) {{contributor}}<br />
+          {% endfor %}
+          {% else %}
+          No contributors added.
+          {% endif %}
+        </td>
+      </tr>
+      <tr>
+        <td><b>Created on:</b> {{ project.created_at }}</td>
+      </tr>
+      <tr>
+        <td><b>Last edited by:</b> {{ project.edited_by }}</td>
+      </tr>
+      <tr>
+        <td><b>Last edited on:</b> {{ project.edited_at }}</td>
+      </tr>
+      <tr>
+        <td><b>Description:</b> {{ project.description }}</td>
+      </tr>
+
+    </table>
+    <br />
+    <a href="{% url 'addBiosource' prj_pk=project.pk %}"><button type="button" class="btn btn-primary">Add
+        experiment</button></a>
+    <a href="{% url 'addSequencingRun' prj_pk=project.pk %}"><button type="button" class="btn btn-secondary">Add
+        SequencingRun</button></a>
+    <a href="{% url 'importExperiments' prj_pk=project.pk %}"><button type="button" class="btn btn-success">Bulk Add
+        Experiments</button></a>
+    <a href="{% url 'bulkAddSequencingRun' prj_pk=project.pk%}"><button type="button" class="btn btn-warning">Bulk Add
+        SequencingRun</button></a>
+    <a href="{% url 'importSequencingFiles' prj_pk=project.pk %}"><button type="button" class="btn btn-info">Bulk Add
+        Fastq Files</button></a>
+    <br /><br />
+    <hr><br>
+    {% if messages %}
     {% for message in messages %}
-    	<p{% if message.tags %} class="alert-{{ message.tags }} alert"{% endif %}>{{ message }}</p>
-    {% endfor %}
-	{% endif %}
-	
-	
-	{% if experiment %}
+    <p{% if message.tags %} class="alert-{{ message.tags }} alert" {% endif %}>{{ message }}</p>
+      {% endfor %}
+      {% endif %}
 
-	<h3>Experiment details</h3>
-	<h7>*Grey colored rows means fastq files are added for that experiment</h7>
-	<table class="cell-border table-hover data_table">
-		<thead>
-			<tr>
-				<th>Name</th>
-				<th>Labels</th>
-				<th>Biosource</th>
-				<th>Biosample</th>
-				<th>Assay</th>
-				<th>Created on</th>
-				<!--<th>Created by</th>-->
-			</tr>
-		</thead>
-		<tbody>
-		{% for exp in experiment %}
-			
-			<tr class="{% if exp.file_exp.all|length > 0 %}table-secondary{% endif %}">
-				
-				<td><a href="{% url 'detailExperiment' exp_pk=exp.pk %}">{{ exp.name }}</a></td>
-				<td>{{ exp.uid }}</td>
-				<td><a href="{% url 'detailBiosource' source_pk=exp.biosample.biosource.pk %}">{{ exp.biosample.biosource.name }}</a></td>
-				<td><a href="{% url 'detailBiosample' sample_pk=exp.biosample.pk %}">{{ exp.biosample.name }}</a></td>
-				<td>{{ exp.json_type }}</td>
-				<td>{{ exp.created_at }}</td>
-				<!--<td>{{ exp.created_by }}</td>-->
-			</tr>
-		{% endfor %}	
-		</tbody>
-		</table>
-	{% endif %} 
-	<br>
-	<a href="{% url 'addExperimentLabels' prj_pk=project.pk %}"><button type="button" class="btn btn-primary">Add Experiment Labels</button></a>
-	<a href="{% url 'archiveSequencingRun' prj_pk=project.pk %}"><button type="button" class="btn btn-primary">Archive Run</button></a>
-	<a href="{% url 'addFastqcResults' prj_pk=project.pk %}"><button type="button" class="btn btn-primary">Add FastQC/MultiQC Reports</button></a>
-	<hr><br>
-	<h4 class="text-center">Experiment Tags</h4>
-	<input type="hidden" id="project_id"  value={{ project.pk }}>
-	<div class="container">
-	    <div class="row">
-	       <div class="col-xs-6 col-sm-6 col-md-6">
-	          <a href="{% url 'addExperimentTag' prj_pk=project.pk %}"><button type="button" class="btn btn-primary">Tag experiments</button></a>
-	       </div>
-	       <div class="col-xs-6 col-sm-6 col-md-6">
-	          <canvas id="experimenttags" class="chartjs"></canvas>
-	       </div>
-	     </div>
-	</div>
 
-	<br><hr>
-	<a href="{% url 'exportSequencingform' prj_pk=project.pk %}"><button type="button" class="btn btn-primary">Export Sequencingform</button></a>
-	<a href="{% url 'exportform' prj_pk=project.pk slug='GEO' %}"><button type="button" class="btn btn-primary">Export GEO form</button></a>
-	<a href="{% url 'exportform' prj_pk=project.pk slug='EGA' %}"><button type="button" class="btn btn-primary">Export EGA form</button></a>
-	<a href="{% url 'exportform' prj_pk=project.pk slug='IHEC' %}"><button type="button" class="btn btn-primary">Export IHEC form</button></a>
-	
-	<br><hr>
-	{% if sequencingRun %}
-	<h3>Sequencing run details</h6>
-	<table class="cell-border table-hover data_table">
-		<thead>
-			<tr>
-				<th>Name</th>
-				<th>Experiments</th> 
-				<th>Created on</th>
-				<th>Created by</th>
-			</tr>
-		</thead>
-		<tbody>
-		{% for run in sequencingRun %}
-			<tr>
-				<td><a href="{% url 'detailSequencingRun' run_pk=run.pk %}">{{ run.name }}</a></td>
-				<td>
-				{% for exp in run.experiment.all %}
-					({{ forloop.counter }}) <a href="{% url 'detailExperiment' exp_pk=exp.pk %}">{{ exp.name }}</a><br/>
-				{% endfor %}
-				</td>
-				<td>{{ run.created_at }}</td>
-				<td>{{ run.created_by }}</td>
-			</tr>
-		{% endfor %}	
-		</tbody>
-		</table>
-	{% endif %} 
-	
+      {% if experiment %}
+
+      <h3>Experiment details</h3>
+      <h7>*Grey colored rows means fastq files are added for that experiment</h7>
+      <table class="cell-border table-hover data_table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Labels</th>
+            <th>Biosource</th>
+            <th>Biosample</th>
+            <th>Assay</th>
+            <th>Created on</th>
+            <!--<th>Created by</th>-->
+          </tr>
+        </thead>
+        <tbody>
+          {% for exp in experiment %}
+
+          <tr class="{% if exp.file_exp.all|length > 0 %}table-secondary{% endif %}">
+
+            <td><a href="{% url 'detailExperiment' exp_pk=exp.pk %}">{{ exp.name }}</a></td>
+            <td>{{ exp.uid }}</td>
+            <td>
+              <a href="{% url 'detailBiosource' source_pk=exp.biosample.biosource.pk %}">
+                {{ exp.biosample.biosource.name }}
+              </a>
+            </td>
+            <td><a href="{% url 'detailBiosample' sample_pk=exp.biosample.pk %}">{{ exp.biosample.name }}</a></td>
+            <td>{{ exp.json_type }}</td>
+            <td>{{ exp.created_at }}</td>
+            <!--<td>{{ exp.created_by }}</td>-->
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+      <br>
+      <a href="{% url 'addExperimentLabels' prj_pk=project.pk %}"><button type="button" class="btn btn-primary">Add
+          Experiment Labels</button></a>
+      <a href="{% url 'archiveSequencingRun' prj_pk=project.pk %}"><button type="button" class="btn btn-primary">Archive
+          Run</button></a>
+      <a href="{% url 'addFastqcResults' prj_pk=project.pk %}"><button type="button" class="btn btn-primary">Add
+          FastQC/MultiQC Reports</button></a>
+      <hr><br>
+      <h4 class="text-center">Experiment Tags</h4>
+      <input type="hidden" id="project_id" value={{ project.pk }}>
+      <div class="container">
+        <div class="row">
+          <div class="col-xs-6 col-sm-6 col-md-6">
+            <a href="{% url 'addExperimentTag' prj_pk=project.pk %}"><button type="button" class="btn btn-primary">Tag
+                experiments</button></a>
+          </div>
+          <div class="col-xs-6 col-sm-6 col-md-6">
+            <canvas id="experimenttags" class="chartjs"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <br>
+      <hr>
+      <a href="{% url 'exportSequencingform' prj_pk=project.pk %}"><button type="button" class="btn btn-primary">Export
+          Sequencingform</button></a>
+      <a href="{% url 'exportform' prj_pk=project.pk slug='GEO' %}"><button type="button" class="btn btn-primary">Export
+          GEO form</button></a>
+      <a href="{% url 'exportform' prj_pk=project.pk slug='EGA' %}"><button type="button" class="btn btn-primary">Export
+          EGA form</button></a>
+      <a href="{% url 'exportform' prj_pk=project.pk slug='IHEC' %}"><button type="button"
+          class="btn btn-primary">Export IHEC form</button></a>
+
+      <br>
+      <hr>
+      {% if sequencingRun %}
+      <h3>Sequencing run details</h6>
+        <table class="cell-border table-hover data_table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Experiments</th>
+              <th>Created on</th>
+              <th>Created by</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for run in sequencingRun %}
+            <tr>
+              <td><a href="{% url 'detailSequencingRun' run_pk=run.pk %}">{{ run.name }}</a></td>
+              <td>
+                {% for exp in run.experiment.all %}
+                ({{ forloop.counter }}) <a href="{% url 'detailExperiment' exp_pk=exp.pk %}">{{ exp.name }}</a><br />
+                {% endfor %}
+              </td>
+              <td>{{ run.created_at }}</td>
+              <td>{{ run.created_by }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
+
 </div>
-{% endif %} 
+{% endif %}
 {% endblock %}
