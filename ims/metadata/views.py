@@ -43,7 +43,6 @@ from ims.views import *
 from pprint import pprint
 from user_profiles.utils import get_user_lab
 from .utils import get_projects_for_user
-from .decorators import lab_assignment_required
 #import metadata.extendSession
 # Create your views here.
 
