@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 from django.http.response import HttpResponseRedirect, JsonResponse
 from metadata.forms import *
 from metadata.models import *
@@ -13,6 +13,7 @@ from django.urls.base import reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.core import serializers
+from django.core.exceptions import PermissionDenied
 import json
 from django.db import models
 import metadata.models as app_models
@@ -42,6 +43,7 @@ from ims.views import *
 from pprint import pprint
 from user_profiles.utils import get_user_lab
 from .utils import get_projects_for_user
+from .decorators import lab_assignment_required
 #import metadata.extendSession
 # Create your views here.
 
@@ -146,7 +148,6 @@ def addFields(request):
 #######################
 ####PROJECT############
 
-
 class ShowProject(LoginRequiredMixin, View):
     template_name = 'showProject.html'
 
@@ -156,6 +157,7 @@ class ShowProject(LoginRequiredMixin, View):
         lab = get_user_lab(usr)
 
         obj= Project.objects.filter(labs=lab).order_by('-pk')
+        print(obj)
 
         context = {
             'object': obj,
@@ -192,7 +194,12 @@ class DetailProject(LoginRequiredMixin, DetailBreadcrumbMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(DetailProject, self).get_context_data(**kwargs)
-        prj = Project.objects.get(pk=self.kwargs['prj_pk'])
+        prj = get_object_or_404(Project, id=self.kwargs['prj_pk'])
+        usr= self.request.user
+        lab = get_user_lab(usr)
+
+        if not prj.labs.filter(id=lab.id).exists():
+          raise PermissionDenied("You do not have access to this project.")
         #self.request.CustomSession['active_project'] = self.kwargs['prj_pk']
         exp = Experiment.objects.filter(project=self.kwargs['prj_pk']).order_by('-pk')
         run = SequencingRun.objects.filter(project=self.kwargs['prj_pk']).order_by('-pk')
@@ -1293,97 +1300,57 @@ from django.db.models import Count
 
 @csrf_exempt
 def populateCharts(request,slug):
+  if request.method == 'POST':
+    if (slug=="owner"):
+      proj_owner=list(Project.objects.values('created_by__first_name').annotate(dcount=Count('created_by')).order_by())
+      js_project=json.dumps(proj_owner)
 
-    if request.method == 'POST':
-        if (slug=="owner"):
-            proj_owner=list(Project.objects.values('created_by__first_name').annotate(dcount=Count('created_by')).order_by())
-            js_project=json.dumps(proj_owner)
+    elif (slug=="assay"):
+      proj_owner=list(Project.objects.values('exp_project__json_type__name').annotate(dcount=Count('exp_project__json_type__name')).order_by())
+      js_project=json.dumps(proj_owner)
 
-        elif (slug=="assay"):
-            proj_owner=list(Project.objects.values('exp_project__json_type__name').annotate(dcount=Count('exp_project__json_type__name')).order_by())
-            js_project=json.dumps(proj_owner)
+    elif (slug=="disease"):
+      proj_owner=list(Project.objects.values('disease_site__name').annotate(dcount=Count('disease_site__name')).order_by())
+      js_project=json.dumps(proj_owner)
 
-        elif (slug=="disease"):
-            proj_owner=list(Project.objects.values('disease_site__name').annotate(dcount=Count('disease_site__name')).order_by())
-            js_project=json.dumps(proj_owner)
+    elif (slug=="status"):
+      proj_owner=list(Project.objects.values('status').annotate(dcount=Count('status')).order_by())
+      js_project=json.dumps(proj_owner)
 
-        elif (slug=="status"):
-            proj_owner=list(Project.objects.values('status').annotate(dcount=Count('status')).order_by())
-            js_project=json.dumps(proj_owner)
+    elif (slug.startswith("tags")):
+      s=slug.split("_")
+      tag_experiments=list(ExperimentTag.objects.filter(project=s[1]).values('name').annotate(dcount=Count('experiment')).order_by())
+      js_project=json.dumps(tag_experiments)
 
-        elif (slug.startswith("tags")):
-            s=slug.split("_")
-            tag_experiments=list(ExperimentTag.objects.filter(project=s[1]).values('name').annotate(dcount=Count('experiment')).order_by())
-            js_project=json.dumps(tag_experiments)
+    elif (slug.startswith("grid")):
+      slug_vals=slug.split("+")
+      diseaseList=list(ChoiceDisease.objects.filter(class_type="disease_site").values_list('name', flat=True).order_by('id'))
+      assayList=list(JsonObj.objects.filter(json_type="experiment_type").values_list('name', flat=True).order_by('id'))
+      cancer_matrix = []
+      data = {}
+      data['Disease-site'] = diseaseList
+      for row in diseaseList:
+        for col in assayList:
+          if(data.get(col) is None):
+            data[col] = []
+          no_of_exp=len(Experiment.objects.filter(json_type__name=col, project__disease_site__name=row))
+          data[col].append(no_of_exp)
 
-        elif (slug.startswith("grid")):
-            slug_vals=slug.split("+")
-            diseaseList=list(ChoiceDisease.objects.filter(class_type="disease_site").values_list('name', flat=True).order_by('id'))
-            print(f"diseaseList: {diseaseList}")
-            assayList=list(JsonObj.objects.filter(json_type="experiment_type").values_list('name', flat=True).order_by('id'))
-            print(f"assayList: {assayList}")
-            cancer_matrix = []
-            if(len(slug_vals)==1):
-                for row in diseaseList:
-                    new_row=[]
-                    new_row.append(row)
-                    for col in assayList:
-                        no_of_exp=len(Experiment.objects.filter(json_type__name=col, project__disease_site__name=row))
-                        new_row.append({'assay': col, 'value': no_of_exp})
+      # Create a DataFrame
+      df = pd.DataFrame(data)
 
-                    values = [d['value'] for d in new_row[1:-1]]
-                    if(sum(values)>0):
-                        cancer_matrix.append(new_row)
-            else:
-                for row in diseaseList:
-                    new_row=[]
-                    new_row.append(row)
-                    for col in assayList:
-                        no_of_exp=len(Experiment.objects.filter(json_type__name=col, project__disease_site__name=row))
-                        new_row.append({'assay': col, 'value': no_of_exp})
+      # Sort the DataFrame by the 'ATAC-seq' column in descending order
+      if(len(slug_vals) > 1):
+        sorted_df = df.sort_values(by=slug_vals[1], ascending=ast.literal_eval(slug_vals[2]))
+      else:
+        sorted_df = df
 
-                    print(f"new_row[1:-1]: {new_row[1:-1]}")
-                    values = [d['value'] for d in new_row[1:-1]]
-                    print(f"values: {values}")
-                    if(sum(values)>0):
-                        cancer_matrix.append(new_row)
+      # Remove rows where the sum of numeric values is zero
+      filtered_df = sorted_df[sorted_df[assayList].sum(axis=1) != 0]
 
-                print(f"cancer_matrix length: {len(cancer_matrix)}")
-                index = 1
-                blah = []
-                for row in cancer_matrix:
-                    print(f"cancer_matrix row: {index}: {row}")
-                    print(f"row length: {len(row)}")
-                    print(f"row[1:-1]: {row[1:-1]}")
-                    values = [d['value'] for d in row[1:-1]]
-                    blah.append(values)
-                    index = index + 1
+      return JsonResponse(filtered_df.to_dict(orient='records'), safe=False)
 
-                print(f"blah: {blah}")
-                np_cancer=np.array(blah)
-                print(f"np_cancer: {np_cancer}")
-                column_values = ['Disease-site'] + assayList
-                print(f"column_values: {column_values}")
-                df = pd.DataFrame(data = np_cancer, columns = assayList)
-                print(df)
-                print(df.info())
-                if(slug_vals[1] != 'Disease-site'):
-                 df[slug_vals[1]] = pd.to_numeric(df[slug_vals[1]], errors='coerce')
-                print(df.info())
-                print(f"slug_vals[1]: {slug_vals[1]}")
-                print(f"slug_vals[2]: {slug_vals[2]}")
-                cancer_matrix=df.sort_values(by=slug_vals[1], ascending=ast.literal_eval(slug_vals[2]))
-                print(f"cancer_matrix: {cancer_matrix}")
-                print(cancer_matrix.info())
-                result = cancer_matrix.to_json(orient="values")
-                print(f"result: {result}")
-                parsed = json.loads(result)
-
-                cancer_matrix=parsed
-
-            js_project=cancer_matrix
-
-        return JsonResponse(js_project, safe=False)
-    else :
-        return HttpResponse('<h1>Page was found</h1>')
+    return JsonResponse(js_project, safe=False)
+  else :
+    return HttpResponse('<h1>Page was found</h1>')
 

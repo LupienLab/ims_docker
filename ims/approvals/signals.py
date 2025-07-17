@@ -12,7 +12,7 @@ def approval_request_created(sender, instance, created, **kwargs):
     subject = f'New Document Submitted: {instance.title}'
     message = (
         f'Hello "{profile.lab.supervisor}",\n\n'
-        f'A new document titled "{instance.title}" has been submitted by {instance.created_by.username}.\n'
+        f'A new document titled "{instance.title}" has been submitted by {instance.created_by.username} for approval.\n'
         f'You can review it in the system.'
     )
     recipient_list = [profile.lab.supervisor]

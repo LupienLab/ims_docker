@@ -36,10 +36,10 @@ def approval_list(request):
   print(request.user)
   if request.user == profile.lab.supervisor:
     # If the user is a supervisor, show all requests for their lab
-    approvals = ApprovalRequest.objects.filter(user__profile__lab=profile.lab)
+    approvals = ApprovalRequest.objects.filter(user__profile__lab=profile.lab).order_by('status')
   else:
     # If the user is not a supervisor, show only their own requests
-    approvals = ApprovalRequest.objects.filter(created_by=request.user)
+    approvals = ApprovalRequest.objects.filter(created_by=request.user).order_by('status')
 
   return render(request, 'approval_list.html', {'approvals': approvals, 'is_supervisor': supervisor_status})
 
