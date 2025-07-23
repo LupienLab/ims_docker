@@ -85,24 +85,23 @@ class Rview(View):
             return HttpResponseRedirect(reverse('index'))
 
 class Index(LoginRequiredMixin, View):
-    template_name = 'index.html'
-    #pk_url_kwarg = 'username'
-    def get(self,request,**kwargs):
-        usr=self.request.user
-        context = {}
-        if usr:
-            lab = get_user_lab(usr)
-            print(lab)
-            projects = get_projects_for_user(usr)
+  template_name = 'index.html'
 
-            # Filter projects associated with the lab
-            obj = projects.filter(status="Active").order_by('-pk').distinct('pk')
-            # obj= Project.objects.filter(status="Active").filter(lab_name__name__in=labname).order_by('-pk').distinct('pk')
-            context = {
-                'object': obj,
-                'usr':usr
-            }
-        return render(request, self.template_name, context)
+  def get(self,request,**kwargs):
+    usr=self.request.user
+    context = {}
+    if usr:
+      lab = get_user_lab(usr)
+      print(lab)
+      projects = get_projects_for_user(usr)
+
+      # Filter projects associated with the lab
+      obj = projects.filter(status="Active").order_by('-pk').distinct('pk')
+      context = {
+          'object': obj,
+          'usr':usr
+      }
+    return render(request, self.template_name, context)
 
 #######################
 # def change_password(request):
@@ -148,21 +147,18 @@ def addFields(request):
 ####PROJECT############
 
 class ShowProject(LoginRequiredMixin, View):
-    template_name = 'showProject.html'
+  template_name = 'showProject.html'
 
-    def get(self,request):
-        # obj = Project.objects.all().order_by('-pk')
-        usr=self.request.user
-        lab = get_user_lab(usr)
+  def get(self,request):
+    projects = get_projects_for_user(self.request.user)
 
-        obj= Project.objects.filter(labs=lab).order_by('-pk')
-        print(obj)
+    obj= projects.order_by('-pk')
 
-        context = {
-            'object': obj,
-        }
+    context = {
+        'object': obj,
+    }
 
-        return render(request, self.template_name, context)
+    return render(request, self.template_name, context)
 
 class BrowseProject(LoginRequiredMixin, View):
     template_name = 'showProject.html'
@@ -172,13 +168,16 @@ class BrowseProject(LoginRequiredMixin, View):
         usrGroup_as_list = list(usrGroup)
         labname=[k for k in usrGroup_as_list if 'lab' in k]
 
-        obj = Project.objects.filter(created_by__first_name=slug).filter(lab_name__name__in=labname).order_by('-pk')
+        labname = get_user_lab(self.request.user)
+
+        obj = Project.objects.filter(created_by__first_name=slug).filter(labs=labname).order_by('-pk')
+        print(obj)
         if(len(obj)==0):
-            obj = Project.objects.filter(exp_project__json_type__name=slug).filter(lab_name__name__in=labname).order_by('-pk').distinct()
+            obj = Project.objects.filter(exp_project__json_type__name=slug).filter(labs=labname).order_by('-pk').distinct()
         if(len(obj)==0):
-            obj = Project.objects.filter(disease_site__name=slug).filter(lab_name__name__in=labname).order_by('-pk').distinct()
+            obj = Project.objects.filter(disease_site__name=slug).filter(labs=labname).order_by('-pk').distinct()
         if(len(obj)==0):
-            obj = Project.objects.filter(status=slug).filter(lab_name__name__in=labname).order_by('-pk').distinct()
+            obj = Project.objects.filter(status=slug).filter(labs=labname).order_by('-pk').distinct()
         context = {
             'object': obj,
         }
@@ -236,14 +235,6 @@ class AddProject(LoginRequiredMixin, CreateView):
 
 
         form.instance.name = name_string
-
-        form.save()
-
-        usrGroup = self.request.user.groups.values_list('name',flat = True) # QuerySet Object
-        usrGroup_as_list = list(usrGroup)
-        labname=[k for k in usrGroup_as_list if 'lab' in k]
-        for l in labname:
-            form.instance.lab_name.add(Choice.objects.get(name=l))
 
         form.save()
 
@@ -340,8 +331,8 @@ class DetailBiosource(LoginRequiredMixin, BaseBreadcrumbMixin, DetailView):
         context = super(DetailBiosource, self).get_context_data(**kwargs)
         rel_bisam=self.object.sample_source.all().order_by('-pk')
         context = {
-            'object': self.object,
-            'rel_bisam': rel_bisam
+          'object': self.object,
+          'rel_bisam': rel_bisam
         }
         return (context)
 
@@ -349,11 +340,8 @@ class DetailBiosource(LoginRequiredMixin, BaseBreadcrumbMixin, DetailView):
     def crumbs(self):
 
       pprint(self.object.__dict__)
-
       return [
-          {'title': 'Home', 'url': reverse('index')},
-          {'title': 'Project', 'url': reverse('detailProject', args=[self.object.pk])},
-          {'title': str(self.object), 'url': reverse('detailBiosource', args=[self.object.pk])},
+          ('Biosource: ' + self.object.name, reverse('detailBiosource', kwargs={'source_pk': self.object.pk}))
       ]
 
 #     @cached_property
@@ -524,6 +512,12 @@ class DetailExperiment(LoginRequiredMixin, DetailBreadcrumbMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(DetailExperiment, self).get_context_data(**kwargs)
+        prj = get_object_or_404(Project, id=self.object.project.pk)
+        usr= self.request.user
+        lab = get_user_lab(usr)
+
+        if not prj.labs.filter(id=lab.id).exists():
+          raise PermissionDenied("You do not have access to this project.")
         seqfiles=context["object"].file_exp.all().order_by('pk')
         context["seqfiles"]=seqfiles
         return context
@@ -574,9 +568,15 @@ class BrowseExperimentGrid(LoginRequiredMixin, View):
         usrGroup_as_list = list(usrGroup)
         labname=[k for k in usrGroup_as_list if 'lab' in k]
 
-        projects_lab= Project.objects.filter(lab_name__name__in=labname)
+        projects_lab= get_projects_for_user(self.request.user)
+        print(projects_lab)
+        print(projects_lab[0].pk)
 
+        print(slug_assay)
+        print(slug_disease)
+        print(Experiment.objects.filter(project__in=[63]))
         obj = Experiment.objects.filter(json_type__name=slug_assay, project__disease_site__name=slug_disease, project__in=projects_lab).order_by('-pk').distinct()
+        print(obj)
         context = {
             'object': obj,
         }

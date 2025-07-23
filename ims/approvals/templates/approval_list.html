@@ -4,6 +4,11 @@
 <h2 class="mt-3">Approval Requests</h2>
 <br>
 <div class="container">
+  {% if not profile_exists %}
+  <div class="alert alert-warning">
+    You do not have a user profile. Please contact Admin to create one for so you can access approval requests.
+  </div>
+  {% else %}
   <a href="{% url 'create_approval_request' %}"><button type="button" class="btn btn-primary mb-4">Create New Approval
       Request</button></a>
   {% if approvals %}
@@ -88,6 +93,6 @@
   <p>No approval requests available for your lab.</p>
   {% endif %}
   <br>
-
+  {% endif %}
 </div>
 {% endblock %}

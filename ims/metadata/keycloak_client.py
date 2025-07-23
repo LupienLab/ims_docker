@@ -10,7 +10,7 @@ CLIENT_ID = os.getenv("KEYCLOAK_CLIENT_ID")
 CLIENT_SECRET = os.getenv("KEYCLOAK_CLIENT_SECRET")
 
 # Create Keycloak client instance
-keycloak_openid = KeycloakOpenID(server_url="http://localhost:8080/",
+keycloak_openid = KeycloakOpenID(server_url=KEYCLOAK_SERVER_URL,
                                  client_id=CLIENT_ID,
                                  realm_name=REALM_NAME,
                                  client_secret_key=CLIENT_SECRET)
