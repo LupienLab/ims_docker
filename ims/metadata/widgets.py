@@ -6,7 +6,6 @@ Created on Apr 29, 2020
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django.forms import widgets
-from django.conf import settings
 
 class RelatedFieldWidgetCanAdd(widgets.Select):
 
@@ -25,7 +24,7 @@ class RelatedFieldWidgetCanAdd(widgets.Select):
     def render(self, name, value, *args, **kwargs):
         self.related_url = reverse(self.related_url)
         output = [super(RelatedFieldWidgetCanAdd, self).render(name, value, *args, **kwargs)]
-        
+
         output.append('<a href="%s?_to_field=id&_popup=1" class="add-another" id="add_id_%s" onclick="return showAddAnotherPopup(this);"> ' % \
         (self.related_url, name))
         output.append('<img src="/static/admin/img/icon-addlink.svg" width="10" height="10" alt="%s"/></a>' % ('Add Another'))

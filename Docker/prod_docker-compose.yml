@@ -3,10 +3,12 @@ version: '3'
 services:
   db:
     image: postgres:12.2
+    env_file:
+      - ./config/.env.production
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=ims_db
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
     volumes:
       - ../../pgdata:/var/lib/postgresql/data
       - ../db-initialization:/docker-entrypoint-initdb.d
@@ -17,7 +19,7 @@ services:
     environment:
        - PRODUCTION=1
     env_file:
-       - ./config/db_variables.env
+       - ./config/.env.production
     command: bash /code/start_django_server.sh
     volumes:
       - ../ims:/ims

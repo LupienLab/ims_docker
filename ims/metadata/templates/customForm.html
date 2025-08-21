@@ -5,24 +5,33 @@
 
 
 {% block content %}
-  <form method="post" enctype="multipart/form-data">
+<div class="container">
+  <form id="custom-form" method="post" enctype="multipart/form-data">
     {% csrf_token %}
 
-    {% if json_values %}
-	    {% json_saved_data json_values as jsonEntry %}
-	    {{ jsonEntry|json_script:"json-data" }}
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+      {{ form.non_field_errors }}
+    </div>
     {% endif %}
 
-    
-    <h1>Add {{form | modelname}}</h1>
-     {% include "modelHelpFrag.html" with form=form %}
-     {{ form|crispy }}
-     
-     <div id="json_form_display">
-     
-     </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
-  </form>
-    {{ form.media }}
+    {% if json_values %}
+    {% json_saved_data json_values as jsonEntry %}
+    {{ jsonEntry|json_script:"json-data" }}
+    {% endif %}
 
+
+    <h1>Add {{form | modelname}}</h1>
+    {% include "modelHelpFrag.html" with form=form %}
+    {% crispy form %}
+
+    <div id="json_form_display">
+
+    </div>
+
+    <button type="submit" class="btn btn-primary" form="custom-form">Submit</button>
+
+  </form>
+  {{ form.media }}
+</div>
 {% endblock %}

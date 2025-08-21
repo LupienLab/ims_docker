@@ -3,14 +3,13 @@ Created on Feb. 26, 2020
 
 @author: ankita
 '''
-from django.forms import ModelForm, widgets
+from django.forms import ModelForm
 from metadata.models import *
 from django import forms
 from django.forms import ModelChoiceField
 from metadata.widgets import *
 from dal import autocomplete
 from dal import forward
-from ims import settings
 from django.forms import formset_factory
 
 class ProjectForm(ModelForm):

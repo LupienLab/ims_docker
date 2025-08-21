@@ -15,6 +15,7 @@ class ApprovalRequest(models.Model):
   created_at = models.DateTimeField(auto_now_add=True)
   approved_by = models.ForeignKey(User, null=True, blank=True, related_name='approvals', on_delete=models.SET_NULL)
   approved_at = models.DateTimeField(null=True, blank=True)
+  comments = models.CharField(max_length=500, null=True, blank=True)
 
   def __str__(self):
     return f"Request by {self.created_by.username} - Status: {self.status}"

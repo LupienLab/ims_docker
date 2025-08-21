@@ -1,6 +1,5 @@
 # user_profiles/utils.py
 
-from django.contrib.auth.models import Group
 from .models import UserProfile
 
 def is_admin(user):

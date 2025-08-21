@@ -1,22 +1,17 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse, HttpResponseForbidden
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse
 from django.http.response import HttpResponseRedirect, JsonResponse
 from metadata.forms import *
 from metadata.models import *
 from django.views.generic.base import View
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic.edit import CreateView, FormView, DeleteView,\
-    UpdateView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.utils import timezone
 from django.urls import reverse
 from django.urls.base import reverse_lazy
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import logout
-from django.core import serializers
 from django.core.exceptions import PermissionDenied
 import json
-from django.db import models
-import metadata.models as app_models
 from django.views.decorators.csrf import csrf_exempt
 from crispy_forms.utils import render_crispy_form
 from django import forms
@@ -26,15 +21,10 @@ from view_breadcrumbs import DetailBreadcrumbMixin, BaseBreadcrumbMixin
 from django.utils.functional import cached_property
 from metadata.handle_upload import *
 from django.contrib import messages
-from django.contrib.auth import update_session_auth_hash
-from django.contrib.auth.forms import PasswordChangeForm
 import binascii
 import os
 import pandas as pd
-import numpy as np
 import ast
-from _collections import defaultdict, OrderedDict
-from .keycloak_client import keycloak_openid
 from .keycloak_client import *
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.views import LoginView
@@ -49,23 +39,19 @@ from .utils import get_projects_for_user
 ####INDEX############
 
 class KeycloakLoginView(LoginView):
-    def get(self, request):
-        #print("in get")
-        login_url = get_keycloak_url(request)
-        code = request.GET.get('code')
-        if code:
-            print("inside code")
-            user_token,user_info = get_keycloak_user_token(request)
-            username = user_info["preferred_username"]
-            return reverse('index')
-        return HttpResponseRedirect(login_url)
+  def get(self, request):
+    login_url = get_keycloak_url(request)
+    code = request.GET.get('code')
+    if code:
+      user_token,user_info = get_keycloak_user_token(request)
+      username = user_info["preferred_username"]
+      return reverse('index')
+    return HttpResponseRedirect(login_url)
 
 class Rview(View):
     def get(self,request):
         code = request.GET.get('code')
-        #print("I have code",code)
         if code:
-            #print("I have code")
             user_token,user_info = get_keycloak_user_token(request)
             username = user_info["preferred_username"]
             print("my username is",username)
@@ -88,18 +74,15 @@ class Index(LoginRequiredMixin, View):
   template_name = 'index.html'
 
   def get(self,request,**kwargs):
-    usr=self.request.user
+    usr = self.request.user
     context = {}
     if usr:
-      lab = get_user_lab(usr)
-      print(lab)
       projects = get_projects_for_user(usr)
 
       # Filter projects associated with the lab
       obj = projects.filter(status="Active").order_by('-pk').distinct('pk')
       context = {
           'object': obj,
-          'usr':usr
       }
     return render(request, self.template_name, context)
 
@@ -134,11 +117,13 @@ def createJSON(request):
 
 @csrf_exempt
 def addFields(request):
-    if request.method == 'POST' and request.is_ajax():
+    if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
         json_type_pk = request.POST.get('json_type_pk')
         field_values = JsonObj.objects.get(pk=json_type_pk).json_fields
+        print(field_values)
         form = FieldsForm(initial={'field_values':field_values})
         form_html = render_crispy_form(form)
+        print(form_html)
         return HttpResponse(form_html)
     else :
         return HttpResponse('<h1>Page was found</h1>')
@@ -164,14 +149,10 @@ class BrowseProject(LoginRequiredMixin, View):
     template_name = 'showProject.html'
 
     def get(self,request,slug):
-        usrGroup = self.request.user.groups.values_list('name',flat = True) # QuerySet Object
-        usrGroup_as_list = list(usrGroup)
-        labname=[k for k in usrGroup_as_list if 'lab' in k]
 
         labname = get_user_lab(self.request.user)
 
         obj = Project.objects.filter(created_by__first_name=slug).filter(labs=labname).order_by('-pk')
-        print(obj)
         if(len(obj)==0):
             obj = Project.objects.filter(exp_project__json_type__name=slug).filter(labs=labname).order_by('-pk').distinct()
         if(len(obj)==0):
@@ -220,25 +201,25 @@ class AddProject(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('showProject')
 
     def form_valid(self, form):
-        form.instance.created_by = self.request.user
-        form.instance.edited_by = self.request.user
+      form.instance.created_by = self.request.user
+      form.instance.edited_by = self.request.user
 
-        disease_site=ChoiceDisease.objects.get(pk=self.request.POST.get('disease_site')).name
-        disease_acr=disease_site.split("(")
-        if(len(disease_acr)>1):
-            site=disease_acr[1].split(")")[0]
-        else:
-            site=disease_acr[0]
-        tissue_type=Choice.objects.get(pk=self.request.POST.get('tissue_type')).name
+      disease_site=ChoiceDisease.objects.get(pk=self.request.POST.get('disease_site')).name
+      disease_acr=disease_site.split("(")
+      if(len(disease_acr)>1):
+          site=disease_acr[1].split(")")[0]
+      else:
+          site=disease_acr[0]
+      tissue_type=Choice.objects.get(pk=self.request.POST.get('tissue_type')).name
 
-        name_string = "_".join([site,tissue_type,self.request.POST.get('user_name_string'),self.request.user.last_name,self.request.POST.get('starting_date')])
+      name_string = "_".join([site,tissue_type,self.request.POST.get('user_name_string'),self.request.user.last_name,self.request.POST.get('starting_date')])
 
 
-        form.instance.name = name_string
+      form.instance.name = name_string
 
-        form.save()
+      form.save()
 
-        return super().form_valid(form)
+      return super().form_valid(form)
 
 
 class EditProject(LoginRequiredMixin, UpdateView):
@@ -307,6 +288,7 @@ class AddBiosource(LoginRequiredMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super(AddBiosource, self).get_context_data(**kwargs)
+        print(context)
         if self.request.method == 'POST':
             json_values = createJSON(self.request)
             context['json_values']= json_values
@@ -561,27 +543,18 @@ class DeleteExperiment(LoginRequiredMixin, DeleteView):
         return reverse('detailProject', kwargs={'prj_pk': self.prj_pk})
 
 class BrowseExperimentGrid(LoginRequiredMixin, View):
-    template_name = 'showExperiments.html'
+  template_name = 'showExperiments.html'
 
-    def get(self,request,slug_disease,slug_assay):
-        usrGroup = self.request.user.groups.values_list('name',flat = True) # QuerySet Object
-        usrGroup_as_list = list(usrGroup)
-        labname=[k for k in usrGroup_as_list if 'lab' in k]
+  def get(self,request,slug_disease,slug_assay):
+    projects_lab= get_projects_for_user(self.request.user)
 
-        projects_lab= get_projects_for_user(self.request.user)
-        print(projects_lab)
-        print(projects_lab[0].pk)
+    obj = Experiment.objects.filter(json_type__name=slug_assay, project__disease_site__name=slug_disease, project__in=projects_lab).order_by('-pk').distinct()
 
-        print(slug_assay)
-        print(slug_disease)
-        print(Experiment.objects.filter(project__in=[63]))
-        obj = Experiment.objects.filter(json_type__name=slug_assay, project__disease_site__name=slug_disease, project__in=projects_lab).order_by('-pk').distinct()
-        print(obj)
-        context = {
-            'object': obj,
-        }
+    context = {
+        'object': obj,
+    }
 
-        return render(request, self.template_name, context)
+    return render(request, self.template_name, context)
 
 class AddExperimentLabels(LoginRequiredMixin, View):
     template_name = 'addExperimentLabels.html'

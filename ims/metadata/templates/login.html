@@ -1,28 +1,58 @@
-<!doctype html>
 {% load static %}
+{# Load the tag library #}
+{% load django_bootstrap5 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
 
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  
-  
-  <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
-  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.css">
-  <link rel="stylesheet" type="text/css" href="{% static 'base.css' %}">
-  
-  <script type="text/javascript" src="http://code.jquery.com/jquery-3.4.1.min.js"></script>
-  <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js"></script>
-  <script type="text/javascript" src="{% static 'base.js' %}"></script>
 
-  
-  
+  <!-- Load Bootstrap -->
+  <!-- <link rel="stylesheet" href="{% static 'bootstrap.min.css' %}"> -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+  <!-- <script src="{% static 'bootstrap.min.js' %}"></script> -->
+
+  <!-- Load jquery -->
+  <script src="{% static 'jquery-3.7.1.min.js' %}"></script>
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.3/themes/base/jquery-ui.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.3/jquery-ui.min.js"
+    integrity="sha512-Ww1y9OuQ2kehgVWSD/3nhgfrb424O3802QYP/A5gPXoM4+rRjiKrjHdGxQKrMGQykmsJ/86oGdHszfcVgUr4hA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script type="text/javascript" charset="utf8"
+    src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js"></script>
+
+  <script type="text/javascript" src="/static/admin/js/vendor/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/static/admin/js/jquery.init.js"></script>
+  <script type="text/javascript" src="/static/admin/js/admin/RelatedObjectLookups.js"></script>
+
+  <!-- Load chart.js -->
+  <script src=" https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js "></script>
+
+
+  <!-- Load gridjs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gridjs/6.2.0/gridjs.production.min.js"
+    integrity="sha512-UxJx7Aa36ndtmns24kdxG3ARmAPPYllynVsgpV18TdQYGhENGkdb+fC8xOjeJ8UR8Rsc5S2xUZ9pCO5ygECnOQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
+
+  <link rel="stylesheet" type="text/css" href="{% static 'base.css' %}">
+  <script type="text/javascript" src="{% static 'base.js' %}"></script>
+  <script type="text/javascript" src="{% static 'addlabels.js' %}"></script>
+
   <title>DUnCAN</title>
 </head>
 
-<div class="header">
-  <img src="{% static 'img/LogoLupienLab.png' %}" alt="Lupien Lab" style="width:300px;height:100px;"> 
+<div class="p-4">
+  <img class="img-fluid" src="{% static 'img/Logo_lupien_UHN_P2CC_2025.png' %}" alt="Lupien Lab Logo">
 </div>
 
 <body>
@@ -39,18 +69,18 @@
     {% endfor %}
 {% endif %}
 
-<div style="padding:35px;color:#0066a7;"><h2><b><u>DUnCAN</u> : Data Unit Common for Advanced Navigation<b></h2></div>
+<div class="text-center text-primary-emphasis p-5"><h2><b><u>DUnCAN</u> : Data Unit Common for Advanced Navigation<b></h2></div>
   <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="text-center">
                 <div class="p-4">
                     <!-- Content of the first div -->
-                    <h2><p>Login with PMDS Keycloak</p></h2>
+                    <h2>Login with PMDS Keycloak</h2>
                 </div>
                 <div class="p-4 mt-3">
                     <!-- Content of the second div -->
-                    <a href="{% url 'keycloak_login' %}"><button type="button" class="btn btn-primary btn-block btn-lg">Login</button></a>
+                    <a class="btn btn-primary btn-lg" href="{% url 'keycloak_login' %}" role="button">Login</a>
                 </div>
             </div>
         </div>

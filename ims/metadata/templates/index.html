@@ -1,74 +1,64 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
+<section class="container mb-5">
+  <h2 class="text-center">Browse projects</h2>
+  <div class="row mb-4">
+    <div class="col-xs-6 col-sm-6 col-md-6">
+      <canvas id="disease" class="chartjs"></canvas>
+    </div>
+    <div class="col-xs-6 col-sm-6 col-md-6">
+      <canvas id="owner" class="chartjs"></canvas>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-6 col-sm-6 col-md-6">
+      <canvas id="assay" class="chartjs"></canvas>
+    </div>
+    <div class="col-xs-6 col-sm-6 col-md-6">
+      <canvas id="projectlabel" class="chartjs"></canvas>
+    </div>
+  </div>
+</section>
+<section class="container mb-5">
+  <h2>Export metadata from last 200 days</h2>
+  <a href="{% url 'exportSequencingdata' %}"><button type="button" class="btn btn-primary">Sequencing data</button></a>
+  <a href="{% url 'exportnoSequencingdata' %}"><button type="button" class="btn btn-primary">Experiments with NO
+      sequencing data added</button></a>
+</section>
+<section class="container mb-5">
+  <h2 class="text-center">Browse experiments&nbsp; &nbsp; &#8594;</h2>
+  <div class="container">
+    <div id="matrixDataGrid"></div>
+  </div>
+</section>
 
-{% if usr %}
-	<br/><h3>Welcome {{usr.get_full_name | default:usr.username}}!</h3><br/>
-{% endif %}
 
-<style>
 
-.gridjs-th{
-	min-width: 295px !important;
-width: 295px !important;
-}
-</style>
-<h4 class="text-center">Browse projects</h4>
-<div class="container">
-    <div class="row">
-       <div class="col-xs-6 col-sm-6 col-md-6">
-          <canvas id="disease" class="chartjs"></canvas>
-       </div>
-       <div class="col-xs-6 col-sm-6 col-md-6">
-          <canvas id="owner" class="chartjs"></canvas>
-       </div>
-     </div>
-    <hr/>
-     <div class="row">
-       <div class="col-xs-6 col-sm-6 col-md-6">
-          <canvas id="assay" class="chartjs"></canvas>
-       </div>
-       <div class="col-xs-6 col-sm-6 col-md-6">
-          <canvas id="projectlabel" class="chartjs"></canvas>
-       </div>
-     </div>
-</div>
-<hr/><br/>
-<h5>Export metadata from last 200 days</h5>
-<a href="{% url 'exportSequencingdata' %}"><button type="button" class="btn btn-primary">Sequencing data</button></a>
-<a href="{% url 'exportnoSequencingdata' %}"><button type="button" class="btn btn-primary">Experiments with NO sequencing data added</button></a>
-<hr/><br/>
-<h4 class="text-center">Browse experiments&nbsp; &nbsp;  &#8594;</h4>
 
-<div class="container">
-     <div id="matrixDataGrid"></div>
-</div>
-<hr/><br/>
 
+<section class="bodyContent container">
+  <table class="table table-bordered table-hover data_table">
+    <thead>
+      <tr>
+        <th class="table_head">
+          Active Projects
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if object %}
+      {% for project in object %}
+      <tr>
+        <td><a href="{% url 'detailProject' project.pk %}">{{ project.name }}</a></td>
+      </tr>
+      {% endfor %}
+      {% else %}
+      <p>No data available.</p>
+      {% endif %}
+    </tbody>
+  </table>
+</section>
 
 <script type="text/javascript" src="{% static 'createCharts.js' %}"></script>
-
-
-<div class="bodyContent container">
-<table class="table table-bordered table-hover data_table">
-<thead>
-  <tr>
-    <th class="table_head">
-    	Active Projects
-    </th>
-  </tr>
-</thead>
-<tbody>
-{% if object %}
-  {% for project in object %}
-  <tr>
-	<td><a href="{% url 'detailProject' project.pk %}">{{ project.name }}</a></td>
-</tr>
-	{% endfor %}
-</tbody>
-{% else %}
-    <p>No data available.</p>
-</table>
-</div>
-{% endif %}
 {% endblock %}

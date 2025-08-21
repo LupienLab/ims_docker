@@ -2,38 +2,38 @@
 {% load tags %}
 {% load static %}
 {% block content %}
-<h1>Biosource</h1><br />
+
 <div class="container">
   {% if messages %}
   {% for message in messages %}
-  <p{% if message.tags %} class="alert-{{ message.tags }} alert" {% endif %}>{{ message }}</p>
-    {% endfor %}
-    {% endif %}
+  <p {% if message.tags %} class="alert-{{ message.tags }} alert" {% endif %}>{{ message }}</p>
+  {% endfor %}
+  {% endif %}
 
-    {% if object %}
-    <table class="cell-border table-hover data_table">
-      <thead>
-        <tr>
-          <th>Biosource Name</th>
-          <th>Disease</th>
-          <th>Source organism</th>
-          <th>Owner</th>
-          <th>Created at</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for source in object %}
-        <tr>
-          <td><a href="{% url 'detailBiosource' source.pk %}">{{ source.name }}</a></td>
-          <td>{{ source.disease }}</td>
-          <td>{{ source.source_organism }}</td>
-          <td>{{ source.created_by }}</td>
-          <td>{{ source.created_at|date }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    {% else %}
-    <p>No data available.</p>
+  {% if object %}
+  <table class="cell-border table-hover data_table">
+    <thead>
+      <tr>
+        <th>Biosource Name</th>
+        <th>Disease</th>
+        <th>Source organism</th>
+        <th>Owner</th>
+        <th>Created at</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for source in object %}
+      <tr>
+        <td><a href="{% url 'detailBiosource' source.pk %}">{{ source.name }}</a></td>
+        <td>{{ source.disease }}</td>
+        <td>{{ source.source_organism }}</td>
+        <td>{{ source.created_by }}</td>
+        <td>{{ source.created_at|date }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>No data available.</p>
 </div>
 {% endif %} {% endblock %}

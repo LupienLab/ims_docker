@@ -4,7 +4,7 @@ function format(value) {
 
 
 $(document).ready(function () {
-	
+
     var table = $('.data_table').DataTable({
     	 "order": [],
     });
@@ -24,22 +24,22 @@ $(document).ready(function () {
             tr.addClass('shown');
         }
     });
-    
+
     if($('#id_json_type').val()){
     	callAjax();
     }
-    
+
     $('#id_json_type').on('change',callAjax);
-    
+
     function callAjax() {
     	var json_type_pk = $('#id_json_type').val();
 		if(json_type_pk.length>0){
     	$.ajax({
 		    url: "/addFields/",
 		    type: "POST",
-		    data: { 
+		    data: {
                 'json_type_pk': json_type_pk,
-            }, 
+            },
 		    cache:false,
 		    success: function(obj){
 		    	$('#json_form_display').empty();
@@ -62,13 +62,13 @@ $(document).ready(function () {
 		$('#json_form_display').empty();
 	}
     }
-    
+
     function populate(data) {
 		  $.each(data, function(key, value){
 		    $('[name='+key+']').val(value);
 		  });
 		}
-     
+
 
 	 if($('#id_choose_existing').val()){
     	existingCheck();
@@ -81,7 +81,7 @@ $(document).ready(function () {
     	$('label.requiredField').each(function(){
     		prevRequired.push($(this).parent('div').attr('id'))
     	})
-    	      if($("#id_choose_existing").val() !=""){    	  
+    	      if($("#id_choose_existing").val() !=""){
     	    	  $('#id_json_type').val("");
     	    	  callAjax();
     	    	  $("input").removeAttr("required" );
@@ -91,10 +91,10 @@ $(document).ready(function () {
     	    	  $("select:not(#id_choose_existing)").prop('disabled',true);
     	    	  $("textarea").prop('disabled',true);
     	    	  $(".asteriskField").remove();
-    	    	  
+
             	  $("#id_choose_existing").prop('required',true);
             	  $("#div_id_choose_existing label").append( "<span class=\"asteriskField\">*</span>" );
-            	  
+
     	      }
     	      else{
     	    	  $("#id_choose_existing").removeAttr("required" );
@@ -110,10 +110,10 @@ $(document).ready(function () {
     	    		    }
     	    		});
     	      }
-    	 }  
-    	
+    	 }
+
     $( "<h5>Or Add New</h5>" ).insertAfter( "#div_id_choose_existing" );
-    
+
     $('.jsontable').hide();
     $('.hide-show').click(function() {
        $('.jsontable').toggle();
@@ -126,5 +126,5 @@ $(document).ready(function () {
         changeYear: true
     });
     }
-  
+
 });

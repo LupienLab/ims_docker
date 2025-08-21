@@ -8,4 +8,5 @@ media/
 .metadata
 .DS_Store
 Docker/config/*.env
+Docker/config/*.env.*
 ims/static/*

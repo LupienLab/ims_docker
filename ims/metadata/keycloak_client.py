@@ -1,13 +1,13 @@
 from keycloak import KeycloakOpenID
-import os
+from decouple import config
 #from django.shortcuts import render, get_object_or_404, redirect
 #from keycloak import KeycloakAdmin
 
 # Keycloak configuration
-KEYCLOAK_SERVER_URL = os.getenv("KEYCLOAK_SERVER_URL")
-REALM_NAME = os.getenv("KEYCLOAK_REALM_NAME")
-CLIENT_ID = os.getenv("KEYCLOAK_CLIENT_ID")
-CLIENT_SECRET = os.getenv("KEYCLOAK_CLIENT_SECRET")
+KEYCLOAK_SERVER_URL = config("KEYCLOAK_SERVER_URL")
+REALM_NAME = config("KEYCLOAK_REALM_NAME")
+CLIENT_ID = config("KEYCLOAK_CLIENT_ID")
+CLIENT_SECRET = config("KEYCLOAK_CLIENT_SECRET")
 
 # Create Keycloak client instance
 keycloak_openid = KeycloakOpenID(server_url=KEYCLOAK_SERVER_URL,
@@ -17,8 +17,6 @@ keycloak_openid = KeycloakOpenID(server_url=KEYCLOAK_SERVER_URL,
 
 # Function to get Keycloak user token
 def get_keycloak_url(request):
-
-
     #login_url = keycloak_openid.auth_url('http://172.27.164.206:5050/')
     print(request)
     print(keycloak_openid)
@@ -30,7 +28,6 @@ def get_keycloak_url(request):
 # Function to get Keycloak user token
 def get_keycloak_user_token(request):
     code = request.GET.get('code')
-    #print("code",code)
     user_token = keycloak_openid.token(
             grant_type='authorization_code',
             code=code,
@@ -39,9 +36,6 @@ def get_keycloak_user_token(request):
 
     userinfo = keycloak_openid.userinfo(user_token["access_token"])
 
-    print(user_token)
-    print(user_token["access_token"])
-    print(userinfo)
     request.session['user_token'] = user_token
     return (user_token,userinfo)
 

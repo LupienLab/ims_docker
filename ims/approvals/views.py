@@ -1,29 +1,28 @@
 # views.py
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages
 from django.utils import timezone
+from django.http import JsonResponse
 from .forms import ApprovalRequestForm
 from .models import ApprovalRequest
 from user_profiles.models import UserProfile
-from user_profiles.utils import is_supervisor, is_admin_or_is_supervisor
+from user_profiles.utils import is_admin_or_is_supervisor
+from metadata.models import Experiment
 from django.contrib.auth.decorators import login_required, user_passes_test
 
 @login_required
 def create_approval_request(request):
-  print(request)
-  print(request.method)
-  print(request.POST)
-  print(request.FILES)
   if request.method == 'POST':
-    form = ApprovalRequestForm(request.POST, request.FILES)
+    form = ApprovalRequestForm(request.POST, request.FILES, user=request.user)
     print(form)
     if form.is_valid():
       approval_request = form.save(commit=False)
       approval_request.created_by = request.user
+      selected_project = form.cleaned_data.get('projects')
+      selected_experiment = form.cleaned_data.get('experiments')
       approval_request.save()
       return redirect('approval_list')
   else:
-    form = ApprovalRequestForm()
+    form = ApprovalRequestForm(user=request.user)
   return render(request, 'create_request.html', {'form': form})
 
 @login_required
@@ -71,11 +70,22 @@ def approve_request(request, pk):
 @user_passes_test(is_admin_or_is_supervisor) # Only allow supervisor to approve
 def disapprove_request(request, pk):
   approval_request = get_object_or_404(ApprovalRequest, pk=pk)
-  approval_request.status = 'disapproved'
-  approval_request.approved_by = request.user  # Set the supervisor who approved
-  approval_request.approved_at = timezone.now()  # Set the approval timestamp
-  approval_request.save()
+  if request.method == 'POST':
+    # Handle the comment submission
+    comment = request.POST.get('comment')
+    approval_request.comments = comment
+    approval_request.status = 'disapproved'
+    approval_request.approved_by = request.user  # Set the supervisor who approved
+    approval_request.approved_at = timezone.now()  # Set the approval timestamp
+    approval_request.save()
+
   return redirect('approval_list')
 
 def access_denied(request):
   return render(request, 'access_denied.html')
+
+def get_experiments(request, project_id):
+  experiments = Experiment.objects.filter(project_id=project_id)
+  # Serialize the experiments into a list of dictionaries
+  experiments_data = [{'id': experiment.id, 'name': experiment.name} for experiment in experiments]
+  return JsonResponse({'experiments': experiments_data})
