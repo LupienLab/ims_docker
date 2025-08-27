@@ -9,10 +9,8 @@
 {% block content %}
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    console.log("hello world")
     const projectSelect = document.getElementById('id_projects');
     const experimentSelect = document.getElementById('id_experiments');
-    console.log(projectSelect)
 
     projectSelect.addEventListener('change', function () {
       const projectId = this.value;
@@ -21,14 +19,12 @@
         fetch(`/approvals/get_experiments/${projectId}/`)
           .then(response => response.json())
           .then(data => {
-            console.log(data)
             // Clear existing options
             experimentSelect.innerHTML = '';
 
             // Populate new options
             data.experiments.forEach(experiment => {
               const option = document.createElement('option');
-              console.log(experiment)
               option.value = experiment.id;
               option.textContent = experiment.name;
               experimentSelect.appendChild(option);

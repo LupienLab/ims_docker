@@ -104,6 +104,8 @@
       <tr>
         <th>Title</th>
         <th>User</th>
+        <th>Project</th>
+        <th>Experiments</th>
         <th>Document</th>
         <th>Created At</th>
         <th>Status</th>
@@ -116,6 +118,14 @@
       class="{% if approval.status == 'approved' %}table-success{% elif approval.status == 'disapproved' %} table-danger {% else %} {% endif %}">
       <td data-label="Title">{{ approval.title }}</td>
       <td data-label="User">{{ approval.created_by.get_full_name }}</td>
+      <td data-label="Project"><a href="{% url 'detailProject' approval.project.pk %}">{{ approval.project.name }}</a></td>
+      <td data-label="Experiments">
+        {% for experiment in approval.experiments.all %}
+          <a href="{% url 'detailExperiment' experiment.pk %}">{{ experiment.name }}</a>{% if not forloop.last %}, {% endif %}
+        {% empty %}
+          None
+        {% endfor %}
+      </td>
       <td data-label="Document"><a href="{{ approval.document.url }}" target="_blank">Download</a></td>
       <td data-label="Created At">{{ approval.created_at|date:"Y-m-d H:i" }}</td>
       <td data-label="Status">{{ approval.get_status_display }}</td>
@@ -143,6 +153,8 @@
         <tr>
           <th>Title</th>
           <th>User</th>
+          <th>Project</th>
+          <th>Experiments</th>
           <th>Document</th>
           <th>Created At</th>
           <th>Status</th>
@@ -157,6 +169,14 @@
         class="{% if approval.status == 'approved' %}table-success{% elif approval.status == 'disapproved' %} table-danger {% else %} {% endif %}">
         <td data-label="Title">{{ approval.title }}</td>
         <td data-label="User">{{ approval.created_by.get_full_name }}</td>
+        <td data-label="Project"><a href="{% url 'detailProject' approval.project.pk %}">{{ approval.project.name }}</a></td>
+        <td data-label="Experiments">
+          {% for experiment in approval.experiments.all %}
+            <a href="{% url 'detailExperiment' experiment.pk %}">{{ experiment.name }}</a>{% if not forloop.last %}, {% endif %}
+          {% empty %}
+            None
+          {% endfor %}
+        </td>
         <td data-label="Document"><a href="{{ approval.document.url }}" target="_blank">Download</a></td>
         <td data-label="Created At">{{ approval.created_at|date:"Y-m-d H:i" }}</td>
         <td data-label="Status">{{ approval.get_status_display }}</td>

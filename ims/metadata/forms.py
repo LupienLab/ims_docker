@@ -36,7 +36,11 @@ class ExperimentForm(ModelForm):
 
 
 class BiosourceForm(ModelForm):
-    choose_existing = ModelChoiceField(queryset = Biosource.objects.all(),required=False, widget=autocomplete.ModelSelect2(url='biosourceAutocomplete'), help_text='Choose from existing list')
+    choose_existing = ModelChoiceField(
+        queryset = Biosource.objects.all(),
+        required=False,
+        widget=autocomplete.ModelSelect2(url='biosourceAutocomplete'),
+        help_text='Choose from existing list')
     class Meta:
         model = Biosource
         exclude = ('created_at','created_by','edited_at','edited_by','json_fields')

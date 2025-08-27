@@ -13,13 +13,18 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 def create_approval_request(request):
   if request.method == 'POST':
     form = ApprovalRequestForm(request.POST, request.FILES, user=request.user)
-    print(form)
     if form.is_valid():
       approval_request = form.save(commit=False)
       approval_request.created_by = request.user
+      # Set the project FK
       selected_project = form.cleaned_data.get('projects')
-      selected_experiment = form.cleaned_data.get('experiments')
+      approval_request.project = selected_project
       approval_request.save()
+
+      # Set the many-to-many experiments
+      selected_experiments = form.cleaned_data.get('experiments')
+      approval_request.experiments.set(selected_experiments)
+
       return redirect('approval_list')
   else:
     form = ApprovalRequestForm(user=request.user)
@@ -48,10 +53,10 @@ def approval_list(request):
 
   if request.user == lab.supervisor:
     # If the user is a supervisor, show all requests for their lab
-    approvals = ApprovalRequest.objects.filter(created_by__userprofile__lab=lab).order_by('status')
+    approvals = ApprovalRequest.objects.filter(created_by__userprofile__lab=lab).select_related('project').prefetch_related('experiments').order_by('status')
   else:
     # If the user is not a supervisor, show only their own requests
-    approvals = ApprovalRequest.objects.filter(created_by=user).order_by('status')
+    approvals = ApprovalRequest.objects.filter(created_by=user).select_related('project').prefetch_related('experiments').order_by('status')
 
   return render(request, 'approval_list.html', {'approvals': approvals, 'is_supervisor': supervisor_status, 'profile_exists': True, 'is_sequence_core': is_sequence_core})
 

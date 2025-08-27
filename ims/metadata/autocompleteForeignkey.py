@@ -9,18 +9,14 @@ from metadata.models import *
 
 class BiosourceAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
-        print("BiosourceAutocomplete")
-        print(self.request.user.is_authenticated)
         # Don't forget to filter out results depending on the visitor !
         if not self.request.user.is_authenticated:
             return Biosource.objects.none()
 
         qs = Biosource.objects.all()
-        print(qs)
 
         if self.q:
             qs = qs.filter(name__istartswith=self.q)
-            print(qs)
 
         return qs
 

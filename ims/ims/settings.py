@@ -160,10 +160,13 @@ MEDIA_URL = '/media/'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = config("EMAIL_HOST")
-EMAIL_PORT = config("EMAIL_PORT")
+EMAIL_PORT = config("EMAIL_PORT", default=1025, cast=int)
 DEFAULT_FROM_EMAIL = 'noreply@mailcatcher.com'
-EMAIL_HOST_USER = config("EMAIL_HOST_USER")  # Your email address
-EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")  # Your email password
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=False, cast=bool)
+EMAIL_USE_SSL = config('EMAIL_USE_SSL', default=False, cast=bool)
+EMAIL_HOST_USER = config("EMAIL_HOST_USER", default='')  # Your email address
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default='')  # Your email password
+
 
 # Keycloak settings
 KEYCLOAK_SERVER_URL = config("KEYCLOAK_SERVER_URL")

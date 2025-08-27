@@ -30,7 +30,6 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.decorators import login_required
 from ims.views import *
-from pprint import pprint
 from user_profiles.utils import get_user_lab
 from .utils import get_projects_for_user
 #import metadata.extendSession
@@ -54,7 +53,6 @@ class Rview(View):
         if code:
             user_token,user_info = get_keycloak_user_token(request)
             username = user_info["preferred_username"]
-            print("my username is",username)
             password = "imsdbuser1"
             user = authenticate(request, username=username, password=password)
             if user is not None:
@@ -63,7 +61,6 @@ class Rview(View):
                 request.session['myusername'] = myusername
                 return HttpResponseRedirect(reverse('index'))
             else:
-                print("calling logout2")
                 logout_view2(request)
                 messages.error(request, 'Unable to authenticate, please try again or contact admin')
                 return HttpResponseRedirect(reverse('login'))
@@ -120,10 +117,8 @@ def addFields(request):
     if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
         json_type_pk = request.POST.get('json_type_pk')
         field_values = JsonObj.objects.get(pk=json_type_pk).json_fields
-        print(field_values)
         form = FieldsForm(initial={'field_values':field_values})
         form_html = render_crispy_form(form)
-        print(form_html)
         return HttpResponse(form_html)
     else :
         return HttpResponse('<h1>Page was found</h1>')
@@ -288,7 +283,6 @@ class AddBiosource(LoginRequiredMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super(AddBiosource, self).get_context_data(**kwargs)
-        print(context)
         if self.request.method == 'POST':
             json_values = createJSON(self.request)
             context['json_values']= json_values
@@ -320,8 +314,6 @@ class DetailBiosource(LoginRequiredMixin, BaseBreadcrumbMixin, DetailView):
 
     @cached_property
     def crumbs(self):
-
-      pprint(self.object.__dict__)
       return [
           ('Biosource: ' + self.object.name, reverse('detailBiosource', kwargs={'source_pk': self.object.pk}))
       ]
@@ -703,7 +695,6 @@ class AddFastqcResults(LoginRequiredMixin, View):
 
 
     def get(self,request,prj_pk):
-        print(SeqencingFile.objects.filter(project=prj_pk))
         form = self.form_class()
         form.fields["selected_fastqs"].queryset = SeqencingFile.objects.filter(project=prj_pk).order_by('name')
 

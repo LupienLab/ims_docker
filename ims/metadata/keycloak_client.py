@@ -18,10 +18,7 @@ keycloak_openid = KeycloakOpenID(server_url=KEYCLOAK_SERVER_URL,
 # Function to get Keycloak user token
 def get_keycloak_url(request):
     #login_url = keycloak_openid.auth_url('http://172.27.164.206:5050/')
-    print(request)
-    print(keycloak_openid)
     login_url = keycloak_openid.auth_url("http://localhost:8000/",scope='openid')
-    print(login_url)
 
     return (login_url)
 
