@@ -14,7 +14,7 @@ import os
 from decouple import config
 from pathlib import Path
 
-BASE_URL = config("BASE_URL") or "http://localhost:8000"
+# BASE_URL = config("BASE_URL") or "http://localhost:8000"
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -173,7 +173,6 @@ DEFAULT_FROM_EMAIL = 'noreply@mailcatcher.com'
 EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=False, cast=bool)
 EMAIL_USE_SSL = config('EMAIL_USE_SSL', default=False, cast=bool)
 EMAIL_HOST_USER = config("EMAIL_HOST_USER", default='')  # Your email address
-EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default='')  # Your email password
 
 
 # Keycloak settings

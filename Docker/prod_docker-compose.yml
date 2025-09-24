@@ -4,7 +4,7 @@ services:
   db:
     image: postgres:12.2
     env_file:
-      - ./config/.env.production
+      - .env.production
     environment:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
@@ -19,7 +19,7 @@ services:
     environment:
        - PRODUCTION=1
     env_file:
-       - ./config/.env.production
+       - .env.production
     command: bash /code/start_django_server.sh
     volumes:
       - ../ims:/ims

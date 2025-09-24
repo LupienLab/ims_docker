@@ -8,6 +8,7 @@ KEYCLOAK_SERVER_URL = config("KEYCLOAK_SERVER_URL")
 REALM_NAME = config("KEYCLOAK_REALM_NAME")
 CLIENT_ID = config("KEYCLOAK_CLIENT_ID")
 CLIENT_SECRET = config("KEYCLOAK_CLIENT_SECRET")
+BASE_URL = config("BASE_URL")
 
 # Create Keycloak client instance
 keycloak_openid = KeycloakOpenID(server_url=KEYCLOAK_SERVER_URL,
@@ -18,7 +19,7 @@ keycloak_openid = KeycloakOpenID(server_url=KEYCLOAK_SERVER_URL,
 # Function to get Keycloak user token
 def get_keycloak_url(request):
     #login_url = keycloak_openid.auth_url('http://172.27.164.206:5050/')
-    login_url = keycloak_openid.auth_url("http://localhost:8000/",scope='openid')
+    login_url = keycloak_openid.auth_url(BASE_URL,scope='openid')
 
     return (login_url)
 
@@ -28,7 +29,7 @@ def get_keycloak_user_token(request):
     user_token = keycloak_openid.token(
             grant_type='authorization_code',
             code=code,
-            redirect_uri="http://localhost:8000/",
+            redirect_uri=BASE_URL,
             scope='openid')
 
     userinfo = keycloak_openid.userinfo(user_token["access_token"])
