@@ -24,7 +24,7 @@ def approval_request_created(sender, instance, created, **kwargs):
       'logo_url': logo_url,
     }
     # TODO needs to also add the submitter and add Ankita email address (ankita.nand@uhn.ca)
-    recipient_list = [profile.lab.supervisor]
+    recipient_list = [instance.created_by.email, profile.lab.supervisor, "ankita.nand@uhn.ca"]
     send_notification_email(subject, recipient_list, context, 'approval_request_created_email_template.html')
 
 @receiver(post_save, sender=ApprovalRequest)
@@ -42,10 +42,11 @@ def approval_request_processed(sender, instance, created, **kwargs):
       'approver_name': instance.approved_by.username,
       'result': instance.status,
       'approval_link': approval_link,
+      'comments': instance.comments,
       'logo_url': logo_url,
     }
     # TODO send to supervisor submitter and Ankita
-    recipient_list = [instance.created_by.email]
+    recipient_list = [instance.created_by.email, instance.approved_by.email, "ankita.nand@uhn.ca"]
     send_notification_email(subject, recipient_list, context, 'approval_request_processed_email_template.html')
 
 
