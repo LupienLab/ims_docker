@@ -23,11 +23,13 @@ def approval_request_created(sender, instance, created, **kwargs):
       'approval_link': approval_link,
       'logo_url': logo_url,
     }
+    # TODO needs to also add the submitter and add Ankita email address (ankita.nand@uhn.ca)
     recipient_list = [profile.lab.supervisor]
     send_notification_email(subject, recipient_list, context, 'approval_request_created_email_template.html')
 
 @receiver(post_save, sender=ApprovalRequest)
 def approval_request_processed(sender, instance, created, **kwargs):
+  # TODO add comment to email for disapprove
   if instance.status != 'pending':  # Only send notification when approved or disapproved
     subject = f'Document {instance.status}: {instance.title}'
 
@@ -42,7 +44,7 @@ def approval_request_processed(sender, instance, created, **kwargs):
       'approval_link': approval_link,
       'logo_url': logo_url,
     }
-
+    # TODO send to supervisor submitter and Ankita
     recipient_list = [instance.created_by.email]
     send_notification_email(subject, recipient_list, context, 'approval_request_processed_email_template.html')
 

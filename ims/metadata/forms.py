@@ -39,7 +39,7 @@ class BiosourceForm(ModelForm):
     choose_existing = ModelChoiceField(
         queryset = Biosource.objects.all(),
         required=False,
-        widget=autocomplete.ModelSelect2(url='biosourceAutocomplete'),
+        #widget=autocomplete.ModelSelect2(url='biosourceAutocomplete'),
         help_text='Choose from existing list')
     class Meta:
         model = Biosource
@@ -56,7 +56,8 @@ class BiosampleForm(ModelForm):
         super(BiosampleForm, self).__init__(*args, **kwargs)
         if source_pk:
 
-            self.fields['choose_existing'] = ModelChoiceField(queryset = Biosample.objects.all(),required=False,widget=autocomplete.ModelSelect2(url='biosampleAutocomplete',forward=(forward.Const(source_pk, 'f4'),)), help_text='Choose from existing list')
+            self.fields['choose_existing'] = ModelChoiceField(queryset = Biosample.objects.all(),required=False,#widget=autocomplete.ModelSelect2(url='biosampleAutocomplete',forward=(forward.Const(source_pk, 'f4'),)),
+                                                              help_text='Choose from existing list')
 
     class Meta:
         model = Biosample

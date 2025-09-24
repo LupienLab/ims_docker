@@ -10,3 +10,4 @@ media/
 Docker/config/*.env
 Docker/config/*.env.*
 ims/static/*
+ims/staticfiles/*
