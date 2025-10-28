@@ -14,7 +14,7 @@ import os
 from decouple import config
 from pathlib import Path
 
-# BASE_URL = config("BASE_URL") or "http://localhost:8000"
+BASE_URL = config("BASE_URL") or "http://localhost:8000"
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -30,6 +30,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+CSRF_TRUSTED_ORIGINS = ['https://duncan-lupien.uhnresearch.ca']
 
 # Application definition
 
@@ -104,7 +105,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.environ['DB_NAME'],
         'USER': os.environ['DB_USER'],
-        'PASSWORD':os.environ['DB_PASSWD'],
+        'PASSWORD':os.environ['DB_PASSWORD'],
         'HOST': os.environ['DB_HOST'],
         'PORT': int(os.environ['DB_PORT']),
     }
@@ -151,15 +152,16 @@ LOGOUT_REDIRECT_URL='keycloak_login'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+#BASE_DIR = Path(__file__).resolve().parent.parent
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',  # This points to the top-level static folder inside ims/
-]
+
+#STATICFILES_DIRS = [
+#    BASE_DIR / 'static',  # This points to the top-level static folder inside ims/
+#]
 
 # For production collect static files here
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'

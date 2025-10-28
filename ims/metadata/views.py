@@ -539,9 +539,10 @@ class BrowseExperimentGrid(LoginRequiredMixin, View):
 
   def get(self,request,slug_disease,slug_assay):
     projects_lab= get_projects_for_user(self.request.user)
-
+    #print("printing from BrowseExperimentGrid")
+    #print(projects_lab)
     obj = Experiment.objects.filter(json_type__name=slug_assay, project__disease_site__name=slug_disease, project__in=projects_lab).order_by('-pk').distinct()
-
+    #print(obj)
     context = {
         'object': obj,
     }
