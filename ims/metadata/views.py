@@ -1,21 +1,17 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from django.http.response import HttpResponseRedirect, JsonResponse
 from metadata.forms import *
 from metadata.models import *
 from django.views.generic.base import View
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic.edit import CreateView, FormView, DeleteView,\
-    UpdateView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.utils import timezone
 from django.urls import reverse
 from django.urls.base import reverse_lazy
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import logout
-from django.core import serializers
+from django.core.exceptions import PermissionDenied
 import json
-from django.db import models
-import metadata.models as app_models
 from django.views.decorators.csrf import csrf_exempt
 from crispy_forms.utils import render_crispy_form
 from django import forms
@@ -25,21 +21,15 @@ from view_breadcrumbs import DetailBreadcrumbMixin, BaseBreadcrumbMixin
 from django.utils.functional import cached_property
 from metadata.handle_upload import *
 from django.contrib import messages
-from django.contrib.auth import update_session_auth_hash
-from django.contrib.auth.forms import PasswordChangeForm
 import binascii
 import os
 import pandas as pd
-import numpy as np
 import ast
-from _collections import defaultdict, OrderedDict
-from .keycloak_client import keycloak_openid
 from .keycloak_client import *
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.decorators import login_required
 from ims.views import *
-from pprint import pprint
 from user_profiles.utils import get_user_lab
 from .utils import get_projects_for_user
 #import metadata.extendSession
@@ -48,26 +38,21 @@ from .utils import get_projects_for_user
 ####INDEX############
 
 class KeycloakLoginView(LoginView):
-    def get(self, request):
-        #print("in get")
-        login_url = get_keycloak_url(request)
-        code = request.GET.get('code')
-        if code:
-            print("inside code")
-            user_token,user_info = get_keycloak_user_token(request)
-            username = user_info["preferred_username"]
-            return reverse('index')
-        return HttpResponseRedirect(login_url)
+  def get(self, request):
+    login_url = get_keycloak_url(request)
+    code = request.GET.get('code')
+    if code:
+      user_token,user_info = get_keycloak_user_token(request)
+      username = user_info["preferred_username"]
+      return reverse('index')
+    return HttpResponseRedirect(login_url)
 
 class Rview(View):
     def get(self,request):
         code = request.GET.get('code')
-        #print("I have code",code)
         if code:
-            #print("I have code")
             user_token,user_info = get_keycloak_user_token(request)
             username = user_info["preferred_username"]
-            print("my username is",username)
             password = "imsdbuser1"
             user = authenticate(request, username=username, password=password)
             if user is not None:
@@ -76,7 +61,6 @@ class Rview(View):
                 request.session['myusername'] = myusername
                 return HttpResponseRedirect(reverse('index'))
             else:
-                print("calling logout2")
                 logout_view2(request)
                 messages.error(request, 'Unable to authenticate, please try again or contact admin')
                 return HttpResponseRedirect(reverse('login'))
@@ -84,24 +68,20 @@ class Rview(View):
             return HttpResponseRedirect(reverse('index'))
 
 class Index(LoginRequiredMixin, View):
-    template_name = 'index.html'
-    #pk_url_kwarg = 'username'
-    def get(self,request,**kwargs):
-        usr=self.request.user
-        context = {}
-        if usr:
-            lab = get_user_lab(usr)
-            print(lab)
-            projects = get_projects_for_user(usr)
+  template_name = 'index.html'
 
-            # Filter projects associated with the lab
-            obj = projects.filter(status="Active").order_by('-pk').distinct('pk')
-            # obj= Project.objects.filter(status="Active").filter(lab_name__name__in=labname).order_by('-pk').distinct('pk')
-            context = {
-                'object': obj,
-                'usr':usr
-            }
-        return render(request, self.template_name, context)
+  def get(self,request,**kwargs):
+    usr = self.request.user
+    context = {}
+    if usr:
+      projects = get_projects_for_user(usr)
+
+      # Filter projects associated with the lab
+      obj = projects.filter(status="Active").order_by('-pk').distinct('pk')
+      context = {
+          'object': obj,
+      }
+    return render(request, self.template_name, context)
 
 #######################
 # def change_password(request):
@@ -134,7 +114,7 @@ def createJSON(request):
 
 @csrf_exempt
 def addFields(request):
-    if request.method == 'POST' and request.is_ajax():
+    if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
         json_type_pk = request.POST.get('json_type_pk')
         field_values = JsonObj.objects.get(pk=json_type_pk).json_fields
         form = FieldsForm(initial={'field_values':field_values})
@@ -146,38 +126,34 @@ def addFields(request):
 #######################
 ####PROJECT############
 
-
 class ShowProject(LoginRequiredMixin, View):
-    template_name = 'showProject.html'
+  template_name = 'showProject.html'
 
-    def get(self,request):
-        # obj = Project.objects.all().order_by('-pk')
-        usr=self.request.user
-        lab = get_user_lab(usr)
+  def get(self,request):
+    projects = get_projects_for_user(self.request.user)
 
-        obj= Project.objects.filter(labs=lab).order_by('-pk')
+    obj= projects.order_by('-pk')
 
-        context = {
-            'object': obj,
-        }
+    context = {
+        'object': obj,
+    }
 
-        return render(request, self.template_name, context)
+    return render(request, self.template_name, context)
 
 class BrowseProject(LoginRequiredMixin, View):
     template_name = 'showProject.html'
 
     def get(self,request,slug):
-        usrGroup = self.request.user.groups.values_list('name',flat = True) # QuerySet Object
-        usrGroup_as_list = list(usrGroup)
-        labname=[k for k in usrGroup_as_list if 'lab' in k]
 
-        obj = Project.objects.filter(created_by__first_name=slug).filter(lab_name__name__in=labname).order_by('-pk')
+        labname = get_user_lab(self.request.user)
+
+        obj = Project.objects.filter(created_by__first_name=slug).filter(labs=labname).order_by('-pk')
         if(len(obj)==0):
-            obj = Project.objects.filter(exp_project__json_type__name=slug).filter(lab_name__name__in=labname).order_by('-pk').distinct()
+            obj = Project.objects.filter(exp_project__json_type__name=slug).filter(labs=labname).order_by('-pk').distinct()
         if(len(obj)==0):
-            obj = Project.objects.filter(disease_site__name=slug).filter(lab_name__name__in=labname).order_by('-pk').distinct()
+            obj = Project.objects.filter(disease_site__name=slug).filter(labs=labname).order_by('-pk').distinct()
         if(len(obj)==0):
-            obj = Project.objects.filter(status=slug).filter(lab_name__name__in=labname).order_by('-pk').distinct()
+            obj = Project.objects.filter(status=slug).filter(labs=labname).order_by('-pk').distinct()
         context = {
             'object': obj,
         }
@@ -192,7 +168,12 @@ class DetailProject(LoginRequiredMixin, DetailBreadcrumbMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(DetailProject, self).get_context_data(**kwargs)
-        prj = Project.objects.get(pk=self.kwargs['prj_pk'])
+        prj = get_object_or_404(Project, id=self.kwargs['prj_pk'])
+        usr= self.request.user
+        lab = get_user_lab(usr)
+
+        if not prj.labs.filter(id=lab.id).exists():
+          raise PermissionDenied("You do not have access to this project.")
         #self.request.CustomSession['active_project'] = self.kwargs['prj_pk']
         exp = Experiment.objects.filter(project=self.kwargs['prj_pk']).order_by('-pk')
         run = SequencingRun.objects.filter(project=self.kwargs['prj_pk']).order_by('-pk')
@@ -215,33 +196,25 @@ class AddProject(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('showProject')
 
     def form_valid(self, form):
-        form.instance.created_by = self.request.user
-        form.instance.edited_by = self.request.user
+      form.instance.created_by = self.request.user
+      form.instance.edited_by = self.request.user
 
-        disease_site=ChoiceDisease.objects.get(pk=self.request.POST.get('disease_site')).name
-        disease_acr=disease_site.split("(")
-        if(len(disease_acr)>1):
-            site=disease_acr[1].split(")")[0]
-        else:
-            site=disease_acr[0]
-        tissue_type=Choice.objects.get(pk=self.request.POST.get('tissue_type')).name
+      disease_site=ChoiceDisease.objects.get(pk=self.request.POST.get('disease_site')).name
+      disease_acr=disease_site.split("(")
+      if(len(disease_acr)>1):
+          site=disease_acr[1].split(")")[0]
+      else:
+          site=disease_acr[0]
+      tissue_type=Choice.objects.get(pk=self.request.POST.get('tissue_type')).name
 
-        name_string = "_".join([site,tissue_type,self.request.POST.get('user_name_string'),self.request.user.last_name,self.request.POST.get('starting_date')])
+      name_string = "_".join([site,tissue_type,self.request.POST.get('user_name_string'),self.request.user.last_name,self.request.POST.get('starting_date')])
 
 
-        form.instance.name = name_string
+      form.instance.name = name_string
 
-        form.save()
+      form.save()
 
-        usrGroup = self.request.user.groups.values_list('name',flat = True) # QuerySet Object
-        usrGroup_as_list = list(usrGroup)
-        labname=[k for k in usrGroup_as_list if 'lab' in k]
-        for l in labname:
-            form.instance.lab_name.add(Choice.objects.get(name=l))
-
-        form.save()
-
-        return super().form_valid(form)
+      return super().form_valid(form)
 
 
 class EditProject(LoginRequiredMixin, UpdateView):
@@ -334,20 +307,15 @@ class DetailBiosource(LoginRequiredMixin, BaseBreadcrumbMixin, DetailView):
         context = super(DetailBiosource, self).get_context_data(**kwargs)
         rel_bisam=self.object.sample_source.all().order_by('-pk')
         context = {
-            'object': self.object,
-            'rel_bisam': rel_bisam
+          'object': self.object,
+          'rel_bisam': rel_bisam
         }
         return (context)
 
     @cached_property
     def crumbs(self):
-
-      pprint(self.object.__dict__)
-
       return [
-          {'title': 'Home', 'url': reverse('index')},
-          {'title': 'Project', 'url': reverse('detailProject', args=[self.object.pk])},
-          {'title': str(self.object), 'url': reverse('detailBiosource', args=[self.object.pk])},
+          ('Biosource: ' + self.object.name, reverse('detailBiosource', kwargs={'source_pk': self.object.pk}))
       ]
 
 #     @cached_property
@@ -518,6 +486,12 @@ class DetailExperiment(LoginRequiredMixin, DetailBreadcrumbMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(DetailExperiment, self).get_context_data(**kwargs)
+        prj = get_object_or_404(Project, id=self.object.project.pk)
+        usr= self.request.user
+        lab = get_user_lab(usr)
+
+        if not prj.labs.filter(id=lab.id).exists():
+          raise PermissionDenied("You do not have access to this project.")
         seqfiles=context["object"].file_exp.all().order_by('pk')
         context["seqfiles"]=seqfiles
         return context
@@ -561,21 +535,18 @@ class DeleteExperiment(LoginRequiredMixin, DeleteView):
         return reverse('detailProject', kwargs={'prj_pk': self.prj_pk})
 
 class BrowseExperimentGrid(LoginRequiredMixin, View):
-    template_name = 'showExperiments.html'
+  template_name = 'showExperiments.html'
 
-    def get(self,request,slug_disease,slug_assay):
-        usrGroup = self.request.user.groups.values_list('name',flat = True) # QuerySet Object
-        usrGroup_as_list = list(usrGroup)
-        labname=[k for k in usrGroup_as_list if 'lab' in k]
+  def get(self,request,slug_disease,slug_assay):
+    projects_lab= get_projects_for_user(self.request.user)
 
-        projects_lab= Project.objects.filter(lab_name__name__in=labname)
+    obj = Experiment.objects.filter(json_type__name=slug_assay, project__disease_site__name=slug_disease, project__in=projects_lab).order_by('-pk').distinct()
 
-        obj = Experiment.objects.filter(json_type__name=slug_assay, project__disease_site__name=slug_disease, project__in=projects_lab).order_by('-pk').distinct()
-        context = {
-            'object': obj,
-        }
+    context = {
+        'object': obj,
+    }
 
-        return render(request, self.template_name, context)
+    return render(request, self.template_name, context)
 
 class AddExperimentLabels(LoginRequiredMixin, View):
     template_name = 'addExperimentLabels.html'
@@ -724,7 +695,6 @@ class AddFastqcResults(LoginRequiredMixin, View):
 
 
     def get(self,request,prj_pk):
-        print(SeqencingFile.objects.filter(project=prj_pk))
         form = self.form_class()
         form.fields["selected_fastqs"].queryset = SeqencingFile.objects.filter(project=prj_pk).order_by('name')
 
@@ -1293,97 +1263,57 @@ from django.db.models import Count
 
 @csrf_exempt
 def populateCharts(request,slug):
+  if request.method == 'POST':
+    if (slug=="owner"):
+      proj_owner=list(Project.objects.values('created_by__first_name').annotate(dcount=Count('created_by')).order_by())
+      js_project=json.dumps(proj_owner)
 
-    if request.method == 'POST':
-        if (slug=="owner"):
-            proj_owner=list(Project.objects.values('created_by__first_name').annotate(dcount=Count('created_by')).order_by())
-            js_project=json.dumps(proj_owner)
+    elif (slug=="assay"):
+      proj_owner=list(Project.objects.values('exp_project__json_type__name').annotate(dcount=Count('exp_project__json_type__name')).order_by())
+      js_project=json.dumps(proj_owner)
 
-        elif (slug=="assay"):
-            proj_owner=list(Project.objects.values('exp_project__json_type__name').annotate(dcount=Count('exp_project__json_type__name')).order_by())
-            js_project=json.dumps(proj_owner)
+    elif (slug=="disease"):
+      proj_owner=list(Project.objects.values('disease_site__name').annotate(dcount=Count('disease_site__name')).order_by())
+      js_project=json.dumps(proj_owner)
 
-        elif (slug=="disease"):
-            proj_owner=list(Project.objects.values('disease_site__name').annotate(dcount=Count('disease_site__name')).order_by())
-            js_project=json.dumps(proj_owner)
+    elif (slug=="status"):
+      proj_owner=list(Project.objects.values('status').annotate(dcount=Count('status')).order_by())
+      js_project=json.dumps(proj_owner)
 
-        elif (slug=="status"):
-            proj_owner=list(Project.objects.values('status').annotate(dcount=Count('status')).order_by())
-            js_project=json.dumps(proj_owner)
+    elif (slug.startswith("tags")):
+      s=slug.split("_")
+      tag_experiments=list(ExperimentTag.objects.filter(project=s[1]).values('name').annotate(dcount=Count('experiment')).order_by())
+      js_project=json.dumps(tag_experiments)
 
-        elif (slug.startswith("tags")):
-            s=slug.split("_")
-            tag_experiments=list(ExperimentTag.objects.filter(project=s[1]).values('name').annotate(dcount=Count('experiment')).order_by())
-            js_project=json.dumps(tag_experiments)
+    elif (slug.startswith("grid")):
+      slug_vals=slug.split("+")
+      diseaseList=list(ChoiceDisease.objects.filter(class_type="disease_site").values_list('name', flat=True).order_by('id'))
+      assayList=list(JsonObj.objects.filter(json_type="experiment_type").values_list('name', flat=True).order_by('id'))
+      cancer_matrix = []
+      data = {}
+      data['Disease-site'] = diseaseList
+      for row in diseaseList:
+        for col in assayList:
+          if(data.get(col) is None):
+            data[col] = []
+          no_of_exp=len(Experiment.objects.filter(json_type__name=col, project__disease_site__name=row))
+          data[col].append(no_of_exp)
 
-        elif (slug.startswith("grid")):
-            slug_vals=slug.split("+")
-            diseaseList=list(ChoiceDisease.objects.filter(class_type="disease_site").values_list('name', flat=True).order_by('id'))
-            print(f"diseaseList: {diseaseList}")
-            assayList=list(JsonObj.objects.filter(json_type="experiment_type").values_list('name', flat=True).order_by('id'))
-            print(f"assayList: {assayList}")
-            cancer_matrix = []
-            if(len(slug_vals)==1):
-                for row in diseaseList:
-                    new_row=[]
-                    new_row.append(row)
-                    for col in assayList:
-                        no_of_exp=len(Experiment.objects.filter(json_type__name=col, project__disease_site__name=row))
-                        new_row.append({'assay': col, 'value': no_of_exp})
+      # Create a DataFrame
+      df = pd.DataFrame(data)
 
-                    values = [d['value'] for d in new_row[1:-1]]
-                    if(sum(values)>0):
-                        cancer_matrix.append(new_row)
-            else:
-                for row in diseaseList:
-                    new_row=[]
-                    new_row.append(row)
-                    for col in assayList:
-                        no_of_exp=len(Experiment.objects.filter(json_type__name=col, project__disease_site__name=row))
-                        new_row.append({'assay': col, 'value': no_of_exp})
+      # Sort the DataFrame by the 'ATAC-seq' column in descending order
+      if(len(slug_vals) > 1):
+        sorted_df = df.sort_values(by=slug_vals[1], ascending=ast.literal_eval(slug_vals[2]))
+      else:
+        sorted_df = df
 
-                    print(f"new_row[1:-1]: {new_row[1:-1]}")
-                    values = [d['value'] for d in new_row[1:-1]]
-                    print(f"values: {values}")
-                    if(sum(values)>0):
-                        cancer_matrix.append(new_row)
+      # Remove rows where the sum of numeric values is zero
+      filtered_df = sorted_df[sorted_df[assayList].sum(axis=1) != 0]
 
-                print(f"cancer_matrix length: {len(cancer_matrix)}")
-                index = 1
-                blah = []
-                for row in cancer_matrix:
-                    print(f"cancer_matrix row: {index}: {row}")
-                    print(f"row length: {len(row)}")
-                    print(f"row[1:-1]: {row[1:-1]}")
-                    values = [d['value'] for d in row[1:-1]]
-                    blah.append(values)
-                    index = index + 1
+      return JsonResponse(filtered_df.to_dict(orient='records'), safe=False)
 
-                print(f"blah: {blah}")
-                np_cancer=np.array(blah)
-                print(f"np_cancer: {np_cancer}")
-                column_values = ['Disease-site'] + assayList
-                print(f"column_values: {column_values}")
-                df = pd.DataFrame(data = np_cancer, columns = assayList)
-                print(df)
-                print(df.info())
-                if(slug_vals[1] != 'Disease-site'):
-                 df[slug_vals[1]] = pd.to_numeric(df[slug_vals[1]], errors='coerce')
-                print(df.info())
-                print(f"slug_vals[1]: {slug_vals[1]}")
-                print(f"slug_vals[2]: {slug_vals[2]}")
-                cancer_matrix=df.sort_values(by=slug_vals[1], ascending=ast.literal_eval(slug_vals[2]))
-                print(f"cancer_matrix: {cancer_matrix}")
-                print(cancer_matrix.info())
-                result = cancer_matrix.to_json(orient="values")
-                print(f"result: {result}")
-                parsed = json.loads(result)
-
-                cancer_matrix=parsed
-
-            js_project=cancer_matrix
-
-        return JsonResponse(js_project, safe=False)
-    else :
-        return HttpResponse('<h1>Page was found</h1>')
+    return JsonResponse(js_project, safe=False)
+  else :
+    return HttpResponse('<h1>Page was found</h1>')
 

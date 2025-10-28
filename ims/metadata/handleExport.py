@@ -3,14 +3,11 @@ Created on Dec. 8, 2020
 
 @author: ankita
 '''
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render
 from django.http import HttpResponse
-from django.http.response import HttpResponseRedirect, JsonResponse
 from metadata.models import *
 from metadata.forms import *
 from openpyxl.reader.excel import load_workbook
-from openpyxl.styles import Color, Fill
-from openpyxl.utils.cell import get_column_letter
 from datetime import datetime
 from datetime import date
 from metadata.excelRow import insert_rows
@@ -39,44 +36,44 @@ def handle_exportSequencingform(request,prj_pk):
     sequencing_type=request.POST.get('sequencing_type')
     multiplexing_sequencing=request.POST.get('multiplexing_sequencing')
 
-    
+
     dt_string = now.strftime("%Y-%m-%d_%H-%M-%S")
     dt_today = today.strftime("%Y-%m-%d")
     project_id=prj_pk
     prj = Project.objects.get(pk=project_id)
-      
+
     # Create the HttpResponse object with the appropriate CSV header.
     response = HttpResponse(content_type='application/ms-excel')
     response['Content-Disposition'] = "attachment; filename=Epigenetics_Initiative_Sample_Submission_Form_"+dt_string+".xlsx"
     file_path_new = 'static/Epigenetics_Initiative_Sample_Submission_Form_v3.1.xlsx'
- 
+
     wb = load_workbook(file_path_new)
     ws = wb.worksheets[0]
     ws.insert_rows = insert_rows
-    
+
     contributor1 = prj.created_by
     contributor2 = prj.contributor.all().order_by('first_name')
-    
+
     membersList = []
     membersList.append(contributor1.get_full_name())
     for values in contributor2:
         membersList.append(values.get_full_name())
     m=list(set(membersList))
-    
+
     emailList=[]
     emailList.append(contributor1.email)
     for values in contributor2:
         emailList.append(values.email)
     e=list(set(emailList))
-    
-    
+
+
     ws.cell(row=5, column=5).value = dt_today
     ws.cell(row=7, column=2).value = " / ".join(m)
     ws.cell(row=8, column=2).value = " / ".join(e)
     ws.cell(row=9, column=2).value = data_recipient_contact_name
     ws.cell(row=10, column=2).value = data_recipient_contact_email
     ws.cell(row=14, column=2).value = grant
-    
+
     sampleRowNo=18
     count=0
     for ep in experimentList:
@@ -87,33 +84,33 @@ def handle_exportSequencingform(request,prj_pk):
         ws.cell(row=sampleRowNo, column=1).value = exp.uid
         ws.cell(row=sampleRowNo, column=2).value = exp.name
         ws.cell(row=sampleRowNo, column=3).value = exp.json_type.name
-        
+
         ws.cell(row=sampleRowNo, column=4).value = exp.biosample.biosource.source_organism.name
-        
+
 #         if(exp.biosample.sample_type):
 #             ws.cell(row=sampleRowNo, column=5).value = exp.biosample.sample_type.name
-            
+
         if(exp.biosample_quantity_units):
             ws.cell(row=sampleRowNo, column=6).value = str(exp.biosample_quantity)+" "+str(exp.biosample_quantity_units.name)
         elif(exp.biosample_quantity):
             ws.cell(row=sampleRowNo, column=6).value = str(exp.biosample_quantity)
         else:
             ws.cell(row=sampleRowNo, column=6).value = "value not filled in db"
-        
+
         ws.cell(row=sampleRowNo, column=12).value = buffer
 
-        
+
         sampleRowNo += 1
         count += 1
-    
+
     ws.cell(row=23+count, column=2).value = bp_length
     ws.cell(row=24+count, column=2).value = low_diversity_sample
     ws.cell(row=25+count, column=2).value = sequencing_type
     ws.cell(row=26+count, column=2).value = multiplexing_sequencing
     ws.cell(row=28+count, column=1).value = instructions
-    
-    
-    wb.save(response)    
+
+
+    wb.save(response)
     return response
 
 
@@ -127,7 +124,7 @@ def exportSequencingform(request,prj_pk):
 
     else:
         form = SequencingForm(initial={'prj_pk':prj_pk})
-     
+
     pageContext = {
         'form': form,
         'form_name':'Export genomic core sequencing form'
@@ -139,7 +136,7 @@ def handle_exportegaform(request,prj_pk):
     response = HttpResponse(content_type='application/ms-excel')
     response['Content-Disposition'] = "attachment; filename=EGA_Sample_Submission_Form_"+dt_string+".xlsx"
     file_path_new = 'static/EGA_Array_based_Format_V4.3.xlsx'
- 
+
     wb = load_workbook(file_path_new)
     ws = wb.worksheets[1]
     c=5
@@ -158,20 +155,20 @@ def handle_exportegaform(request,prj_pk):
             ws.cell(row=c, column=6).value = biosample.biosource.disease
             if("donor_id" in json.loads(biosample.biosource.json_fields)):
                 ws.cell(row=c, column=7).value = json.loads(biosample.biosource.json_fields)["donor_id"]
-            
+
             sampleCount+=1
             c+=1
-    
-    
+
+
     c=15
     ws = wb.worksheets[2]
     ws.cell(row=c, column=1).value = Project.objects.get(pk=prj_pk).name
     ws.cell(row=c, column=7).value = sampleCount
-    
+
     c=13
     ws = wb.worksheets[3]
     for exp in experimentList:
-        ex=Experiment.objects.get(pk=exp) 
+        ex=Experiment.objects.get(pk=exp)
         biosample = ex.biosample
         files = SeqencingFile.objects.filter(experiment=exp)
         for f in files:
@@ -181,40 +178,40 @@ def handle_exportegaform(request,prj_pk):
             ws.cell(row=c, column=3).value = f.cluster_path
             ws.cell(row=c, column=4).value = f.file_format.name
             c+=1
-    
-    wb.save(response)    
+
+    wb.save(response)
     return response
 
 
 def handle_exportiheacform(request,prj_pk):
     experimentList=request.POST.getlist('choose_experiments')
     response = HttpResponse(content_type='text/csv')
-    
+
     typeList=[]
     sampleList=[]
     for exp in experimentList:
         biosample = Experiment.objects.get(pk=exp).biosample
         typeB = biosample.biosource.json_type.name
         typeList.append(typeB)
-        
+
         if(biosample.json_type.name=="culture details - Available"):
             sampleList.append("Y")
         else:
             sampleList.append("N")
-            
+
     c=0
     if(len(set(typeList)) == 1):
         if(typeList[0]=="cell line"):
-            headerLine=["id", "sample_ontology_uri", "disease", "disease_ontology_uri", "biomaterial_type", "line", "lineage", 
+            headerLine=["id", "sample_ontology_uri", "disease", "disease_ontology_uri", "biomaterial_type", "line", "lineage",
                         "differentiation_stage", "medium", "sex"]
             response['Content-Disposition'] = "attachment; filename=ihec_cellLine_"+dt_string+".csv"
             writer = csv.writer(response)
-            
+
             writer.writerow(headerLine)
-                
+
             biosampleList=[]
             for exp in experimentList:
-                ex=Experiment.objects.get(pk=exp) 
+                ex=Experiment.objects.get(pk=exp)
                 biosample = ex.biosample
                 if(biosample.name not in biosampleList):
                     biosampleList.append(biosample.name)
@@ -231,20 +228,20 @@ def handle_exportiheacform(request,prj_pk):
                     fields.append(json.loads(biosample.biosource.json_fields)["sex"])
                     writer.writerow(fields)
                     c+=1
-         
+
         if(typeList[0]=="tissue") or (typeList[0]=="tissue explants"):
-            
-            headerLine=["id", "sample_ontology_uri", "disease", "disease_ontology_uri", "biomaterial_type", "tissue_type", "tissue_depot", 
+
+            headerLine=["id", "sample_ontology_uri", "disease", "disease_ontology_uri", "biomaterial_type", "tissue_type", "tissue_depot",
                         "donor_id", "donor_age", "donor_age_unit", "donor_health_status", "donor_sex", "donor_ethnicity"]
             response['Content-Disposition'] = "attachment; filename=ihec_primaryTissue_"+dt_string+".csv"
             writer = csv.writer(response)
-            
+
             writer.writerow(headerLine)
-            
-            
+
+
             biosampleList=[]
             for exp in experimentList:
-                ex=Experiment.objects.get(pk=exp) 
+                ex=Experiment.objects.get(pk=exp)
                 biosample = ex.biosample
                 if(biosample.name not in biosampleList):
                     biosampleList.append(biosample.name)
@@ -264,18 +261,18 @@ def handle_exportiheacform(request,prj_pk):
                     fields.append(json.loads(biosample.biosource.json_fields)["donor_ethnicity"])
                     writer.writerow(fields)
                     c+=1
-         
+
         if(typeList[0]=="primary cell"):
             if(len(set(typeList)) == 1) and typeList[0]=="Y":
-                headerLine=["id", "sample_ontology_uri", "disease", "disease_ontology_uri", "biomaterial_type", "cell_type", 
+                headerLine=["id", "sample_ontology_uri", "disease", "disease_ontology_uri", "biomaterial_type", "cell_type",
                             "donor_id", "donor_age", "donor_age_unit", "donor_health_status", "donor_sex", "donor_ethnicity"]
                 response['Content-Disposition'] = "attachment; filename=ihec_primaryCell_"+dt_string+".csv"
                 writer = csv.writer(response)
-            
+
                 writer.writerow(headerLine)
                 biosampleList=[]
                 for exp in experimentList:
-                    ex=Experiment.objects.get(pk=exp) 
+                    ex=Experiment.objects.get(pk=exp)
                     biosample = ex.biosample
                     if(biosample.name not in biosampleList):
                         biosampleList.append(biosample.name)
@@ -293,17 +290,17 @@ def handle_exportiheacform(request,prj_pk):
                         fields.append(json.loads(biosample.biosource.json_fields)["sex"])
                         fields.append(json.loads(biosample.biosource.json_fields)["donor_ethnicity"])
                         writer.writerow(fields)
-                        c+=1       
+                        c+=1
             else:
-                headerLine=["id", "sample_ontology_uri", "disease", "disease_ontology_uri", "biomaterial_type", "cell_type", "culture_conditions", 
+                headerLine=["id", "sample_ontology_uri", "disease", "disease_ontology_uri", "biomaterial_type", "cell_type", "culture_conditions",
                             "donor_id", "donor_age", "donor_age_unit", "donor_health_status", "donor_sex", "donor_ethnicity"]
                 response['Content-Disposition'] = "attachment; filename=ihec_primaryCellCulture_"+dt_string+".csv"
                 writer = csv.writer(response)
-            
+
                 writer.writerow(headerLine)
                 biosampleList=[]
                 for exp in experimentList:
-                    ex=Experiment.objects.get(pk=exp) 
+                    ex=Experiment.objects.get(pk=exp)
                     biosample = ex.biosample
                     if(biosample.name not in biosampleList):
                         biosampleList.append(biosample.name)
@@ -322,13 +319,13 @@ def handle_exportiheacform(request,prj_pk):
                         fields.append(json.loads(biosample.biosource.json_fields)["sex"])
                         fields.append(json.loads(biosample.biosource.json_fields)["donor_ethnicity"])
                         writer.writerow(fields)
-        
-                        c+=1       
-       
+
+                        c+=1
+
     else:
         pass
-    
-  
+
+
     return response
 
 
@@ -337,36 +334,36 @@ def handle_exportgeoform(request,prj_pk):
     response = HttpResponse(content_type='application/ms-excel')
     response['Content-Disposition'] = "attachment; filename=GEO_sheet_v04282020_"+dt_string+".xlsx"
     file_path_new = 'static/GEO_sheet_v04282020.xlsx'
- 
+
     wb = load_workbook(file_path_new)
     ws = wb.worksheets[0]
     ws.insert_rows = insert_rows
-    
+
     ws.cell(row=9, column=2).value = Project.objects.get(pk=prj_pk).name
     ws.cell(row=10, column=2).value = Project.objects.get(pk=prj_pk).description
     ws.cell(row=12, column=2).value = Project.objects.get(pk=prj_pk).created_by.get_full_name()
     c=13
-   
+
     for n in Project.objects.get(pk=prj_pk).contributor.all():
         if(c>14):
             insert_rows(ws, row_idx= c, cnt = 1, above=False, copy_style=True)
-            
+
             ws.cell(row=c, column=1).value = "contributor"
-        
+
         ws.cell(row=c, column=2).value = n.get_full_name()
         c+=1
-    
+
     rowNo = ws.max_row
     for i in range (rowNo):
         if((ws.cell(row=i+1, column=1).value)=="Sample name"):
             desiredrowNo = i+2
             break
-        
+
     c=desiredrowNo
     sampleNo=1
     biosampleList=[]
     for exp in experimentList:
-        e=Experiment.objects.get(pk=exp) 
+        e=Experiment.objects.get(pk=exp)
         biosample = e.biosample
         if(biosample.name not in biosampleList):
             biosampleList.append(biosample.name)
@@ -383,15 +380,15 @@ def handle_exportgeoform(request,prj_pk):
                 ws.cell(row=c, column=colno).value = f.name
                 colno+=1
             c+=1
-        
+
     rowNo = ws.max_row
     for i in range (rowNo):
         if((ws.cell(row=i+1, column=1).value)=="RAW FILES"):
             desiredrowNo = i+3
             break
-        
+
     c=desiredrowNo
-    
+
     for exp in experimentList:
         e=Experiment.objects.get(pk=exp)
         files = SeqencingFile.objects.filter(experiment=e)
@@ -410,15 +407,15 @@ def handle_exportgeoform(request,prj_pk):
                 ws.cell(row=c, column=5).value = "single"
             ws.cell(row=c, column=6).value = f.cluster_path
             c+=1
-            
+
     rowNo = ws.max_row
     for i in range (rowNo):
         if((ws.cell(row=i+1, column=1).value)=="PAIRED-END EXPERIMENTS"):
             desiredrowNo = i+3
             break
-        
+
     c=desiredrowNo
-    
+
     listfiles=[]
     for exp in experimentList:
         e=Experiment.objects.get(pk=exp)
@@ -431,8 +428,8 @@ def handle_exportgeoform(request,prj_pk):
                 listfiles.append(f.name)
                 listfiles.append(f.related_files.name)
                 c+=1
-            
-    wb.save(response)    
+
+    wb.save(response)
     return response
 
 
@@ -447,12 +444,12 @@ def exportform(request,prj_pk,slug):
                 res = handle_exportiheacform(request,prj_pk)
             elif(slug=="GEO"):
                 res = handle_exportgeoform(request,prj_pk)
-                
+
             return res
 
     else:
         form = selectExperimentsForm(initial={'prj_pk':prj_pk})
-     
+
     pageContext = {
         'form': form,
         'form_name':'Export '+slug+' form'
@@ -465,7 +462,7 @@ def exportSequencingdata(request):
     headerLine=["run_name","user","submission_date","retrieval_date","duration"]
     response['Content-Disposition'] = "attachment; filename=sequencingdata_"+dt_string+".csv"
     writer = csv.writer(response)
-            
+
     writer.writerow(headerLine)
     startdate = datetime.today()
     enddate = startdate - timedelta(days=200)
@@ -485,13 +482,13 @@ def exportnoSequencingdata(request):
     headerLine=["experiment_name","user","creation_date","duration till now"]
     response['Content-Disposition'] = "attachment; filename=experimentswithnodata_"+dt_string+".csv"
     writer = csv.writer(response)
-            
+
     writer.writerow(headerLine)
     startdate = datetime.today()
     enddate = startdate - timedelta(days=200)
-    
+
     e=Experiment.objects.filter(created_at__range=[enddate,startdate], run_experiment=None).order_by('pk')
-    
+
     for i in e:
         fields=[]
         fields.append(i.name)

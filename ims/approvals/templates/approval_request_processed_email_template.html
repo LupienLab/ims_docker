@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Approval Request</title>
+  <style>
+    body {
+      background-color: #f4f4f4;
+    }
+
+    .container {
+      margin-top: 20px;
+      background: white;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .button {
+      display: inline-block;
+      padding: 10px 20px;
+      margin-top: 20px;
+      background-color: #007BFF;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+
+    .footer {
+      margin-top: 20px;
+      font-size: 12px;
+      color: #999;
+    }
+
+    .footer img {
+      max-width: 40rem;
+      /* Adjust the size as needed */
+      height: auto;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1 class="text-primary">Request Processed</h1>
+    <p>Dear {{ requester_name }},</p>
+    <p>Your Request has been processed:</p>
+    <p><strong>Request Details:</strong></p>
+    <ul>
+      <li><strong>Title:</strong> {{ request_title }}</li>
+      <li><strong>Requested By:</strong> {{ requester_name }}</li>
+      <li><strong>Processed By:</strong> {{ approver_name }}</li>
+      <li><strong>Result:</strong> {{ result }}</li>
+      <li><strong>comments:</strong> {{ comments }}</li>
+    </ul>
+    <p>Please review the request at your earliest convenience. You can view your requests using the button
+      below:</p>
+    <a href="{{ approval_link }}" class="button">View Request</a>
+    <p>Thank you for your attention to this matter.</p>
+    <p>Best regards,<br>{{ approver_name }}</p>
+    <div class="footer">
+      <p>This is an automated message. Please do not reply.</p>
+      <img src="{{ logo_url }}" alt="Lupien Lab Logo">
+    </div>
+  </div>
+</body>
+
+</html>

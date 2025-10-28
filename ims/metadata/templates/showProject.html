@@ -1,42 +1,45 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>Projects</h1><br/>
-<div class="container">
-<br/><a href="{% url 'addProject' %}"><button type="button" class="btn btn-success float-right">Add Project</button></a><br/><br/>
-	{% if object %}
-	<table class="cell-border table-hover data_table">
-		<thead>
-			<tr>
-				<th style="width: 5%"></th>
-				<th>Project Name</th>
-				<th>Status</th>
-				<th>Owner</th>
-				<th>Contributors</th>
-				<th>Created at</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for project in object %}
-			<tr data-child-value="{{ project.description }}">
-				<td style="width: 5%" class="details-control"></td>
-				<td><a href="{% url 'detailProject' project.pk %}">{{ project.name }}</a></td>
-				<td>{{ project.status }}</td>
-				<td>{{ project.created_by }}</td> 
-			    <td> 
-			         {% if project.contributor.all %} 
-			              {% for contributor in project.contributor.all %}
-				             ({{forloop.counter }}) {{contributor}}<br /> 
-			          {% endfor %} 
-			{% else %} 
-				No contributors added. 
-			{% endif %}
-			</td>
-				<td>{{ project.created_at|date }}</td>
-			</tr>
-			{% endfor %}
-		</tbody>
-	</table>
-	{% else %}
-	<p>No data available under your lab group. Contact administrator to gain access.</p>
-</div>
+
+<section class="container">
+  <a href="{% url 'addProject' %}">
+    <button type="button" class="btn btn-success float-right">Add Project</button>
+  </a>
+  <hr>
+  {% if object %}
+  <table class="cell-border table-hover data_table">
+    <thead>
+      <tr>
+        <th style="width: 5%"></th>
+        <th>Project Name</th>
+        <th>Status</th>
+        <th>Owner</th>
+        <th>Contributors</th>
+        <th>Created at</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for project in object %}
+      <tr data-child-value="{{ project.description }}">
+        <td style="width: 5%" class="details-control"></td>
+        <td><a href="{% url 'detailProject' project.pk %}">{{ project.name }}</a></td>
+        <td>{{ project.status }}</td>
+        <td>{{ project.created_by }}</td>
+        <td>
+          {% if project.contributor.all %}
+          {% for contributor in project.contributor.all %}
+          ({{forloop.counter }}) {{contributor}}<br />
+          {% endfor %}
+          {% else %}
+          No contributors added.
+          {% endif %}
+        </td>
+        <td>{{ project.created_at|date }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>No data available under your lab group. Contact administrator to gain access.</p>
+</section>
 {% endif %} {% endblock %}

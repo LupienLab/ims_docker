@@ -1,0 +1,29 @@
+# Use a lighter base image with Python
+FROM python:3.11-slim
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+  build-essential \
+  graphviz \
+  graphviz-dev \
+  netcat-openbsd \
+  libpq-dev \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
+
+# Create a working directory
+WORKDIR /code
+
+# Copy requirements file and install Python dependencies
+COPY ./config/pip-requirements.txt /code/
+RUN pip install --no-cache-dir -r pip-requirements.txt
+
+# Copy the start script and make it executable
+COPY start_django_server.sh /code/
+RUN chmod +x /code/start_django_server.sh
+
+# Set the working directory for the Django application
+WORKDIR /ims

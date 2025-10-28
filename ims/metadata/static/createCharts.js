@@ -268,10 +268,13 @@ var experimenttags = new Chart(ctx5, {
     }
 });
 }
+
+const EXPERIMENT_COLUMNS = ['Disease-site','ATAC-seq', 'Hi-C', 'ChIP-seq', 'RNA-seq', 'scATAC', 'scATAC-RNAseq-multiome', 'BS-seq','Cut-Run', 'WGS', 'WES']
+
 /*##############*/
 new gridjs.Grid({
   search: true,
-  columns: ['Disease-site','ATAC-seq', 'Hi-C', 'ChIP-seq', 'RNA-seq', 'scATAC', 'scATAC-RNAseq-multiome', 'BS-seq','Cut-Run', 'WGS', 'WES'],
+  columns: EXPERIMENT_COLUMNS,
   sort: {
     multiColumn: false,
     server: {
@@ -280,7 +283,7 @@ new gridjs.Grid({
 
        const col = columns[0];
        const dir = col.direction === 1 ? 'True' : 'False';
-       let colName = ['Disease-site','ATAC-seq', 'Hi-C', 'ChIP-seq', 'RNA-seq', 'scATAC', 'scATAC-RNAseq-multiome', 'BS-seq','Cut-Run','WGS', 'WES'][col.index];
+       let colName = EXPERIMENT_COLUMNS[col.index];
 
        return `${prev}+${colName}+${dir}`;
      }
@@ -289,32 +292,15 @@ new gridjs.Grid({
   server: {
 	  method: 'POST',
     url: '/populateCharts/grid',
-    then: data => data.map((card) => {
-
-      console.log("card:", card)
-
-      return card.map((value, index) => {
-        console.log(value)
-        if(index === 0) {
-          return gridjs.html(`${value}`)
-        } else {
-          return gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/${value['assay']}'>${value['value']}</a>`)
+    then: data => data.map((row) => {
+      const formattedRow = Object.keys(row).map(key => {
+        if(key === 'Disease-site') {
+          return gridjs.html(`${row['Disease-site']}`)
         }
+        return gridjs.html(`<a href='/browseExperimentGrid/${row['Disease-site']}/${key}'>${row[key]}</a>`)
       })
-
-      // return [ gridjs.html(`${card[0]}`),
-      //   gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/${card[1]['assay]']}'>${card[1]}</a>`),
-      //   gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/${card[2]['assay]']}'>${card[2]}</a>`),
-      //   gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/${card[3]['assay]']}'>${card[3]}</a>`),
-      //   gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/${card[4]['assay]']}'>${card[4]}</a>`),
-      //   gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/${card[5]['assay]']}'>${card[5]}</a>`),
-      //   gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/${card[6]['assay]']}'>${card[6]}</a>`),
-      //   gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/${card[7]['assay]']}'>${card[7]}</a>`),
-      //   gridjs.html(`<a href='/browseExperimentGrid/${card[0]}/${card[8]['assay]']}'>${card[8]}</a>`),
-      // ]
-
-    }
-    ),
+      return formattedRow
+    }),
     handle: (res) => {
       // no matching records found
       if (res.status === 404) return {data: []};

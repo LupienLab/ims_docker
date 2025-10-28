@@ -3,21 +3,20 @@ Created on Feb. 26, 2020
 
 @author: ankita
 '''
-from django.forms import ModelForm, widgets
+from django.forms import ModelForm
 from metadata.models import *
 from django import forms
 from django.forms import ModelChoiceField
 from metadata.widgets import *
 from dal import autocomplete
 from dal import forward
-from ims import settings
 from django.forms import formset_factory
 
 class ProjectForm(ModelForm):
     class Meta:
         model = Project
-        exclude = ('name','created_at','created_by','edited_at','edited_by','lab_name', 'labs')
-        fields = ('user_name_string','starting_date','disease_site','tissue_type','contributor','status','description',)
+        exclude = ('name','created_at','created_by','edited_at','edited_by','lab_name')
+        fields = ('user_name_string','starting_date','disease_site','tissue_type','contributor','status','description','labs')
         #fields = ('contributor','status','description',)
 
     def __init__(self, *args, **kwargs):
@@ -37,7 +36,11 @@ class ExperimentForm(ModelForm):
 
 
 class BiosourceForm(ModelForm):
-    choose_existing = ModelChoiceField(queryset = Biosource.objects.all(),required=False, widget=autocomplete.ModelSelect2(url='biosourceAutocomplete'), help_text='Choose from existing list')
+    choose_existing = ModelChoiceField(
+        queryset = Biosource.objects.all(),
+        required=False,
+        #widget=autocomplete.ModelSelect2(url='biosourceAutocomplete'),
+        help_text='Choose from existing list')
     class Meta:
         model = Biosource
         exclude = ('created_at','created_by','edited_at','edited_by','json_fields')
@@ -53,7 +56,8 @@ class BiosampleForm(ModelForm):
         super(BiosampleForm, self).__init__(*args, **kwargs)
         if source_pk:
 
-            self.fields['choose_existing'] = ModelChoiceField(queryset = Biosample.objects.all(),required=False,widget=autocomplete.ModelSelect2(url='biosampleAutocomplete',forward=(forward.Const(source_pk, 'f4'),)), help_text='Choose from existing list')
+            self.fields['choose_existing'] = ModelChoiceField(queryset = Biosample.objects.all(),required=False,#widget=autocomplete.ModelSelect2(url='biosampleAutocomplete',forward=(forward.Const(source_pk, 'f4'),)),
+                                                              help_text='Choose from existing list')
 
     class Meta:
         model = Biosample

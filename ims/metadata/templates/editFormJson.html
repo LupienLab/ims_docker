@@ -2,21 +2,22 @@
 {% load crispy_forms_tags %}
 {% load tags %}
 
+
 {% block content %}
 
 
-  <form method="post">
-    {% csrf_token %}
-    
-    {% json_saved_data form.instance.json_fields as jsonEntry %}
-    {{ jsonEntry|json_script:"json-data" }}
-    
-    <h1>Edit {{form | modelname}}</h1>
-     {{ form|crispy }}
-     
-     <div id="json_form_display">
-     
-     </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
-  </form>
+<form method="post">
+  {% csrf_token %}
+
+  {% json_saved_data form.instance.json_fields as jsonEntry %}
+  {{ jsonEntry|json_script:"json-data" }}
+
+  <h1>Edit {{form | modelname}}</h1>
+  {% crispy form %}
+
+  <div id="json_form_display">
+
+  </div>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
 {% endblock %}

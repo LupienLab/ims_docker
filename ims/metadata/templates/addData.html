@@ -5,21 +5,50 @@
 
 
 {% block content %}
-   <br/><h5><u><b>Add Data</b></u></h5>
-	<h3>STEP 1:</h3>
-	<a href="{% url 'addProject' %}"><button type="button" class="btn btn-success float-left">Add Project</button></a><br/><br/>
-	
-	<h3>STEP 2:</h3>
-	<a href="{% url 'bulkAddBiosource' %}"><button type="button" class="btn btn-success">Bulk Add Biosource</button></a>
-	<img src="{% static 'img/arrow.png' %}" alt="arrow" style="width:100px;height:50px;">
-	<a href="{% url 'bulkAddBiosample' %}"><button type="button" class="btn btn-success">Bulk Add Biosample</button></a>
-	<img src="{% static 'img/arrow.png' %}" alt="arrow" style="width:100px;height:50px;">
-	<a href="{% url 'selectProjectforImport' slug="experiments"%}"><button type="button" class="btn btn-success">Bulk Add Experiments</button></a><br/><br/>
-	
-	
-	<h3>STEP 3:</h3>
-	<a href="{% url 'selectProjectforImport' slug="sequencingrun"%}"><button type="button" class="btn btn-success">Bulk Add SequencingRun</button></a>
-	<img src="{% static 'img/arrow.png' %}" alt="arrow" style="width:100px;height:50px;">
-	<a href="{% url 'selectProjectforImport' slug="files"%}"><button type="button" class="btn btn-success">Bulk Add Fastq Files</button></a>
-	
+<section class="container">
+  <h1>Add Data</h1>
+  <h3>STEP 1:</h3>
+  <div class="row mb-3">
+    <a href="{% url 'addProject' %}">
+      <button type="button" class="btn btn-success float-left">
+        Add Project
+      </button>
+    </a>
+  </div>
+  <h3>STEP 2:</h3>
+  <div class="row row-cols-3 mb-3" style="height: 50px;">
+    <div class="col w-auto">
+      <a href="{% url 'bulkAddBiosource' %}">
+        <button type="button" class="btn btn-success">Bulk Add Biosource</button>
+      </a>
+      <img src="{% static 'img/arrow.png' %}" alt="arrow" style="width:100px;height:50px;">
+    </div>
+    <div class="col w-auto">
+      <a href="{% url 'bulkAddBiosample' %}">
+        <button type="button" class="btn btn-success">Bulk Add Biosample</button>
+      </a>
+      <img src="{% static 'img/arrow.png' %}" alt="arrow" style="width:100px;height:50px;">
+    </div>
+    <div class="col w-auto">
+      <a href="{% url 'selectProjectforImport' slug='experiments' %}">
+        <button type="button" class="btn btn-success">Bulk Add Experiments</button>
+      </a>
+    </div>
+  </div>
+
+  <h3>STEP 3:</h3>
+  <div class="row row-cols-2" style="height: 50px;">
+    <div class="col w-auto">
+      <a href="{% url 'selectProjectforImport' slug='sequencingrun' %}">
+        <button type="button" class="btn btn-success">Bulk Add SequencingRun</button>
+      </a>
+      <img src="{% static 'img/arrow.png' %}" alt="arrow" style="width:100px;height:50px;">
+    </div>
+    <div class="col w-auto">
+      <a href="{% url 'selectProjectforImport' slug='files' %}">
+        <button type="button" class="btn btn-success">Bulk Add Fastq Files</button>
+      </a>
+    </div>
+  </div>
+</section>
 {% endblock %}

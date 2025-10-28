@@ -1,5 +1,3 @@
-# views.py in projects app
-from django.shortcuts import render, get_object_or_404
 from user_profiles.utils import get_user_lab  # Import the utility function to get user's lab
 from .models import Project
 

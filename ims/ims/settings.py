@@ -11,19 +11,19 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+from decouple import config
+from pathlib import Path
 
+# BASE_URL = config("BASE_URL") or "http://localhost:8000"
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-print("BASE_DIR:")
-print(BASE_DIR)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'dal_select2',
     'django.contrib.admin',
     'crispy_forms',
-    'crispy_bootstrap4',
+    'crispy_bootstrap5',
+    'django_bootstrap5',
     'accounts',
     'metadata',
     'approvals',
@@ -55,9 +56,9 @@ INSTALLED_APPS = [
 
 ]
 
-CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
+CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -66,7 +67,8 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware'
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'approvals.middleware.ApprovalsAccessMiddleware',
 ]
 
 # AUTHENTICATION_BACKENDS = [
@@ -149,11 +151,15 @@ LOGOUT_REDIRECT_URL='keycloak_login'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
-STATIC_ROOT = os.path.join(BASE_DIR, "static/")
-STATIC_URL = '/static/'
+BASE_DIR = Path(__file__).resolve().parent.parent
 
-print("STATIC_ROOT:")
-print(STATIC_ROOT)
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',  # This points to the top-level static folder inside ims/
+]
+
+# For production collect static files here
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
@@ -161,15 +167,17 @@ MEDIA_URL = '/media/'
 # Email settings
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'mailcatcher'
-EMAIL_PORT = 1025
+EMAIL_HOST = config("EMAIL_HOST")
+EMAIL_PORT = config("EMAIL_PORT", default=1025, cast=int)
 DEFAULT_FROM_EMAIL = 'noreply@mailcatcher.com'
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")  # Your email address
-EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")  # Your email password
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=False, cast=bool)
+EMAIL_USE_SSL = config('EMAIL_USE_SSL', default=False, cast=bool)
+EMAIL_HOST_USER = config("EMAIL_HOST_USER", default='')  # Your email address
+
 
 # Keycloak settings
-KEYCLOAK_SERVER_URL = os.getenv("KEYCLOAK_SERVER_URL")
-KEYCLOAK_REALM = os.getenv("KEYCLOAK_REALM_NAME")
-KEYCLOAK_CLIENT_ID = os.getenv("KEYCLOAK_CLIENT_ID")
-KEYCLOAK_CLIENT_SECRET = os.getenv("KEYCLOAK_CLIENT_SECRET")
+KEYCLOAK_SERVER_URL = config("KEYCLOAK_SERVER_URL")
+KEYCLOAK_REALM = config("KEYCLOAK_REALM_NAME")
+KEYCLOAK_CLIENT_ID = config("KEYCLOAK_CLIENT_ID")
+KEYCLOAK_CLIENT_SECRET = config("KEYCLOAK_CLIENT_SECRET")
 KEYCLOAK_REDIRECT_URI = 'http://localhost:8000/auth/callback/'

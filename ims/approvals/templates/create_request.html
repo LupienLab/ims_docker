@@ -4,13 +4,47 @@
 {% load static %}
 
 
+
+
 {% block content %}
-  <h2 class="mt-3">Create Approval Request</h2>
-  <br>
-  <div class="container">
-    <form method="post" enctype="multipart/form-data">
-      {% csrf_token %}
-      {% crispy form %}
-    </form>
-  </div>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const projectSelect = document.getElementById('id_projects');
+    const experimentSelect = document.getElementById('id_experiments');
+
+    projectSelect.addEventListener('change', function () {
+      const projectId = this.value;
+
+      if (projectId) {  // Check if a project is selected
+        fetch(`/approvals/get_experiments/${projectId}/`)
+          .then(response => response.json())
+          .then(data => {
+            // Clear existing options
+            experimentSelect.innerHTML = '';
+
+            // Populate new options
+            data.experiments.forEach(experiment => {
+              const option = document.createElement('option');
+              option.value = experiment.id;
+              option.textContent = experiment.name;
+              experimentSelect.appendChild(option);
+            });
+          })
+          .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
+          });
+      } else {
+        // Clear experiments if no project is selected
+        experimentSelect.innerHTML = '';
+      }
+    });
+  });
+</script>
+<h2 class="mt-3">Create Approval Request</h2>
+<br>
+<div class="container">
+  <form method="post" enctype="multipart/form-data">
+    {% crispy form %}
+  </form>
+</div>
 {% endblock %}

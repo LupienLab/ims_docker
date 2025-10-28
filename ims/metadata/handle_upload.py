@@ -13,7 +13,6 @@ import pandas as pd
 import datetime
 import binascii
 import os
-from django.shortcuts import render, get_object_or_404, redirect
 
 def get_or_none(classmodel, **kwargs):
     try:
@@ -37,7 +36,7 @@ def validate(date_text):
 def checkSanity(obj,request,row,c):
     if(row[obj]==None or str(row[obj])=="nan" or str(row[obj])=="" or str(row[obj])==" "):
         return False
-    
+
     return True
 
 def createJSON(json_type,row):
@@ -61,11 +60,11 @@ def removeStar(old_cols):
         else:
             newList.append(i)
     return newList
-    
+
 def handle_uploaded_experiments(request,inputdf):
     df = inputdf
     df=df.sort_values(by=['experiment_name'])
-    
+
     c=2
     errorList=[]
     for index, row in df.iterrows():
@@ -77,7 +76,7 @@ def handle_uploaded_experiments(request,inputdf):
                 uid = row["experiment_label"]
             else:
                 uid = binascii.hexlify(os.urandom(3)).decode()
-            
+
             if(source==None):
                 messages.add_message(request, messages.WARNING, 'Biosource is incorrect in line '+str(c))
                 return
@@ -87,12 +86,12 @@ def handle_uploaded_experiments(request,inputdf):
             if(exp==None):
                 messages.add_message(request, messages.WARNING, 'Experiment to clone is incorrect in line '+str(c))
                 return
-            
+
             if(row["concentration_of_sample"] and not(str(row["concentration_of_sample"])=="nan")):
-                conc=row["concentration_of_sample"] 
+                conc=row["concentration_of_sample"]
             else:
                 conc=exp.concentration_of_sample
-            
+
             if(source):
                 if(sample):
                     if(exp):
@@ -116,16 +115,16 @@ def handle_uploaded_experiments(request,inputdf):
                             new_exp.json_fields=json.dumps(json_vals)
                             new_exp.save()
                             #print("New experiment cloned pk: "+str(new_exp.pk))
-                            
+
                         except IntegrityError:
                             messages.add_message(request, messages.WARNING, 'Same experiment name exists in the database, should be unique name.')
                             return
-                            
+
                     else:
                         print("Error in given experiment to clone in line "+ str(c))
                         errorList.append(str(c))
                 elif(sample) and (not(checkSanity("new_biosample_name",request,row,c))):
-                    if(exp):    
+                    if(exp):
                         try:
                             new_exp=exp.make_clone(attrs={'name': row["experiment_name"],
                                                           'uid':uid,
@@ -144,7 +143,7 @@ def handle_uploaded_experiments(request,inputdf):
                                 json_vals["targeted_factor"]=row["targeted_factor"]
                             new_exp.json_fields=json.dumps(json_vals)
                             new_exp.save()
-                            
+
                             print("New experiment cloned pk: "+str(new_exp.pk))
                         except IntegrityError:
                             messages.add_message(request, messages.WARNING, 'Not unique experiment name in line '+ str(c))
@@ -159,12 +158,12 @@ def handle_uploaded_experiments(request,inputdf):
                 messages.add_message(request, messages.WARNING, 'Error in given biosource to clone in line '+ str(c))
                 return
         c+=1
-        
+
     if len(errorList)>0:
         messages.add_message(request, messages.WARNING, 'Error in lines '+",".join(set(errorList)))
     else:
         messages.add_message(request, messages.SUCCESS, 'All experiments are added successfully')
-                    
+
 def handle_uploaded_sequencingfiles(request, prj_pk, inputdf):
     df = inputdf
     df=df.sort_values(by=['file_path'])
@@ -192,8 +191,8 @@ def handle_uploaded_sequencingfiles(request, prj_pk, inputdf):
                 read_length=None
             md5sum = row['md5sum']
             pair= row['paired']
-            
-            
+
+
             if(path):
                     file_name=re.split('.fastq|.fq',path.split("/")[-1])[0]
                     #file_name_values=file_name.split("_")
@@ -201,14 +200,14 @@ def handle_uploaded_sequencingfiles(request, prj_pk, inputdf):
                         if(not(len(md5sum)==32)):
                             messages.add_message(request, messages.WARNING, 'md5sum is incorrect in line '+str(c))
                             return
-                    
+
                     try:
                         similar_name=re.split('_I\d|_R\d',file_name)
-                        
+
                         related_files=SeqencingFile.objects.filter(name__icontains=similar_name[0],assay__name=assay,run__name=run)
-                        
+
                         new_f = SeqencingFile(
-                            name=file_name, 
+                            name=file_name,
                             project = prj,
                             created_by=request.user,
                             edited_by=request.user,
@@ -230,7 +229,7 @@ def handle_uploaded_sequencingfiles(request, prj_pk, inputdf):
                             for f in related_files:
                                 f.related_files.add(SeqencingFile.objects.get(pk=new_f.pk))
                                 f.save()
-                        
+
                     except IntegrityError as err:
                         if("duplicate key value" in str(err)):
                             print("File already exist in the database. - unique constraint")
@@ -247,22 +246,22 @@ def handle_uploaded_sequencingfiles(request, prj_pk, inputdf):
                         else:
                             messages.add_message(request, messages.WARNING, ' Some error found, unable to process the line number '+str(c))
                             return
-                    
-                        
+
+
             else:
                 errorList.append(str(c))
                 messages.add_message(request, messages.WARNING, 'Error in given file path in line '+str(c))
-                
+
             c+=1
             print("count is", c)
-    
+
     if len(errorList)>0:
         messages.add_message(request, messages.WARNING, 'Error in lines '+",".join(set(errorList)))
     else:
         messages.add_message(request, messages.SUCCESS, 'All files are added successfully')
 
 
- 
+
 def handle_uploaded_biosource(request, inputdf):
     df = inputdf
     c=2
@@ -293,20 +292,20 @@ def handle_uploaded_biosource(request, inputdf):
                 except:
                     errorList.append(str(c))
         c+=1
-        
+
     if len(errorList)>0:
         messages.add_message(request, messages.WARNING, 'Error in lines '+",".join(set(errorList)))
     else:
         messages.add_message(request, messages.SUCCESS, 'All biosource objects are added successfully')
-         
 
-     
+
+
 def handle_uploaded_sequencingruns(request,prj_pk,inputdf):
     df = inputdf
     print(df)
     c=2
     errorList=[]
-    
+
     for index, row in df.iterrows():
         if(not(row['run_name'] =="#") and checkSanity("run_name",request,row,c)):
             run_name=get_or_none_multiple(SequencingRun,name=row['run_name'])
@@ -316,7 +315,7 @@ def handle_uploaded_sequencingruns(request,prj_pk,inputdf):
             exp = get_or_none(Experiment,name=row['experiment'])
             submission_date = row['submission_date']
             retrieval_date = row['retrieval_date']
-            
+
             if(prj==None):
                 messages.add_message(request, messages.WARNING, 'Project does not exist in line '+str(c))
                 return
@@ -360,13 +359,13 @@ def handle_uploaded_sequencingruns(request,prj_pk,inputdf):
             except:
                 errorList.append(str(c))
         c+=1
-        
+
     if len(errorList)>0:
         messages.add_message(request, messages.WARNING, 'Error in line '+",".join(set(errorList)))
     else:
         messages.add_message(request, messages.SUCCESS, 'All sequecing run objects are added successfully')
-    
-    
+
+
 
 def handle_uploaded_biosample(request, inputdf):
     df = inputdf
@@ -378,37 +377,37 @@ def handle_uploaded_biosample(request, inputdf):
             if(biosource==None):
                 messages.add_message(request, messages.WARNING, 'biosource name is incorrect in line '+str(c))
                 return
-            
+
             modification = get_or_none(Modification,name=row['modification'])
             if(checkSanity("modification",request,row,c) and modification==None):
                 messages.add_message(request, messages.WARNING, 'modification name is incorrect in line '+str(c))
                 return
-            
+
             treatment = get_or_none(Treatment,name=row['treatment'])
             if(checkSanity("treatment",request,row,c) and treatment==None):
                 messages.add_message(request, messages.WARNING, 'treatment name is incorrect in line '+str(c))
                 return
-            
+
             if(checkSanity("collection_date",request,row,c) and  not(validate(row['collection_date']))):
                 messages.add_message(request, messages.WARNING, 'collection_date is incorrect in line '+str(c))
             elif(not(checkSanity("collection_date",request,row,c))):
                 coll_date=None
             else:
                 coll_date=row['collection_date']
-            
-            
+
+
             #json_type = get_or_none(JsonObj,name="preprocessing details - Not Available")
             if(checkSanity("preprocessing_details",request,row,c)):
                 json_type = get_or_none(JsonObj,name="preprocessing details - "+row['preprocessing_details'])
-            
+
             if(checkSanity("culture_start_date",request,row,c) and  not(validate(row['culture_start_date']))):
                 messages.add_message(request, messages.WARNING, 'culture_start_date is incorrect in line '+str(c))
-                return 
+                return
             if(checkSanity("culture_harvest_date",request,row,c) and  not(validate(row['culture_harvest_date']))):
                 messages.add_message(request, messages.WARNING, 'culture_harvest_date is incorrect in line '+str(c))
-                return 
-            
-                
+                return
+
+
             sample = get_or_none(Biosample,name=row['biosample_name'])
             if(not(sample==None)):
                 messages.add_message(request, messages.WARNING, 'biosample name is not unique in line '+str(c))
@@ -449,12 +448,12 @@ def handle_uploaded_biosample(request, inputdf):
                 except:
                     errorList.append(str(c))
         c+=1
-        
+
     if len(errorList)>0:
         messages.add_message(request, messages.WARNING, 'Error in lines '+",".join(set(errorList)))
     else:
         messages.add_message(request, messages.SUCCESS, 'All biosample objects are added successfully')
-    
+
 def getdf(request,uploaded_csv):
     df = pd.read_csv(uploaded_csv)
     old_cols=list(df.columns)

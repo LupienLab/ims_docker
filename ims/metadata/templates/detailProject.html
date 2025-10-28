@@ -67,6 +67,15 @@
       <tr>
         <td><b>Description:</b> {{ project.description }}</td>
       </tr>
+      <tr>
+        <td><b>Labs:</b> {% if project.labs.all %}
+          {% for lab in project.labs.all %}
+          ({{forloop.counter }}) {{lab}}<br />
+          {% endfor %}
+          {% else %}
+          No lab found.
+          {% endif %}</td>
+      </tr>
 
     </table>
     <br />

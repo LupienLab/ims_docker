@@ -1,63 +1,221 @@
 {% extends 'base.html' %}
 {% block content %}
 {% load static %}
-  <h2 class="mt-3">Approval Requests</h2>
-  <br>
-  <div class="container">
-    {% if approvals %}
-      <table class="table table-bordered table-hover">
+<style>
+  @media (max-width: 767.98px) {
+
+    /* XS and SM screens */
+    table {
+      border: 0;
+    }
+
+    thead {
+      display: none;
+      /* Hide header */
+    }
+
+    tbody tr {
+      display: block;
+      /* Display rows as block */
+      margin-bottom: 1rem;
+      border-bottom: 2px solid #ddd;
+    }
+
+    tbody tr td {
+      display: flex;
+      justify-content: space-between;
+      padding-left: 50%;
+      /* make space for label */
+      position: relative;
+      border: none;
+      border-bottom: 1px solid #eee;
+    }
+
+    tbody tr td::before {
+      content: attr(data-label);
+      /* Pull label from data-label attr */
+      width: 45%;
+      /* Label width */
+      padding-left: 15px;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+  }
+</style>
+<script>
+  $(document).ready(function () {
+    $('#commentModal').on('show.bs.modal', function (event) {
+      var button = $(event.relatedTarget); // Button that triggered the modal
+      var approvalId = button.data('id'); // Extract info from data-* attributes
+      var approvalTitle = button.data('title');
+
+      // Update the modal's content
+      var modal = $(this);
+      modal.find('#approvalId').val(approvalId); // Set the approval ID in the hidden input
+      modal.find('#commentForm').attr('action', '{% url "disapprove_request" 0 %}'.replace('0', approvalId)); // Set the form action
+    });
+
+    $('#submitButton').on('click', function () {
+      $('#commentForm').submit(); // Programmatically submit the form
+    });
+  });
+</script>
+<!-- Modal -->
+<div class="modal fade" id="commentModal" tabindex="-1" aria-labelledby="commentModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="commentModalLabel">Add Your Comment</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="commentForm" method="POST" action="">
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="commentText">Comment</label>
+            <textarea class="form-control" id="commentText" name="comment" rows="3" maxlength="500"></textarea>
+          </div>
+          <input type="hidden" id="approvalId" name="approval_id" value="">
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="submitButton">Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
+<h2 class="mt-3">Approval Requests</h2>
+<br>
+<div class="container">
+  {% if not profile_exists %}
+  <div class="alert alert-warning">
+    You do not have a user profile. Please contact Admin to create one for so you can access approval requests.
+  </div>
+  {% else %}
+  <a href="{% url 'create_approval_request' %}"><button type="button" class="btn btn-primary mb-4">Create New Approval
+      Request</button></a>
+  {% if approvals %}
+  <nav>
+    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+      <button class="nav-link active" id="nav-pending-tab" data-bs-toggle="tab" data-bs-target="#nav-pending" type="button" role="tab" aria-controls="nav-pending" aria-selected="true">Pending Approval Requests</button>
+      <button class="nav-link" id="nav-processed-tab" data-bs-toggle="tab" data-bs-target="#nav-processed" type="button" role="tab" aria-controls="nav-processed" aria-selected="false">Processed Approval Requests</button>
+    </div>
+  </nav>
+  <div class="tab-content" id="nav-tabContent">
+    <div class="tab-pane fade show active p-4" id="nav-pending" role="tabpanel" aria-labelledby="nav-pending-tab">
+      <table class="table table-bordered table-hover table-sm data_table pt-4" data-page-length='3'>
+        <thead>
           <tr>
             <th>Title</th>
             <th>User</th>
+            <th>Project</th>
+            <th>Experiments</th>
+            <th>Document</th>
+            <th>Created At</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        {% for approval in approvals %}
+        {% if approval.status == 'pending' %}
+        <tr
+          class="{% if approval.status == 'approved' %}table-success{% elif approval.status == 'disapproved' %} table-danger {% else %} {% endif %}">
+          <td data-label="Title">{{ approval.title }}</td>
+          <td data-label="User">{{ approval.created_by.get_full_name }}</td>
+          <td data-label="Project"><a href="{% url 'detailProject' approval.project.pk %}">{{ approval.project.name }}</a></td>
+          <td data-label="Experiments">
+            {% for experiment in approval.experiments.all %}
+              <a href="{% url 'detailExperiment' experiment.pk %}">{{ experiment.name }}</a>{% if not forloop.last %}, {% endif %}
+            {% empty %}
+              None
+            {% endfor %}
+          </td>
+          <td data-label="Document"><a href="{{ approval.document.url }}" target="_blank">Download</a></td>
+          <td data-label="Created At">{{ approval.created_at|date:"Y-m-d H:i" }}</td>
+          <td data-label="Status">{{ approval.get_status_display }}</td>
+          <td data-label="Actions">
+            {% if is_supervisor %}
+            {% if approval.status == 'pending' %}
+            <div class="d-grid gap-2">
+              <a href="{% url 'approve_request' approval.pk %}" class="btn btn-outline-success btn-sm">
+                Approve
+              </a>
+              <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#commentModal"
+                data-id="{{ approval.pk }}">Disapprove</button>
+            </div>
+            {% endif %}
+            {% endif %}
+          </td>
+        </tr>
+        {% endif%}
+        {% endfor %}
+      </table>
+    </div>
+    <div class="tab-pane fade p-4" id="nav-processed" role="tabpanel" aria-labelledby="nav-processed-tab">
+      <table class="table table-bordered table-hover table-sm requests data_table pt-4" data-page-length='3'>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>User</th>
+            <th>Project</th>
+            <th>Experiments</th>
             <th>Document</th>
             <th>Created At</th>
             <th>Status</th>
             <th>Approved/Disapproved By</th>
             <th>Approved/Disapproved At</th>
-            <th>Actions</th>
+            <th>Comment</th>
           </tr>
-          {% for approval in approvals %}
-          <tr>
-              <td>{{ approval.title }}</td>
-              <td>{{ approval.created_by.get_full_name }}</td>
-              <td><a href="{{ approval.document.url }}" target="_blank">Download</a></td>
-              <td>{{ approval.created_at|date:"Y-m-d H:i" }}</td>
-              <td class="{% if approval.status == 'approved' %}table-success{% elif approval.status == 'disapproved' %} table-danger {% else %} {% endif %}">{{ approval.get_status_display }}</td>
-              <td>
-                {% if approval.approved_by %}
-                  {{ approval.approved_by.get_full_name }}
-                {% else %}
-                  N/A
-                {% endif %}
-              </td>
-              <td>
-                {% if approval.approved_by %}
-                  {{ approval.approved_at|date:"Y-m-d H:i" }}
-                {% else %}
-                  N/A
-                {% endif %}
-              </td>
-              <td>
-                {% if is_supervisor %}
-                  {% if approval.status == 'pending' %}
-                    <div class="d-grid gap-2">
-                      <a href="{% url 'approve_request' approval.pk %}" class="btn btn-outline-success">
-                        Approve
-                      </a>
-                      <a href="{% url 'disapprove_request' approval.pk %}" class="btn btn-outline-danger">
-                        Disapprove
-                      </a>
-                    </div>
-                  {% endif %}
-                {% endif %}
-              </td>
-          </tr>
-          {% endfor %}
+        </thead>
+        {% for approval in approvals %}
+        {% if approval.status != 'pending' %}
+        <tr
+          class="{% if approval.status == 'approved' %}table-success{% elif approval.status == 'disapproved' %} table-danger {% else %} {% endif %}">
+          <td data-label="Title">{{ approval.title }}</td>
+          <td data-label="User">{{ approval.created_by.get_full_name }}</td>
+          <td data-label="Project"><a href="{% url 'detailProject' approval.project.pk %}">{{ approval.project.name }}</a></td>
+          <td data-label="Experiments">
+            {% for experiment in approval.experiments.all %}
+              <a href="{% url 'detailExperiment' experiment.pk %}">{{ experiment.name }}</a>{% if not forloop.last %}, {% endif %}
+            {% empty %}
+              None
+            {% endfor %}
+          </td>
+          <td data-label="Document"><a href="{{ approval.document.url }}" target="_blank">Download</a></td>
+          <td data-label="Created At">{{ approval.created_at|date:"Y-m-d H:i" }}</td>
+          <td data-label="Status">{{ approval.get_status_display }}</td>
+          <td data-label="Processed By">
+            {% if approval.approved_by %}
+            {{ approval.approved_by.get_full_name }}
+            {% else %}
+            N/A
+            {% endif %}
+          </td>
+          <td data-label="Processed At">
+            {% if approval.approved_by %}
+            {{ approval.approved_at|date:"Y-m-d H:i" }}
+            {% else %}
+            N/A
+            {% endif %}
+          </td>
+          <td data-label="Comment">{{ approval.comments }}</td>
+        </tr>
+        {% endif%}
+        {% endfor %}
       </table>
+    </div>
     {% else %}
-      <p>No approval requests available for your lab.</p>
+    <p>No approval requests available for your lab.</p>
     {% endif %}
     <br>
-    <a href="{% url 'create_approval_request' %}"><button type="button" class="btn btn-primary">Create New Approval Request</button></a>
+    {% endif %}
+    </div>
   </div>
+
+
+
+
+
 {% endblock %}

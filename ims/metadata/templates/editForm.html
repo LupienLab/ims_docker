@@ -5,16 +5,16 @@
 {% block content %}
 
 
-  <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    
-    
-    <h1>Edit {{form | modelname}}</h1>
-     {{ form|crispy }}
-     
-     <div id="json_form_display">
-     
-     </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
-  </form>
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+
+
+  <h1>Edit {{form | modelname}}</h1>
+  {% crispy form %}
+
+  <div id="json_form_display">
+
+  </div>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
 {% endblock %}

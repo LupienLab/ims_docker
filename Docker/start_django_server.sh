@@ -21,8 +21,8 @@ DEVELOPMENT_PORT=8000
 ##############################################
 ## Make sure that certain environment
 ## variables exist
-if [ ! $DB_NAME  ] || [ ! $DB_USER ]|| \
-   [ ! $DB_PORT ] || [ ! $DB_PORT ];
+if [ -z "$DB_NAME"  ] || [ -z "$DB_USER" ]|| \
+   [ -z "$DB_PORT" ] || [ -z "$DB_HOST" ];
 then
    echo Error: Could not find the DB_* envrionment variables
    exit 1
@@ -33,25 +33,32 @@ fi
 ## Make sure that postgres server is up
 ## and running
 
-while ! nc -w 1 -z db 5432;
+while ! nc -w 1 -z "$DB_HOST" "$DB_PORT";
 do
    sleep 0.1;
 done;
 
 ###############################################
 
+# Run migrations
+echo "Running migrations..."
 python3 manage.py makemigrations
 python3 manage.py migrate --fake-initial
 
+# Graceful shutdown handling
+trap 'exit' INT TERM
+trap 'kill 0' EXIT
+
 if [ $DEVELOPMENT ];
 then
-   echo Running local development server...
-   python3 manage.py runserver 0.0.0.0:${DEVELOPMENT_PORT}
+  echo "Running local development server on port $DEVELOPMENT_PORT..."
+  python3 manage.py runserver 0.0.0.0:${DEVELOPMENT_PORT}
 elif [ $PRODUCTION ];
 then
-   echo Running production...
-   python3 manage.py collectstatic --noinput
-   gunicorn ims.wsgi -t 120 -b 0.0.0.0:${PRODUCTION_PORT}
+  echo "Running production server on port $PRODUCTION_PORT..."
+  python3 manage.py collectstatic --noinput
+  gunicorn ims.wsgi -t 120 -b 0.0.0.0:${PRODUCTION_PORT}
 else
-   echo Unknown run mode!
+  echo Unknown run mode!
+  exit 1
 fi

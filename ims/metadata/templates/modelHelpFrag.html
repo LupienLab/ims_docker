@@ -1,24 +1,24 @@
 {% load tags %}
 {% firstof form|modelname as model_val %}
 
-<p style="color:#6c757d">
-{% if model_val == "Project" %}
-Relevant project information
+<p class="text-secondary">
+  {% if model_val == "Project" %}
+  Relevant project information
 
-{% elif model_val == "Biosource" %}
-Cell line or Patient  information e.g. HeLa
+  {% elif model_val == "Biosource" %}
+  Cell line or Patient information e.g. HeLa
 
-{% elif model_val == "Biosample" %}
-Biological sample information e.g. HeLa–p14
+  {% elif model_val == "Biosample" %}
+  Biological sample information e.g. HeLa–p14
 
-{% elif model_val == "Experiment" %}
-Assay information e.g. ATAC-seq
+  {% elif model_val == "Experiment" %}
+  Assay information e.g. ATAC-seq
 
-{% elif model_val == "SequencingRun" %}
-Sequencing flow cell information
+  {% elif model_val == "SequencingRun" %}
+  Sequencing flow cell information
 
-{% elif model_val == "SeqencingFile" %}
-Sequencing files for this experiment
+  {% elif model_val == "SeqencingFile" %}
+  Sequencing files for this experiment
 
 </p>
 {% endif %}
