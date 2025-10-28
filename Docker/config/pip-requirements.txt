@@ -12,7 +12,7 @@ django-view-breadcrumbs==2.5.1
 django-clone==5.3.3
 pandas==2.2.2
 django-autocomplete-light==3.11.0
-openpyxl==3.1.4
+openpyxl==3.1.5
 python-keycloak==5.5.0
 pygraphviz==1.13
 python-decouple

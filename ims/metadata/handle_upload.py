@@ -202,8 +202,8 @@ def handle_uploaded_sequencingfiles(request, prj_pk, inputdf):
                             return
 
                     try:
-                        similar_name=re.split('_I\d|_R\d',file_name)
-
+                        #similar_name=re.split('_I\d|_R\d',file_name)
+                        similar_name = re.split(r'_I\d|_R\d', file_name)
                         related_files=SeqencingFile.objects.filter(name__icontains=similar_name[0],assay__name=assay,run__name=run)
 
                         new_f = SeqencingFile(
@@ -253,7 +253,6 @@ def handle_uploaded_sequencingfiles(request, prj_pk, inputdf):
                 messages.add_message(request, messages.WARNING, 'Error in given file path in line '+str(c))
 
             c+=1
-            print("count is", c)
 
     if len(errorList)>0:
         messages.add_message(request, messages.WARNING, 'Error in lines '+",".join(set(errorList)))
@@ -302,7 +301,6 @@ def handle_uploaded_biosource(request, inputdf):
 
 def handle_uploaded_sequencingruns(request,prj_pk,inputdf):
     df = inputdf
-    print(df)
     c=2
     errorList=[]
 
