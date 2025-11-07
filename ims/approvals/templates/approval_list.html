@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 {% load static %}
+{% load tags %}
 <style>
   @media (max-width: 767.98px) {
 
@@ -94,16 +95,24 @@
     You do not have a user profile. Please contact Admin to create one for so you can access approval requests.
   </div>
   {% else %}
-  <a href="{% url 'create_approval_request' %}"><button type="button" class="btn btn-primary mb-4">Create New Approval
+    {% if not user|has_group:"sequence_core" %}
+      <a href="{% url 'create_approval_request' %}"><button type="button" class="btn btn-primary mb-4">Create New Approval
       Request</button></a>
+    {% endif %}
   {% if approvals %}
   <nav>
     <div class="nav nav-tabs" id="nav-tab" role="tablist">
-      <button class="nav-link active" id="nav-pending-tab" data-bs-toggle="tab" data-bs-target="#nav-pending" type="button" role="tab" aria-controls="nav-pending" aria-selected="true">Pending Approval Requests</button>
-      <button class="nav-link" id="nav-processed-tab" data-bs-toggle="tab" data-bs-target="#nav-processed" type="button" role="tab" aria-controls="nav-processed" aria-selected="false">Processed Approval Requests</button>
+      {% if user|has_group:"sequence_core" %}
+        <button class="nav-link active" id="nav-processed-tab" data-bs-toggle="tab" data-bs-target="#nav-processed" type="button" role="tab" aria-controls="nav-processed" aria-selected="true">Processed Approval Requests</button>
+      {% else %}
+        <button class="nav-link active" id="nav-pending-tab" data-bs-toggle="tab" data-bs-target="#nav-pending" type="button" role="tab" aria-controls="nav-pending" aria-selected="true">Pending Approval Requests</button>
+
+        <button class="nav-link" id="nav-processed-tab" data-bs-toggle="tab" data-bs-target="#nav-processed" type="button" role="tab" aria-controls="nav-processed" aria-selected="false">Processed Approval Requests</button>
+      {% endif %}
     </div>
   </nav>
   <div class="tab-content" id="nav-tabContent">
+    {% if not user|has_group:"sequence_core" %}
     <div class="tab-pane fade show active p-4" id="nav-pending" role="tabpanel" aria-labelledby="nav-pending-tab">
       <table class="table table-bordered table-hover table-sm data_table pt-4" data-page-length='3'>
         <thead>
@@ -153,7 +162,8 @@
         {% endfor %}
       </table>
     </div>
-    <div class="tab-pane fade p-4" id="nav-processed" role="tabpanel" aria-labelledby="nav-processed-tab">
+    {% endif %}
+    <div class="{% if user|has_group:"sequence_core" %} tab-pane fade show active p-4 {% else %} tab-pane fade p-4 {% endif %}" id="nav-processed" role="tabpanel" aria-labelledby="nav-processed-tab">
       <table class="table table-bordered table-hover table-sm requests data_table pt-4" data-page-length='3'>
         <thead>
           <tr>

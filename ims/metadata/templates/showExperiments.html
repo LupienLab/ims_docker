@@ -1,10 +1,12 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
 
 {% load tags %}
 
-<h1>Experiments</h1><br/>
-<div class="container">
+
+<section class="container">
+  <h2 class="text-center mb-4">Experiments</h2>
 	{% if object %}
 	<table class="cell-border table-hover data_table">
 		<thead>
@@ -37,13 +39,13 @@
 				<td>{{ experiment.project.disease_site.name  }}</td>
 				<td>{{ experiment.json_type.name  }}</td>
 				{% if experiment.json_type.name == "ChIP-seq" %}
-				{% json_saved_data experiment.json_fields as jsonEntry %} 
+				{% json_saved_data experiment.json_fields as jsonEntry %}
 				{% for keys, values in jsonEntry.items %}
 				    {% if keys == "targeted_factor" %}
-                      <td>{{ values }}</td> 
-                    {% endif %}	
+                      <td>{{ values }}</td>
+                    {% endif %}
 				{% endfor %}
-				{% endif %}	
+				{% endif %}
 				<td>{{ experiment.created_by  }}</td>
 			</tr>
 			{% endfor %}
@@ -51,5 +53,9 @@
 	</table>
 	{% else %}
 	<p>No data available.</p>
-</div>
-{% endif %} {% endblock %}
+  {% endif %}
+  <div id="gridjs-experiments"></div>
+</section>
+
+<script type="text/javascript" src="{% static 'experiments.js' %}"></script>
+{% endblock %}

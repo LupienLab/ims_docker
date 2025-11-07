@@ -7,6 +7,7 @@ from django.urls import re_path, path, include
 from django.conf.urls.static import static
 from django.conf import settings
 from . import views
+from .views import ActiveProjectsApiView, BrowseExperimentGridApiView
 from metadata.views import *
 from metadata.autocompleteForeignkey import *
 from metadata.handleExport import *
@@ -32,6 +33,7 @@ urlpatterns = [
     re_path(r'^editExperiment/(?P<exp_pk>[0-9]+)/$', EditExperiment.as_view(), name='editExperiment'),
     re_path(r'^deleteExperiment/(?P<exp_pk>[0-9]+)/$', DeleteExperiment.as_view(), name='deleteExperiment'),
     re_path(r'^browseExperimentGrid/(?P<slug_disease>[\w\ \(\)-]+)/(?P<slug_assay>[\w-]+)/$', BrowseExperimentGrid.as_view(), name='browseExperimentGrid'),
+    path('api/experiments/<path:slug_disease>/<slug:slug_assay>/', BrowseExperimentGridApiView.as_view(), name='api-experiments-grid'),
     re_path(r'^addExperimentLabels/(?P<prj_pk>[0-9]+)/$', AddExperimentLabels.as_view(), name='addExperimentLabels'),
 
     re_path(r'^addBiosource/(?P<prj_pk>[0-9]+)/$', AddBiosource.as_view(), name='addBiosource'),
@@ -83,7 +85,11 @@ urlpatterns = [
     re_path(r'^addData/$', views.addData, name='addData'),
     re_path(r'^populateCharts/(?P<slug>[\w-]+)/$', views.populateCharts, name='populateCharts'),
     re_path(r'^populateCharts/(?P<slug>[\w\+-]+)$', views.populateCharts, name='populateCharts'),
-
+    path('api/charts/<slug:slug>/', views.populateDashboard, name='populate_dashboard'),
+    path('api/owners/', views.get_owners, name='get_owners'),
+    path('api/statuses/', views.get_statuses, name='get_statuses'),
+    path('api/diseases/', views.get_diseases, name='get_diseases'),
+    path('api/active-projects/', ActiveProjectsApiView.as_view(), name='api-active-projects'),
 
     re_path(r'^bulkAddBiosource/$', views.bulkAddBiosource, name='bulkAddBiosource'),
     re_path(r'^bulkAddBiosample/$', views.bulkAddBiosample, name='bulkAddBiosample'),

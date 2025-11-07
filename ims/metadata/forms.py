@@ -56,7 +56,7 @@ class BiosampleForm(ModelForm):
         super(BiosampleForm, self).__init__(*args, **kwargs)
         if source_pk:
 
-            self.fields['choose_existing'] = ModelChoiceField(queryset = Biosample.objects.all(),required=False,#widget=autocomplete.ModelSelect2(url='biosampleAutocomplete',forward=(forward.Const(source_pk, 'f4'),)),
+            self.fields['choose_existing'] = ModelChoiceField(queryset = Biosample.objects.filter(biosource_id=source_pk),required=False,#widget=autocomplete.ModelSelect2(url='biosampleAutocomplete',forward=(forward.Const(source_pk, 'f4'),)),
                                                               help_text='Choose from existing list')
 
     class Meta:
@@ -126,7 +126,6 @@ class FieldsForm(forms.Form):
         super(FieldsForm, self).__init__(*args)
 
         field_values=kwargs.get('initial')
-        #print(field_values['field_values'].get("null"))
         null_json=("null" in field_values['field_values'])
         if(bool(field_values) and (not null_json)):
             json_field_values = sorted(field_values['field_values'].items(), key=lambda item: item[1]["order"])

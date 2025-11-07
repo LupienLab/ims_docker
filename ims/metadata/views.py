@@ -1,6 +1,9 @@
+from urllib.parse import unquote
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from django.http.response import HttpResponseRedirect, JsonResponse
+from django.db.models import Value, CharField, F
+from django.db.models.functions import Concat
 from metadata.forms import *
 from metadata.models import *
 from django.views.generic.base import View
@@ -30,8 +33,9 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.decorators import login_required
 from ims.views import *
-from user_profiles.utils import get_user_lab
+from user_profiles.utils import get_user_lab, is_admin
 from .utils import get_projects_for_user
+
 #import metadata.extendSession
 # Create your views here.
 
@@ -83,6 +87,22 @@ class Index(LoginRequiredMixin, View):
       }
     return render(request, self.template_name, context)
 
+class ActiveProjectsApiView(LoginRequiredMixin, View):
+    def get(self, request):
+        user = request.user
+        # Filter active projects for the current user
+        projects = get_projects_for_user(user).filter(status="Active").order_by('-pk').distinct('pk')
+
+        # Serialize data for JSON response
+        data = [
+            {
+                "name": project.name,
+                "pk": project.pk,
+                "url": request.build_absolute_uri(f"/detailProject/{project.pk}/")  # Adjust URL pattern as needed
+            }
+            for project in projects
+        ]
+        return JsonResponse(data, safe=False)
 #######################
 # def change_password(request):
 #     if request.method == 'POST':
@@ -144,16 +164,29 @@ class BrowseProject(LoginRequiredMixin, View):
     template_name = 'showProject.html'
 
     def get(self,request,slug):
+        user = request.user
+        if is_admin(user):
+            # Admins can see all projects matching any of the filters
+            obj = Project.objects.filter(
+                Q(created_by__first_name=slug) |
+                Q(exp_project__json_type__name=slug) |
+                Q(disease_site__name=slug) |
+                Q(status=slug)
+            ).order_by('-pk').distinct()
+        else:
+          user_lab = get_user_lab(user)
+          if not user_lab:
+            obj = Project.objects.none()
+          else:
+            obj = Project.objects.filter(
+                  labs=user_lab
+              ).filter(
+                  Q(created_by__first_name=slug) |
+                  Q(exp_project__json_type__name=slug) |
+                  Q(disease_site__name=slug) |
+                  Q(status=slug)
+              ).order_by('-pk').distinct()
 
-        labname = get_user_lab(self.request.user)
-
-        obj = Project.objects.filter(created_by__first_name=slug).filter(labs=labname).order_by('-pk')
-        if(len(obj)==0):
-            obj = Project.objects.filter(exp_project__json_type__name=slug).filter(labs=labname).order_by('-pk').distinct()
-        if(len(obj)==0):
-            obj = Project.objects.filter(disease_site__name=slug).filter(labs=labname).order_by('-pk').distinct()
-        if(len(obj)==0):
-            obj = Project.objects.filter(status=slug).filter(labs=labname).order_by('-pk').distinct()
         context = {
             'object': obj,
         }
@@ -172,7 +205,7 @@ class DetailProject(LoginRequiredMixin, DetailBreadcrumbMixin, DetailView):
         usr= self.request.user
         lab = get_user_lab(usr)
 
-        if not prj.labs.filter(id=lab.id).exists():
+        if not prj.labs.filter(id=lab.id).exists() and not is_admin(usr):
           raise PermissionDenied("You do not have access to this project.")
         #self.request.CustomSession['active_project'] = self.kwargs['prj_pk']
         exp = Experiment.objects.filter(project=self.kwargs['prj_pk']).order_by('-pk')
@@ -354,12 +387,9 @@ class DeleteBiosource(LoginRequiredMixin, DeleteView):
 
     def get_object(self):
         bio = get_object_or_404(Biosource, pk=self.kwargs['obj_pk'])
-        #print(bio.sample_source.all())
-#         self.prj_pk = bio__sample__exp__pk
         return bio
 
     def get_success_url(self):
-        #return reverse('detailProject', kwargs={'prj_pk': self.prj_pk})
         return reverse_lazy('showProject')
 
 
@@ -490,7 +520,7 @@ class DetailExperiment(LoginRequiredMixin, DetailBreadcrumbMixin, DetailView):
         usr= self.request.user
         lab = get_user_lab(usr)
 
-        if not prj.labs.filter(id=lab.id).exists():
+        if not prj.labs.filter(id=lab.id).exists() and not is_admin(usr):
           raise PermissionDenied("You do not have access to this project.")
         seqfiles=context["object"].file_exp.all().order_by('pk')
         context["seqfiles"]=seqfiles
@@ -539,15 +569,52 @@ class BrowseExperimentGrid(LoginRequiredMixin, View):
 
   def get(self,request,slug_disease,slug_assay):
     projects_lab= get_projects_for_user(self.request.user)
-    #print("printing from BrowseExperimentGrid")
-    #print(projects_lab)
     obj = Experiment.objects.filter(json_type__name=slug_assay, project__disease_site__name=slug_disease, project__in=projects_lab).order_by('-pk').distinct()
-    #print(obj)
     context = {
         'object': obj,
     }
 
     return render(request, self.template_name, context)
+
+class BrowseExperimentGridApiView(LoginRequiredMixin, View):
+    def get(self, request, slug_disease, slug_assay):
+        # Get projects accessible to the user
+        projects_lab = get_projects_for_user(request.user)
+        decoded_disease = unquote(slug_disease)
+
+        # Filter experiments by assay and disease site within user's projects
+        experiments = Experiment.objects.filter(
+            json_type__name=slug_assay,
+            project__disease_site__name=decoded_disease,
+            project__in=projects_lab
+        ).order_by('-pk').distinct()
+
+        # Serialize the experiments
+        data = []
+        for exp in experiments:
+            # Serialize tissue types as a numbered list string
+            tissue_list = "\n".join([f"({i+1}) {t.name}" for i,t in enumerate(exp.project.tissue_type.all())])
+
+            # Optionally add target only if assay is ChIP-seq
+            target = ""
+            if exp.json_type and exp.json_type.name == "ChIP-seq":
+                json_fields = exp.json_fields or {}
+                target = json_fields.get("targeted_factor", "")
+
+            data.append({
+                "id": exp.pk,
+                "project_name": exp.project.name if exp.project else "",
+                "project_url": request.build_absolute_uri(f"/detailProject/{exp.project.pk}/") if exp.project else "",
+                "experiment_name": exp.name,
+                "experiment_url": request.build_absolute_uri(f"/detailExperiment/{exp.pk}/"),
+                "tissue_type": tissue_list,
+                "disease_site": exp.project.disease_site.name if exp.project and exp.project.disease_site else "",
+                "assay": exp.json_type.name if exp.json_type else "",
+                "target": target,
+                "owner": str(exp.created_by),
+            })
+
+        return JsonResponse(data, safe=False)
 
 class AddExperimentLabels(LoginRequiredMixin, View):
     template_name = 'addExperimentLabels.html'
@@ -1262,7 +1329,99 @@ def bulkAddSequencingRun(request,prj_pk):
 
 from django.db.models import Count
 
+@login_required
+def get_owners(request):
+    owners = Project.objects.annotate(
+        full_name=Concat(
+            F('created_by__first_name'),
+            Value(' '),
+            F('created_by__last_name'),
+            output_field=CharField()
+        )
+    ).values('created_by__id', 'full_name').distinct().order_by('full_name')
+
+    owner_list = [{'id': o['created_by__id'], 'name': o['full_name']} for o in owners]
+
+    return JsonResponse(owner_list, safe=False)
+
+@login_required
+def get_statuses(request):
+    statuses = Project.objects.values_list('status', flat=True).distinct().order_by('status')
+    return JsonResponse(list(statuses), safe=False)
+
+@login_required
+def get_diseases(request):
+    diseases = Project.objects.values_list('disease_site__name', flat=True).distinct().order_by('disease_site__name')
+    return JsonResponse(list(diseases), safe=False)
+
 @csrf_exempt
+@login_required
+def populateDashboard(request, slug):
+    # Accept both POST and GET for flexibility
+    params = request.POST if request.method == 'POST' else request.GET
+
+    owner_filter = params.get('owner')
+    status_filter = params.get('status')
+    disease_filter = params.get('disease')
+
+    queryset = Project.objects.all()
+
+    # Apply filters if present
+    if owner_filter:
+        queryset = queryset.filter(created_by__id=owner_filter)
+    if status_filter:
+        queryset = queryset.filter(status=status_filter)
+    if disease_filter:
+        queryset = queryset.filter(disease_site__name=disease_filter)
+
+    if slug == "owner":
+      # Annotate full name by concatenating first and last name for clarity (optional)
+      data = list(
+          queryset.annotate(
+              full_name=Concat(
+                  F('created_by__first_name'),
+                  Value(' '),
+                  F('created_by__last_name'),
+                  output_field=CharField()
+              )
+          )
+          .values('created_by__id', 'full_name', 'disease_site__name')
+          .annotate(dcount=Count('id'))
+          .order_by('full_name', 'disease_site__name')
+      )
+
+      # Extract unique owners and diseases using IDs and names
+      owners = sorted({(item['created_by__id'], item['full_name']) for item in data})
+      diseases = sorted(set(item['disease_site__name'] for item in data if item['disease_site__name']))
+
+      # Create a mapping from owner id to index
+      owner_index = {owner[0]: idx for idx, owner in enumerate(owners)}
+
+      # Initialize counts dictionary (disease -> counts list aligned with owners)
+      counts = {disease: [0] * len(owners) for disease in diseases}
+
+      for item in data:
+          if item['disease_site__name']:
+              owner_id = item['created_by__id']
+              counts[item['disease_site__name']][owner_index[owner_id]] = item['dcount']
+
+      # Convert owners from tuple(id, name) to list of dicts for frontend ease
+      owners_list = [{'id': o[0], 'name': o[1]} for o in owners]
+
+      return JsonResponse({'owners': owners_list, 'diseases': diseases, 'counts': counts})
+
+    if slug == "assay":
+        data = list(queryset.values('exp_project__json_type__name')
+                    .exclude(exp_project__json_type__name__isnull=True)
+                    .annotate(dcount=Count('exp_project__json_type__name'))
+                    .order_by())
+        for item in data:
+          item['assay_type'] = item.pop('exp_project__json_type__name')
+        return JsonResponse(data, safe=False)
+    return JsonResponse([], safe=False)
+
+@csrf_exempt
+@login_required
 def populateCharts(request,slug):
   if request.method == 'POST':
     if (slug=="owner"):
@@ -1270,7 +1429,7 @@ def populateCharts(request,slug):
       js_project=json.dumps(proj_owner)
 
     elif (slug=="assay"):
-      proj_owner=list(Project.objects.values('exp_project__json_type__name').annotate(dcount=Count('exp_project__json_type__name')).order_by())
+      proj_owner=list(Project.objects.values('exp_project__json_type__name').exclude(exp_project__json_type__name__isnull=True).annotate(dcount=Count('exp_project__json_type__name')).order_by())
       js_project=json.dumps(proj_owner)
 
     elif (slug=="disease"):

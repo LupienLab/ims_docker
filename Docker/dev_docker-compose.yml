@@ -1,21 +1,26 @@
 services:
   db:
-    image: postgres:12.2
+    image: postgres:14-alpine
+    container_name: ims_db
+    restart: always
     env_file:
       - .env
     environment:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_NAME}
+    ports:
+      - "5432:5432"
     volumes:
       - ../../pgdata:/var/lib/postgresql/data
       - ../db-initialization:/docker-entrypoint-initdb.d
       - ../../db_backups:/db_backups
   web:
-    restart: always
+    container_name: ims_web
     build: .
     environment:
-       - DEVELOPMENT=1
+      DEBUG: 1
+      DEVELOPMENT: 1
     env_file:
        - .env
     command: bash /code/start_django_server.sh

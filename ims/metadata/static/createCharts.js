@@ -1,315 +1,135 @@
-$(document).ready(function(){
+$(document).ready(function () {
+  const autocolors = window['chartjs-plugin-autocolors'];
+  Chart.register(autocolors);
 
-var ctx2 = document.getElementById('owner');
-if(ctx2){
-	$.ajax({
-    url: "/populateCharts/owner/",
-    method: "POST",
-    success: function(data) {
-	 d=JSON.parse(data);
-     var chartlabel = [];
-     var chartdata = [];
-     for (var key in d) {
-    var value = d[key]["created_by__first_name"];
-    var ldata = d[key]["dcount"];
-    chartlabel.push(value);
-    chartdata.push(ldata);
-	}
+  // Reusable function to create a pie chart with AJAX-fetched data
+  function createPieChart(ctxId, ajaxUrl, labelKey, chartTitle, clickRedirectBase) {
+    const ctx = document.getElementById(ctxId);
+    if (!ctx) return;
 
-	var owner = new Chart(ctx2, {
-    type: 'pie',
-    data: {
-        labels: chartlabel,
-        datasets: [{
-            data: chartdata
-        }]
-    },
-	  options: {
-		title: {
-            display: true,
-            text: 'Owner: Number of projects'
-        },
-		plugins: {
-	      colorschemes: {
-	        scheme: 'tableau.Tableau20'
-	      }
-        },
-	    legend: {
-	        display: false
-	    },
-	    'onClick' : function (evt) {
-		   var activePoints = owner.getElementsAtEventForMode(evt, 'point', owner.options);
-		    var firstPoint = activePoints[0];
-        	var label = owner.data.labels[firstPoint._index];
-       	    var value = owner.data.datasets[firstPoint._datasetIndex].data[firstPoint._index];
-            window.location = "/browseProject/"+label+"/" ;
-
-       		// alert(label + ": " + value);
-
-	    }
-	}
-});
-    },
-    error: function(data) {
-        console.log(data);
-    }
-});
-}
-/*##############*/
-var ctx3 = document.getElementById('assay');
-if(ctx3){
-$.ajax({
-    url: "/populateCharts/assay/",
-    method: "POST",
-    success: function(data) {
-	 d=JSON.parse(data);
-     var chartlabel = [];
-     var chartdata = [];
-     for (var key in d) {
-    var value = d[key]["exp_project__json_type__name"];
-    var ldata = d[key]["dcount"];
-    chartlabel.push(value);
-    chartdata.push(ldata);
-	}
-var assay = new Chart(ctx3, {
-    type: 'pie',
-    data: {
-        labels: chartlabel,
-        datasets: [{
-            data: chartdata
-        }]
-    },
-	  options: {
-		title: {
-            display: true,
-            text: 'Assay: Number of experiments'
-        },
-		plugins: {
-	      colorschemes: {
-	        scheme: 'tableau.Tableau20'
-	      }
-        },
-	    legend: {
-	        display: false
-	    },
-	    'onClick' : function (evt) {
-		   var activePoints = assay.getElementsAtEventForMode(evt, 'point', assay.options);
-		    var firstPoint = activePoints[0];
-        	var label = assay.data.labels[firstPoint._index];
-       	    var value = assay.data.datasets[firstPoint._datasetIndex].data[firstPoint._index];
-       		window.location = "/browseProject/"+label+"/" ;
-
-	    }
-	}
-});
-},
-    error: function(data) {
-        console.log(data);
-    }
-});
-}
-/*##############*/
-var ctx1 = document.getElementById('disease');
-if(ctx1){
-$.ajax({
-    url: "/populateCharts/disease/",
-    method: "POST",
-    success: function(data) {
-	 d=JSON.parse(data);
-     var chartlabel = [];
-     var chartdata = [];
-     for (var key in d) {
-    var value = d[key]["disease_site__name"];
-    var ldata = d[key]["dcount"];
-    chartlabel.push(value);
-    chartdata.push(ldata);
-	}
-var disease = new Chart(ctx1, {
-    type: 'pie',
-    data: {
-        labels: chartlabel,
-        datasets: [{
-            data: chartdata
-        }]
-    },
-	  options: {
-		title: {
-            display: true,
-            text: 'Disease: Number of projects'
-        },
-		plugins: {
-	      colorschemes: {
-	        scheme: 'tableau.Tableau20'
-	      }
-        },
-	    legend: {
-	        display: false
-	    },
-	    'onClick' : function (evt) {
-		   var activePoints = disease.getElementsAtEventForMode(evt, 'point', disease.options);
-		    var firstPoint = activePoints[0];
-        	var label = disease.data.labels[firstPoint._index];
-       	    var value = disease.data.datasets[firstPoint._datasetIndex].data[firstPoint._index];
-       		 window.location = "/browseProject/"+label+"/" ;
-
-	    }
-	}
-});
-},
-    error: function(data) {
-        console.log(data);
-    }
-});
-}
-/*##############*/
-var ctx4 = document.getElementById('projectlabel');
-if(ctx4){
-$.ajax({
-    url: "/populateCharts/status/",
-    method: "POST",
-    success: function(data) {
-	 d=JSON.parse(data);
-     var chartlabel = [];
-     var chartdata = [];
-     for (var key in d) {
-    var value = d[key]["status"];
-    var ldata = d[key]["dcount"];
-    chartlabel.push(value);
-    chartdata.push(ldata);
-	}
-var projectlabel = new Chart(ctx4, {
-    type: 'pie',
-    data: {
-        labels: chartlabel,
-        datasets: [{
-            data: chartdata
-        }]
-    },
-	  options: {
-		title: {
-            display: true,
-            text: 'Project status: Number of projects'
-        },
-		plugins: {
-	      colorschemes: {
-	        scheme: 'tableau.Tableau20'
-	      }
-        },
-	    legend: {
-	        display: false
-	    },
-	    'onClick' : function (evt) {
-		   var activePoints = projectlabel.getElementsAtEventForMode(evt, 'point', projectlabel.options);
-		    var firstPoint = activePoints[0];
-        	var label = projectlabel.data.labels[firstPoint._index];
-       	    var value = projectlabel.data.datasets[firstPoint._datasetIndex].data[firstPoint._index];
-       		 window.location = "/browseProject/"+label+"/" ;
-
-	    }
-	}
-});
-},
-    error: function(data) {
-        console.log(data);
-    }
-});
-}
-/*##############*/
-var ctx5 = document.getElementById('experimenttags');
-if(ctx5){
-var project_id= $("#project_id").val();
-$.ajax({
-    url: "/populateCharts/tags_"+project_id+"/",
-    method: "POST",
-    success: function(data) {
-	 d=JSON.parse(data);
-     var chartlabel = [];
-     var chartdata = [];
-     for (var key in d) {
-    var value = d[key]["name"];
-    var ldata = d[key]["dcount"];
-    chartlabel.push(value);
-    chartdata.push(ldata);
-	}
-var experimenttags = new Chart(ctx5, {
-    type: 'pie',
-    data: {
-        labels: chartlabel,
-        datasets: [{
-            data: chartdata
-        }]
-    },
-	  options: {
-		title: {
-            display: true,
-            text: 'Tags chart'
-        },
-		plugins: {
-	      colorschemes: {
-	        scheme: 'tableau.Tableau20'
-	      }
-        },
-	    legend: {
-	        display: false
-	    },
-	    'onClick' : function (evt) {
-		   var activePoints = experimenttags.getElementsAtEventForMode(evt, 'point', experimenttags.options);
-		    var firstPoint = activePoints[0];
-        	var label = experimenttags.data.labels[firstPoint._index];
-       	    var value = experimenttags.data.datasets[firstPoint._datasetIndex].data[firstPoint._index];
-       		 window.location = "/detailExperimentTag/"+label+"/" ;
-
-	    }
-	}
-});
-},
-    error: function(data) {
-        console.log(data);
-    }
-});
-}
-
-const EXPERIMENT_COLUMNS = ['Disease-site','ATAC-seq', 'Hi-C', 'ChIP-seq', 'RNA-seq', 'scATAC', 'scATAC-RNAseq-multiome', 'BS-seq','Cut-Run', 'WGS', 'WES']
-
-/*##############*/
-new gridjs.Grid({
-  search: true,
-  columns: EXPERIMENT_COLUMNS,
-  sort: {
-    multiColumn: false,
-    server: {
-      url: (prev, columns) => {
-       if (!columns.length) return prev;
-
-       const col = columns[0];
-       const dir = col.direction === 1 ? 'True' : 'False';
-       let colName = EXPERIMENT_COLUMNS[col.index];
-
-       return `${prev}+${colName}+${dir}`;
-     }
-    }
-  },
-  server: {
-	  method: 'POST',
-    url: '/populateCharts/grid',
-    then: data => data.map((row) => {
-      const formattedRow = Object.keys(row).map(key => {
-        if(key === 'Disease-site') {
-          return gridjs.html(`${row['Disease-site']}`)
+    $.ajax({
+      url: ajaxUrl,
+      method: "POST",
+      dataType: "json",
+      success: function (data) {
+        // Defensive: ensure data is an array
+        if (!Array.isArray(data)) {
+          data = JSON.parse(data);
         }
-        return gridjs.html(`<a href='/browseExperimentGrid/${row['Disease-site']}/${key}'>${row[key]}</a>`)
-      })
-      return formattedRow
-    }),
-    handle: (res) => {
-      // no matching records found
-      if (res.status === 404) return {data: []};
-      if (res.ok) return res.json();
 
-      throw Error('oh no :(');
-    },
+        const labels = data.map(item => item[labelKey] || "N/A");
+        const values = data.map(item => item.dcount || 0);
+
+        const chartInstance = new Chart(ctx, {
+          type: 'pie',
+          data: {
+            labels: labels,
+            datasets: [{
+              data: values
+            }]
+          },
+          options: {
+            plugins: {
+              title: {
+                display: true,
+                text: chartTitle
+              },
+              autocolors: {
+                enabled: true,
+                mode: 'data',
+                offset: 10
+              },
+              legend: {
+                position: "right"
+              }
+            },
+            onClick: function (evt) {
+              const activePoints = chartInstance.getElementsAtEventForMode(evt, 'point', chartInstance.options);
+              if (!activePoints.length) return;
+              const label = chartInstance.data.labels[activePoints[0].index];
+              window.location = clickRedirectBase + label + "/";
+            }
+          }
+        });
+      },
+      error: function (err) {
+        console.error("Error loading chart data:", err);
+      }
+    });
   }
-}).render(document.getElementById("matrixDataGrid"));
 
-/*##############*/
+  // Call the reusable function for each chart
+  createPieChart('owner', '/populateCharts/owner/', 'created_by__first_name', 'Number of projects by Owner', '/browseProject/');
+  createPieChart('assay', '/populateCharts/assay/', 'exp_project__json_type__name', 'Number of experiments by Assay', '/browseProject/');
+  createPieChart('disease', '/populateCharts/disease/', 'disease_site__name', 'Number of projects by Disease', '/browseProject/');
+  createPieChart('projectlabel', '/populateCharts/status/', 'status', 'Number of projects by Status', '/browseProject/');
+  //createPieChart('experimenttags', `/populateCharts/tags_${$("#project_id").val()}/`, 'name', 'Tags chart', '/detailExperimentTag/');
+
+
+  const EXPERIMENT_COLUMNS = ['Disease-site', 'ATAC-seq', 'Hi-C', 'ChIP-seq', 'RNA-seq', 'scATAC', 'scATAC-RNAseq-multiome', 'BS-seq', 'Cut-Run', 'WGS', 'WES'];
+
+  new gridjs.Grid({
+    search: true,
+    columns: EXPERIMENT_COLUMNS,
+    sort: {
+      multiColumn: false,
+      server: {
+        url: (prev, columns) => {
+          if (!columns.length) return prev;
+          const col = columns[0];
+          const dir = col.direction === 1 ? 'True' : 'False';
+          let colName = EXPERIMENT_COLUMNS[col.index];
+          return `${prev}+${colName}+${dir}`;
+        }
+      }
+    },
+    server: {
+      method: 'POST',
+      url: '/populateCharts/grid',
+      then: data => data.map((row) => {
+        return Object.keys(row).map(key => {
+          if (key === 'Disease-site') {
+            return gridjs.html(`${row['Disease-site']}`);
+          }
+          return gridjs.html(`<a href='/browseExperimentGrid/${row['Disease-site']}/${key}'>${row[key]}</a>`);
+        });
+      }),
+      handle: (res) => {
+        if (res.status === 404) return { data: [] };
+        if (res.ok) return res.json();
+        throw Error('Grid data loading failed.');
+      }
+    },
+    style: {
+      container: {
+        width: '100%',
+        height: '100%'
+      },
+      table: {
+        'min-width': '100%' // allows table to expand horizontally
+      }
+    },
+    fixedHeader: true,   // keeps header visible on scroll
+    autoWidth: true      // lets Grid.js calculate column widths dynamically
+  }).render(document.getElementById("matrixDataGrid"));
+
+  fetch('/api/active-projects/')
+    .then(response => response.json())
+    .then(data => {
+      new gridjs.Grid({
+        columns: [
+          { name: 'url', hidden: true},
+          {
+            id: "name",
+            name: 'Project Name',
+            selector: row => row,
+            formatter: (_, row) => gridjs.html(`<a href="${row.cells[0].data}">${row.cells[1].data}</a>`)
+          }
+        ],
+        data: data,
+        search: true,
+        sort: true,
+        pagination: { enabled: true, limit: 10 },
+      }).render(document.getElementById('gridjs-active-projects'));
+    });
 });
