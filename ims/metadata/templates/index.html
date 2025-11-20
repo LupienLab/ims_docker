@@ -2,6 +2,19 @@
 {% load static %}
 {% block content %}
 <section class="container mb-5">
+  <!-- Move this section up closer to your filters or header -->
+  <h2 class="mb-4">Export metadata from last 200 days</h2>
+  <a href="{% url 'exportSequencingdata' %}" class="me-2">
+    <button type="button" class="btn btn-sm btn-primary">
+      <i class="bi bi-cloud-download me-2"></i> With Sequencing data
+    </button></a>
+  <a href="{% url 'exportnoSequencingdata' %}">
+    <button type="button" class="btn btn-sm btn-danger">
+      <i class="bi bi-exclamation-circle me-2"></i> Without sequencing data
+    </button></a>
+</section>
+
+<section class="container mb-5">
   <h2 class="mb-4">Dashboard Filters</h2>
   <div class="row g-3 align-items-center">
     <div class="col-auto">
@@ -32,7 +45,7 @@
     </div>
   </div>
 
-  <h2 class="mt-5 mb-4">Charts Overview</h2>
+  <h2 class="mt-5 mb-4">Dashboard</h2>
   <div class="row gy-4">
     <div class="col-md-6">
       <canvas id="chartOwner" class="chartjs"></canvas>
@@ -42,7 +55,7 @@
     </div>
   </div>
 </section>
-<section class="container mb-5">
+{% comment %} <section class="container mb-5">
   <h2 class="text-center">Browse projects</h2>
   <div class="row mb-4">
     <div class="col-xs-6 col-sm-6 col-md-6" style="position: relative; height: 35rem; text-align: center;">
@@ -60,24 +73,33 @@
       <canvas id="projectlabel" class="chartjs" style="display: block; margin: 0 auto; width: 100% !important; height: 100% !important;"></canvas>
     </div>
   </div>
-</section>
-<section class="container mb-5">
-  <h2>Export metadata from last 200 days</h2>
-  <a href="{% url 'exportSequencingdata' %}"><button type="button" class="btn btn-primary">Sequencing data</button></a>
-  <a href="{% url 'exportnoSequencingdata' %}"><button type="button" class="btn btn-primary">Experiments with NO
-      sequencing data added</button></a>
-</section>
-<section class="container mb-5">
-  <h2 class="text-center mb-4">Browse experiments →</h2>
-  <div class="scroll-wrapper">
-    <div id="matrixDataGrid"></div>
-  </div>
-</section>
+</section> {% endcomment %}
 
-<section class="container mb-5">
-  <h2 class="text-center mb-4">Active Projects</h2>
-  <div id="gridjs-active-projects"></div>
-</section>
+<!-- Nav tabs -->
+<ul class="nav nav-tabs container" id="myTab" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active" id="browseExperiments-tab" data-bs-toggle="tab" data-bs-target="#browseExperiments" type="button" role="tab" aria-controls="browseExperiments" aria-selected="true">
+      Browse experiments
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="activeProjects-tab" data-bs-toggle="tab" data-bs-target="#activeProjects" type="button" role="tab" aria-controls="activeProjects" aria-selected="false">
+      Active Projects
+    </button>
+  </li>
+</ul>
+
+<!-- Tab panes -->
+<div class="tab-content mt-3 mb-5" id="tableContent">
+  <div class="tab-pane fade show active container" id="browseExperiments" role="tabpanel" aria-labelledby="browseExperiments-tab">
+    <div class="scroll-wrapper">
+      <div id="matrixDataGrid"></div>
+    </div>
+  </div>
+  <div class="tab-pane fade container" id="activeProjects" role="tabpanel" aria-labelledby="activeProjects-tab">
+    <div id="gridjs-active-projects"></div>
+  </div>
+</div>
 
 <script type="text/javascript" src="{% static 'createCharts.js' %}" defer></script>
 <script type="text/javascript" src="{% static 'dashboard.js' %}" defer></script>

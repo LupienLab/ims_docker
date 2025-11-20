@@ -59,10 +59,10 @@ $(document).ready(function () {
   }
 
   // Call the reusable function for each chart
-  createPieChart('owner', '/populateCharts/owner/', 'created_by__first_name', 'Number of projects by Owner', '/browseProject/');
-  createPieChart('assay', '/populateCharts/assay/', 'exp_project__json_type__name', 'Number of experiments by Assay', '/browseProject/');
-  createPieChart('disease', '/populateCharts/disease/', 'disease_site__name', 'Number of projects by Disease', '/browseProject/');
-  createPieChart('projectlabel', '/populateCharts/status/', 'status', 'Number of projects by Status', '/browseProject/');
+  // createPieChart('owner', '/populateCharts/owner/', 'created_by__first_name', 'Number of projects by Owner', '/browseProject/');
+  // createPieChart('assay', '/populateCharts/assay/', 'exp_project__json_type__name', 'Number of experiments by Assay', '/browseProject/');
+  // createPieChart('disease', '/populateCharts/disease/', 'disease_site__name', 'Number of projects by Disease', '/browseProject/');
+  // createPieChart('projectlabel', '/populateCharts/status/', 'status', 'Number of projects by Status', '/browseProject/');
   //createPieChart('experimenttags', `/populateCharts/tags_${$("#project_id").val()}/`, 'name', 'Tags chart', '/detailExperimentTag/');
 
 
