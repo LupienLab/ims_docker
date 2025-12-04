@@ -26,11 +26,26 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config("DEBUG", cast=bool, default=False)
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", cast=lambda v: [h.strip() for h in v.split(",") if h.strip()], default="localhost")
 
-CSRF_TRUSTED_ORIGINS = ['https://duncan-lupien.uhnresearch.ca']
+CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS", cast=lambda v: [o.strip() for o in v.split(",") if o.strip()], default="")
+
+if not DEBUG:
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+    # HSTS - Start with shorter duration for testing (300 seconds = 5 min)
+    SECURE_HSTS_SECONDS = 300  # Increase gradually to 31536000 after testing
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True  # Only if HSTS_SECONDS > 0
+
+    SECURE_REFERRER_POLICY = "same-origin"
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_BROWSER_XSS_FILTER = True
 
 # Application definition
 
@@ -182,4 +197,4 @@ KEYCLOAK_SERVER_URL = config("KEYCLOAK_SERVER_URL")
 KEYCLOAK_REALM = config("KEYCLOAK_REALM_NAME")
 KEYCLOAK_CLIENT_ID = config("KEYCLOAK_CLIENT_ID")
 KEYCLOAK_CLIENT_SECRET = config("KEYCLOAK_CLIENT_SECRET")
-KEYCLOAK_REDIRECT_URI = 'http://localhost:8000/auth/callback/'
+KEYCLOAK_REDIRECT_URI = config("KEYCLOAK_REDIRECT_URI")

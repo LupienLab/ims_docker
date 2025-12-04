@@ -78,26 +78,26 @@
 <!-- Nav tabs -->
 <ul class="nav nav-tabs container" id="myTab" role="tablist">
   <li class="nav-item" role="presentation">
-    <button class="nav-link active" id="browseExperiments-tab" data-bs-toggle="tab" data-bs-target="#browseExperiments" type="button" role="tab" aria-controls="browseExperiments" aria-selected="true">
-      Browse experiments
+    <button class="nav-link active" id="activeProjects-tab" data-bs-toggle="tab" data-bs-target="#activeProjects" type="button" role="tab" aria-controls="activeProjects" aria-selected="false">
+      Active Projects
     </button>
   </li>
   <li class="nav-item" role="presentation">
-    <button class="nav-link" id="activeProjects-tab" data-bs-toggle="tab" data-bs-target="#activeProjects" type="button" role="tab" aria-controls="activeProjects" aria-selected="false">
-      Active Projects
+    <button class="nav-link" id="browseExperiments-tab" data-bs-toggle="tab" data-bs-target="#browseExperiments" type="button" role="tab" aria-controls="browseExperiments" aria-selected="true">
+      Browse experiments
     </button>
   </li>
 </ul>
 
 <!-- Tab panes -->
 <div class="tab-content mt-3 mb-5" id="tableContent">
-  <div class="tab-pane fade show active container" id="browseExperiments" role="tabpanel" aria-labelledby="browseExperiments-tab">
+  <div class="tab-pane fade show active container" id="activeProjects" role="tabpanel" aria-labelledby="activeProjects-tab">
+    <div id="gridjs-active-projects"></div>
+  </div>
+  <div class="tab-pane fade container" id="browseExperiments" role="tabpanel" aria-labelledby="browseExperiments-tab">
     <div class="scroll-wrapper">
       <div id="matrixDataGrid"></div>
     </div>
-  </div>
-  <div class="tab-pane fade container" id="activeProjects" role="tabpanel" aria-labelledby="activeProjects-tab">
-    <div id="gridjs-active-projects"></div>
   </div>
 </div>
 

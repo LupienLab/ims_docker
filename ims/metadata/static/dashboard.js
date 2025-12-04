@@ -9,9 +9,7 @@ function loadDropdown(url, selector, defaultOption) {
       const select = $(selector);
       select.empty();
       select.append(new Option(defaultOption, ''));
-      console.log(data)
       data.forEach(item => {
-        console.log(item)
         if(item.id) {
           select.append(new Option(item.name, item.id));
         } else {
@@ -27,8 +25,6 @@ function loadFilteredData() {
   const status = $('#statusFilter').val();
   const disease = $('#diseaseFilter').val();
 
-  console.log(owner)
-
   $.ajax({
     url: "/api/charts/owner/",
     method: "GET",
@@ -42,7 +38,6 @@ function loadFilteredData() {
       const diseases = data.diseases;
       const counts = data.counts;
 
-      console.log({labels})
 
       const datasets = diseases.map((disease, i) => ({
         label: disease,
@@ -155,7 +150,6 @@ function loadHorizontalBarChart() {
 
               // Get owner label (x-axis label)
               const assayType = barChart.data.labels[dataIndex];
-              console.log({ assayType })
               window.location.href = `/browseProject/${encodeURIComponent(assayType)}/`;
             }
           }

@@ -14,6 +14,10 @@ def is_admin_or_is_supervisor(user):
     """Check if the user is a supervisor or admin."""
     return is_admin(user) or is_supervisor(user)
 
+def is_sequence_core(user):
+    """Check if the user is a sequence core user."""
+    return user.groups.filter(name='sequence_core').exists()
+
 def get_user_lab(user):
   """
   Retrieve the lab associated with the given user.

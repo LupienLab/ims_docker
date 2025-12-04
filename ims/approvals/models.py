@@ -9,6 +9,7 @@ class ApprovalRequest(models.Model):
       ('pending', 'Pending'),
       ('approved', 'Approved'),
       ('disapproved', 'Disapproved'),
+      ('completed', 'Completed'),
   ]
   title = models.CharField(max_length=255)
   document = models.FileField(upload_to='documents/')
