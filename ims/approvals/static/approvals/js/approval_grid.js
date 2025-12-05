@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const approvalId = button.getAttribute('data-id');
     const approvalTitle = button.getAttribute('data-title');
     approvalIdInput.value = approvalId;
-    const formAction = `{% url "disapprove_request" 0 %}`.replace('0', approvalId);
+    const formAction = `/approvals/disapprove/${approvalId}/`;
     commentForm.setAttribute('action', formAction);
   });
 
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function () {
     sort: true,
     pagination: { limit: 5 },
     className: {
-      table: 'table table-bordered table-hover table-sm table-primary table-striped',
+      table: 'table table-bordered table-hover table-sm  table-striped',
       thead: 'table-dark'
     }
   }).render(document.getElementById("pendingGrid"));

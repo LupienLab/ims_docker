@@ -28,101 +28,109 @@ SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", cast=bool, default=False)
 
-ALLOWED_HOSTS = config("ALLOWED_HOSTS", cast=lambda v: [h.strip() for h in v.split(",") if h.strip()], default="localhost")
+ALLOWED_HOSTS = config(
+    "ALLOWED_HOSTS",
+    cast=lambda v: [h.strip() for h in v.split(",") if h.strip()],
+    default="localhost",
+)
 
-CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS", cast=lambda v: [o.strip() for o in v.split(",") if o.strip()], default="")
+CSRF_TRUSTED_ORIGINS = config(
+    "CSRF_TRUSTED_ORIGINS",
+    cast=lambda v: [o.strip() for o in v.split(",") if o.strip()],
+    default="",
+)
 
-if not DEBUG:
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    SECURE_SSL_REDIRECT = True
-    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
-    # HSTS - Start with shorter duration for testing (300 seconds = 5 min)
-    SECURE_HSTS_SECONDS = 300  # Increase gradually to 31536000 after testing
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True  # Only if HSTS_SECONDS > 0
+# if not DEBUG:
+# SESSION_COOKIE_SECURE = True
+# CSRF_COOKIE_SECURE = True
+# SECURE_SSL_REDIRECT = True
+# SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
-    SECURE_REFERRER_POLICY = "same-origin"
-    SECURE_CONTENT_TYPE_NOSNIFF = True
-    SECURE_BROWSER_XSS_FILTER = True
+# # HSTS - Start with shorter duration for testing (300 seconds = 5 min)
+# SECURE_HSTS_SECONDS = 300  # Increase gradually to 31536000 after testing
+# SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+# SECURE_HSTS_PRELOAD = True  # Only if HSTS_SECONDS > 0
+
+# SECURE_REFERRER_POLICY = "same-origin"
+# SECURE_CONTENT_TYPE_NOSNIFF = True
+# SECURE_BROWSER_XSS_FILTER = True
 
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django_extensions',
-    'dal',
-    'dal_select2',
-    'django.contrib.admin',
-    'crispy_forms',
-    'crispy_bootstrap5',
-    'django_bootstrap5',
-    'accounts',
-    'metadata',
-    'approvals',
-    'notifications',
-    'lab',                  # Your lab app
-    'user_profiles',        # Your user profiles app
-    'view_breadcrumbs',
-
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "django_extensions",
+    "dal",
+    "dal_select2",
+    "django.contrib.admin",
+    "crispy_forms",
+    "crispy_bootstrap5",
+    "django_bootstrap5",
+    "accounts",
+    "metadata",
+    "approvals",
+    "notifications",
+    "lab",  # Your lab app
+    "user_profiles",  # Your user profiles app
+    "view_breadcrumbs",
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 
-CRISPY_TEMPLATE_PACK = 'bootstrap5'
+CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'approvals.middleware.ApprovalsAccessMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "approvals.middleware.ApprovalsAccessMiddleware",
 ]
 
 # AUTHENTICATION_BACKENDS = [
 
 # ]
 
-ROOT_URLCONF = 'ims.urls'
+ROOT_URLCONF = "ims.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'ims.wsgi.application'
+WSGI_APPLICATION = "ims.wsgi.application"
 
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ['DB_NAME'],
-        'USER': os.environ['DB_USER'],
-        'PASSWORD':os.environ['DB_PASSWORD'],
-        'HOST': os.environ['DB_HOST'],
-        'PORT': int(os.environ['DB_PORT']),
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ["DB_NAME"],
+        "USER": os.environ["DB_USER"],
+        "PASSWORD": os.environ["DB_PASSWORD"],
+        "HOST": os.environ["DB_HOST"],
+        "PORT": int(os.environ["DB_PORT"]),
     }
 }
 
@@ -132,16 +140,16 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -149,9 +157,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = 'America/New_York'
+TIME_ZONE = "America/New_York"
 
 USE_I18N = True
 
@@ -160,36 +168,36 @@ USE_L10N = True
 USE_TZ = True
 
 ##url
-LOGIN_URL = 'keycloak_login'
-LOGIN_REDIRECT_URL='index'
-LOGOUT_REDIRECT_URL='keycloak_login'
+LOGIN_URL = "keycloak_login"
+LOGIN_REDIRECT_URL = "index"
+LOGOUT_REDIRECT_URL = "keycloak_login"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
-#BASE_DIR = Path(__file__).resolve().parent.parent
+# BASE_DIR = Path(__file__).resolve().parent.parent
 
-STATIC_URL = '/static/'
+STATIC_URL = "/static/"
 
-#STATICFILES_DIRS = [
+# STATICFILES_DIRS = [
 #    BASE_DIR / 'static',  # This points to the top-level static folder inside ims/
-#]
+# ]
 
 # For production collect static files here
 STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_URL = "/media/"
 
 # Email settings
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = config("EMAIL_HOST")
 EMAIL_PORT = config("EMAIL_PORT", default=1025, cast=int)
-DEFAULT_FROM_EMAIL = 'noreply@mailcatcher.com'
-EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=False, cast=bool)
-EMAIL_USE_SSL = config('EMAIL_USE_SSL', default=False, cast=bool)
-EMAIL_HOST_USER = config("EMAIL_HOST_USER", default='')  # Your email address
+DEFAULT_FROM_EMAIL = config("EMAIL_HOST_USER", default="noreply@mailcatcher.com")
+EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=False, cast=bool)
+EMAIL_USE_SSL = config("EMAIL_USE_SSL", default=False, cast=bool)
+EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")  # Your email address
 
 
 # Keycloak settings
