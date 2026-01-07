@@ -4,7 +4,45 @@
 {% load tags %}
 <style>
 
-  @media (max-width: 767.98px) {
+  .grid-wrapper {
+    width: max-content !important;  /* table grows as needed */
+    overflow-x: auto !important;    /* scroll if too wide for screen */
+  }
+
+  .gridjs-table {
+    table-layout: auto !important;  /* columns size to content */
+    white-space: nowrap !important; /* no text wrap */
+  }
+  tr:has(td[data-status="Disapproved"]) td {
+    background-color: #ced4da !important;
+  }
+  /* Bootstrap 5 Column Filter */
+  .column-filter {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #dee2e6;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  }
+  .filter-title {
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #495057;
+    font-size: 1.1rem;
+  }
+  .filter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    max-height: 220px;
+    overflow-y: auto;
+  }
+  @media (max-width: 768px) {
+    .filter-grid { grid-template-columns: 1fr; max-height: 300px; }
+  }
+
+  @media (max-width: 768px) {
     /* Your existing responsive CSS - works with Grid.js tables too */
     .gridjs-table {
       border: 0;
@@ -54,12 +92,49 @@
     </div>
   </div>
 </div>
+<!-- Complete Approval Modal -->
+<div class="modal fade" id="completeModal" tabindex="-1" aria-labelledby="completeModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="completeModalLabel">Add Your Comment</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="completeForm" method="POST" enctype="multipart/form-data" action="">
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="completeText">Comment</label>
+            <textarea class="form-control" id="completeText" name="completion_comment" rows="3" maxlength="500"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="completeFiles">Files</label>
+            <input class="form-control" id="completeFiles" type="file" name="files" multiple accept=".pdf,.docx,.xlsx">
+          </div>
+          <input type="hidden" id="approvalCompleteId" name="approval_id" value="">
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="submitCompleteButton">Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="container">
   {% if not profile_exists %}
     <div class="alert alert-warning">
       You do not have a user profile. Please contact Admin to create one for so you can access approval requests.
     </div>
   {% else %}
+    <!-- BOOTSTRAP 5 COLUMN FILTER -->
+    <div class="column-filter">
+      <div class="filter-title">
+        <i class="bi bi-columns-gap me-2"></i>Filter Columns
+      </div>
+      <div class="filter-grid" id="columnCheckboxes"></div>
+    </div>
     {% if not is_sequence_core %}
       <a href="{% url 'create_approval_request' %}"><button type="button" class="btn btn-primary mb-4">Create New Approval
       Request</button></a>
@@ -76,13 +151,13 @@
       </nav>
       <div class="tab-content" id="nav-tabContent">
         <div class="tab-pane fade show active p-4" id="nav-pending" role="tabpanel" aria-labelledby="nav-pending-tab">
-          <div id="pendingGrid" style="width: 100%;"></div>
+          <div id="pendingGrid"></div>
         </div>
         <div class="tab-pane fade p-4" id="nav-processed" role="tabpanel" aria-labelledby="nav-processed-tab">
-          <div id="processedGrid" style="width: 100%;"></div>
+          <div id="processedGrid"></div>
         </div>
         <div class="tab-pane fade p-4" id="nav-completed" role="tabpanel" aria-labelledby="nav-completed-tab">
-          <div id="completedGrid" style="width: 100%;"></div>
+          <div id="completedGrid"></div>
         </div>
       </div>
     {% else %}

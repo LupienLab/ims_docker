@@ -42,6 +42,7 @@ class ApprovalsAccessMiddleware:
           'profile'
       }
 
+
       # Method 1: Check by URL name (handles URL parameters)
       try:
           match = resolve(request.path_info)

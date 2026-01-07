@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.http import JsonResponse
 from .forms import ApprovalRequestForm
-from .models import ApprovalRequest
+from .models import ApprovalRequest, CompletionFile
 from user_profiles.models import UserProfile
 from user_profiles.utils import (
     get_user_lab,
@@ -73,36 +73,28 @@ def approval_list(request):
     # Get the lab associated with the user's profile
     lab = user_profile.lab
 
-    if admin_status:
-        # If the user is an admin, show all requests
+    if admin_status or sequence_core_status:
+        # If the user is an admin or sequence core, show all requests
         approvals = (
             ApprovalRequest.objects.all()
-            .select_related("project")
-            .prefetch_related("experiments")
+            .select_related("project", "completed_by")
+            .prefetch_related("experiments", "completion_files")
             .order_by("status")
         )
     elif request.user == lab.supervisor:
         # If the user is a supervisor, show all requests for their lab
         approvals = (
             ApprovalRequest.objects.filter(created_by__userprofile__lab=lab)
-            .select_related("project")
-            .prefetch_related("experiments")
-            .order_by("status")
-        )
-    elif sequence_core_status:
-        # If the user is a sequqnce user, show all approvals for their lab
-        approvals = (
-            ApprovalRequest.objects.all()
-            .select_related("project")
-            .prefetch_related("experiments")
+            .select_related("project", "completed_by")
+            .prefetch_related("experiments", "completion_files")
             .order_by("status")
         )
     else:
         # If the user is not a supervisor, show only their own requests
         approvals = (
             ApprovalRequest.objects.filter(created_by=user)
-            .select_related("project")
-            .prefetch_related("experiments")
+            .select_related("project", "completed_by")
+            .prefetch_related("experiments", "completion_files")
             .order_by("status")
         )
 
@@ -117,8 +109,22 @@ def approval_list(request):
             )
         experiments_html = ", ".join(experiments_html) if experiments_html else "None"
 
-        approval_lab = get_user_lab(approval.created_by)
+        labs = []
+        for lab in approval.project.labs.all():
+            labs.append(lab.name)
+        labs = ", ".join(labs) if labs else "None"
 
+        completion_files_count = approval.completion_files.count()
+        completion_files_list = []
+        if completion_files_count > 0:
+            for comp_file in approval.completion_files.all():  # Show first 3
+                completion_files_list.append({
+                    'file': comp_file.file.url,
+                    'filename': comp_file.file.name.split('/')[-1],
+                    'uploaded_by': comp_file.uploaded_by.get_full_name() if comp_file.uploaded_by else 'N/A',
+                    'uploaded_at': comp_file.uploaded_at.strftime("%Y-%m-%d %H:%M") if comp_file.uploaded_at else '',
+                    'comment': comp_file.comment or ''
+                })
         all_serialized_approvals.append(
             {
                 "id": approval.pk,
@@ -126,7 +132,7 @@ def approval_list(request):
                 "created_by_full_name": getattr(
                     approval.created_by, "get_full_name", lambda: "N/A"
                 )(),
-                "lab": str(approval_lab.name),
+                "lab": labs,
                 "project_name": approval.project.name if approval.project else "N/A",
                 "project_url": reverse("detailProject", args=[approval.project.pk])
                 if approval.project
@@ -156,9 +162,13 @@ def approval_list(request):
                 "approve_url": reverse("approve_request", args=[approval.pk])
                 if approval.pk
                 else "",
-                "complete_url": reverse("complete_request", args=[approval.pk])
-                if approval.pk
-                else "",
+                "completion_files_count": completion_files_count,
+                "completion_files": completion_files_list,
+                "completed_by_full_name": getattr(
+                    approval.completed_by, "get_full_name", lambda: "N/A"
+                )() if hasattr(approval, 'completed_by') and approval.completed_by else "N/A",
+                "completed_at": approval.completed_at.strftime("%Y-%m-%d %H:%M")
+                if hasattr(approval, 'completed_at') and approval.completed_at else "N/A",
             }
         )
 
@@ -204,7 +214,28 @@ def disapprove_request(request, pk):
 @user_passes_test(lambda u: is_admin(u) or is_sequence_core(u))
 def complete_request(request, pk):
     approval_request = get_object_or_404(ApprovalRequest, pk=pk)
+    if approval_request.status != 'approved':
+        return JsonResponse({'error': 'Can only complete approved requests'}, status=400)
+
+    sequence_core = is_sequence_core(request.user)
+    admin_status = is_admin(request.user)
+    if not sequence_core and not admin_status:
+        return render(request, "access_denied.html")
+
+    files = request.FILES.getlist('files')
+    comment = request.POST.get('completion_comment', '')
+
+    # Create completion files
+    for file in files:
+        CompletionFile.objects.create(
+            approval_request=approval_request,
+            file=file,
+            uploaded_by=request.user,
+            comment=comment
+        )
     approval_request.status = "completed"
+    approval_request.completed_by = request.user
+    approval_request.completed_at = timezone.now()
     approval_request.save()
 
     return redirect("approval_list")

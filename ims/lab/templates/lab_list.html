@@ -14,6 +14,8 @@
         <div><a href="{% url 'supervisor_view' %}" class="btn btn-outline-primary btn-sm">Supervisor Dashboard</a></div>
       {% elif is_admin %}
         <span class="badge bg-warning position-absolute top-0 end-0 m-2">Admin</span>
+      {% elif is_sequence_core %}
+        <span class="badge bg-info position-absolute top-0 end-0 m-2">Sequence Core</span>
       {% else %}
         <span class="badge bg-secondary position-absolute top-0 end-0 m-2">Regular User</span>
       {% endif %}
