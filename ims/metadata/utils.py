@@ -1,4 +1,4 @@
-from user_profiles.utils import get_user_lab  # Import the utility function to get user's lab
+from user_profiles.utils import get_user_lab, is_admin  # Import the utility function to get user's lab
 from .models import Project
 
 def get_projects_for_user(user):
@@ -11,6 +11,11 @@ def get_projects_for_user(user):
     Returns:
         QuerySet: A QuerySet of projects associated with the user's lab.
     """
+
+    if is_admin(user):
+      # Return all projects for admin/staff users
+      return Project.objects.all()
+
     # Get the user's lab using the utility function
     user_lab = get_user_lab(user)
 

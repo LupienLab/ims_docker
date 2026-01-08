@@ -3,6 +3,10 @@ import json
 
 register = template.Library()
 
+@register.filter(name='has_group')
+def has_group(user, group_name):
+    return user.groups.filter(name=group_name).exists()
+
 
 @register.filter
 def modelname(form):
@@ -13,11 +17,11 @@ def modelname(form):
 def get_fields(obj):
     #return [(field.name, field.value_to_string(obj)) for field in obj._meta.fields]
     fields = []
-    
-    
+
+
     for f in obj._meta.fields:
 
-        fname = f.name        
+        fname = f.name
         # resolve picklists/choices, with get_xyz_display() function
         get_choice = 'get_'+fname+'_display'
         if hasattr(obj, get_choice):
@@ -34,15 +38,15 @@ def get_fields(obj):
 
             fields.append(
               {
-               'label':f.verbose_name, 
-               'name':f.name, 
+               'label':f.verbose_name,
+               'name':f.name,
                'value':value,
-               'm2m': False,  
+               'm2m': False,
               }
             )
-    
+
     for f in obj._meta.many_to_many:
-        fname = f.name        
+        fname = f.name
         # resolve picklists/choices, with get_xyz_display() function
         get_choice = 'get_'+fname+'_display'
         if hasattr(obj, get_choice):
@@ -52,25 +56,25 @@ def get_fields(obj):
                 value = getattr(obj, fname)
             except AttributeError:
                 value = None
-        
+
         m2mVQueryset=value.all()
-        
+
         listValues =[]
-        
+
         for m2mV in m2mVQueryset:
             listValues.append({m2mV.pk:m2mV.name})
-        
-        
-        
+
+
+
         fields.append(
           {
-           'label':f.verbose_name, 
+           'label':f.verbose_name,
            'name':f.name,
            'value':listValues,
            'm2m': True,       }
         )
-        
-          
+
+
     return fields
 
 

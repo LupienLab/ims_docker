@@ -2,6 +2,7 @@
 {% load static %}
 {# Load the tag library #}
 {% load django_bootstrap5 %}
+{% load tags %}
 
 {# Load CSS and JavaScript #}
 {% bootstrap_css %}
@@ -16,38 +17,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-  <!-- Load Bootstrap -->
-  <!-- <link rel="stylesheet" href="{% static 'bootstrap.min.css' %}"> -->
+  <!-- Load CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-  <!-- <script src="{% static 'bootstrap.min.js' %}"></script> -->
-
-  <!-- Load jquery -->
-  <script src="{% static 'jquery-3.7.1.min.js' %}"></script>
+  <link rel="stylesheet" type="text/css" href="{% static 'base.css' %}">
   <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.3/themes/base/jquery-ui.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.3/jquery-ui.min.js"
-    integrity="sha512-Ww1y9OuQ2kehgVWSD/3nhgfrb424O3802QYP/A5gPXoM4+rRjiKrjHdGxQKrMGQykmsJ/86oGdHszfcVgUr4hA=="
-    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script type="text/javascript" charset="utf8"
-    src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js"></script>
-
-  <script type="text/javascript" src="/static/admin/js/vendor/jquery/jquery.min.js"></script>
-  <script type="text/javascript" src="/static/admin/js/jquery.init.js"></script>
-  <script type="text/javascript" src="/static/admin/js/admin/RelatedObjectLookups.js"></script>
-
-  <!-- Load chart.js -->
-  <script src=" https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js "></script>
-
-
-  <!-- Load gridjs -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gridjs/6.2.0/gridjs.production.min.js"
-    integrity="sha512-UxJx7Aa36ndtmns24kdxG3ARmAPPYllynVsgpV18TdQYGhENGkdb+fC8xOjeJ8UR8Rsc5S2xUZ9pCO5ygECnOQ=="
-    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
-
-  <link rel="stylesheet" type="text/css" href="{% static 'base.css' %}">
-  <script type="text/javascript" src="{% static 'base.js' %}"></script>
-  <script type="text/javascript" src="{% static 'addlabels.js' %}"></script>
 
   <title>DUnCAN</title>
 </head>
@@ -61,7 +36,7 @@
 <body>
   <div class="container-fluid overflow-hidden">
     <div class="row vh-100 overflow-auto">
-      <nav class="col-12 col-sm-3 col-xl-2 px-sm-2 px-0  d-flex sticky-top bg-light-subtle" data-bs-theme="light">
+      <nav class="col-12 col-sm-3 col-xl-2 px-sm-2 px-0 d-flex sticky-top bg-light-subtle" data-bs-theme="light">
         <div
           class="d-flex flex-sm-column flex-row flex-grow-1 align-items-center align-items-sm-start px-3 pt-2 text-white">
           <a class="d-none d-sm-flex align-items-center pb-sm-3 mb-md-0 me-md-auto text-decoration-none "
@@ -71,31 +46,41 @@
           <ul
             class="nav nav-pills flex-sm-column flex-row flex-nowrap flex-shrink-1 flex-sm-grow-0 flex-grow-1 mb-sm-auto mb-0 justify-content-center align-items-center align-items-sm-start"
             id="menu">
-            <li class="nav-item">
-              <a href="{{home_url}}" class="text-dark nav-link px-2 {% if request.path == home_url %}active{% endif %}">
-                <i class="bi bi-house-fill"></i><span class="ms-1 d-none d-sm-inline">Home</span>
-              </a>
-            </li>
-            <li class="nav-item ">
-              <a href="{{add_data_url}}"
-                class="text-dark nav-link  px-2 {% if request.path == add_data_url %}active{% endif %}">
-                <i class="bi bi-database-add"></i><span class="ms-1 d-none d-sm-inline">Add Data</span> </a>
-            </li>
-            <li class="nav-item">
-              <a href="{{show_projects_url}}"
-                class="text-dark nav-link   px-2 {% if request.path == show_projects_url %}active{% endif %}">
-                <i class="bi bi-journal-medical"></i><span class="ms-1 d-none d-sm-inline">Projects</span></a>
-            </li>
-            <li class="nav-item ">
-              <a href="{{show_biosource_url}}"
-                class="text-dark nav-link  px-2 {% if request.path == show_biosource_url %}active{% endif %}">
-                <i class="bi bi-virus2"></i><span class="ms-1 d-none d-sm-inline">Biosource</span></a>
-            </li>
-            <li class="nav-item ">
-              <a href="{{approval_list_url}}"
-                class="text-dark nav-link  px-2 {% if request.path == approval_list_url %}active{% endif %}">
-                <i class="bi bi-clipboard-check"></i><span class="ms-1 d-none d-sm-inline">Approvals</span> </a>
-            </li>
+            {% if user|has_group:"sequence_core" %}
+              {# Show only Approvals link for sequence_core users #}
+              <li class="nav-item ">
+                <a href="{{approval_list_url}}" class="text-dark nav-link px-2 {% if request.path == approval_list_url %}active{% endif %}">
+                  <i class="bi bi-clipboard-check"></i><span class="ms-1 d-none d-sm-inline">Approvals</span>
+                </a>
+              </li>
+            {% else %}
+              {# Show all links for other users #}
+              <li class="nav-item">
+                <a href="{{home_url}}" class="text-dark nav-link px-2 {% if request.path == home_url %}active{% endif %}">
+                  <i class="bi bi-bar-chart-line"></i><span class="ms-1 d-none d-sm-inline">Dashboard</span>
+                </a>
+              </li>
+              <li class="nav-item ">
+                <a href="{{add_data_url}}"
+                  class="text-dark nav-link  px-2 {% if request.path == add_data_url %}active{% endif %}">
+                  <i class="bi bi-database-add"></i><span class="ms-1 d-none d-sm-inline">Add Data</span> </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{show_projects_url}}"
+                  class="text-dark nav-link   px-2 {% if request.path == show_projects_url %}active{% endif %}">
+                  <i class="bi bi-journal-medical"></i><span class="ms-1 d-none d-sm-inline">Projects</span></a>
+              </li>
+              <li class="nav-item ">
+                <a href="{{show_biosource_url}}"
+                  class="text-dark nav-link  px-2 {% if request.path == show_biosource_url %}active{% endif %}">
+                  <i class="bi bi-virus2"></i><span class="ms-1 d-none d-sm-inline">Biosource</span></a>
+              </li>
+              <li class="nav-item ">
+                <a href="{{approval_list_url}}"
+                  class="text-dark nav-link  px-2 {% if request.path == approval_list_url %}active{% endif %}">
+                  <i class="bi bi-clipboard-check"></i><span class="ms-1 d-none d-sm-inline">Approvals</span> </a>
+              </li>
+            {% endif %}
           </ul>
           <div class="dropdown py-sm-4 mt-sm-auto ms-auto ms-sm-0 flex-shrink-1">
             <a href="#" class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle"
@@ -109,7 +94,7 @@
             </a>
             <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
               <li>
-                <a class="dropdown-item" href="#">Profile</a>
+                <a class="dropdown-item" href="{% url 'profile' %}">Profile</a>
               </li>
               <li>
                 <a class="dropdown-item" href="https://github.com/LupienLab/DuNCAN_issues/issues" target="_blank">
@@ -125,7 +110,7 @@
           </div>
         </div>
       </nav>
-      <div class="col d-flex flex-column h-100">
+      <div class="col-12 col-sm-9 col-xl-10 d-flex flex-column h-100">
         <main class="row overflow-auto">
           <div class="col pt-4">
             {% block content %}
@@ -135,6 +120,30 @@
       </div>
     </div>
   </div>
+  <!-- Load jquery -->
+  <script src="{% static 'jquery-3.7.1.min.js' %}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.3/jquery-ui.min.js"
+    integrity="sha512-Ww1y9OuQ2kehgVWSD/3nhgfrb424O3802QYP/A5gPXoM4+rRjiKrjHdGxQKrMGQykmsJ/86oGdHszfcVgUr4hA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+  <script type="text/javascript" charset="utf8"
+    src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js" defer></script>
+
+  {% comment %} <script type="text/javascript" src="/static/admin/js/vendor/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/static/admin/js/jquery.init.js"></script>
+  <script type="text/javascript" src="/static/admin/js/admin/RelatedObjectLookups.js"></script> {% endcomment %}
+
+  <!-- Load chart.js -->
+  <script src=" https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-autocolors@0.3.1/dist/chartjs-plugin-autocolors.min.js" integrity="sha256-E2VlOU+WSLvM5KIbI7JK8YZ5/kuZjajWHDZuLHw654Q=" crossorigin="anonymous" defer></script>
+
+
+  <!-- Load gridjs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gridjs/6.2.0/gridjs.production.min.js"
+    integrity="sha512-UxJx7Aa36ndtmns24kdxG3ARmAPPYllynVsgpV18TdQYGhENGkdb+fC8xOjeJ8UR8Rsc5S2xUZ9pCO5ygECnOQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+
+  <script type="text/javascript" src="{% static 'base.js' %}" defer></script>
+  <script type="text/javascript" src="{% static 'addlabels.js' %}" defer></script>
 </body>
 
 </html>

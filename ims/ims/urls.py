@@ -27,5 +27,5 @@ urlpatterns = [
     path('accounts/logout/', views.logout_view,name='logout'),
     re_path(r'^', include('metadata.urls')),
     path('approvals/', include('approvals.urls')),  # Include the approvals app URLs
-    path('lab/', include('lab.urls')),
+    path('profile/', include('lab.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

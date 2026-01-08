@@ -1,12 +1,13 @@
 # urls.py
 from django.urls import path
-from .views import create_approval_request, approval_list, approve_request, disapprove_request, access_denied, get_experiments
+from .views import complete_request, create_approval_request, approval_list, approve_request, disapprove_request, access_denied, get_experiments
 
 urlpatterns = [
   path('create/', create_approval_request, name='create_approval_request'),
   path('', approval_list, name='approval_list'),
   path('approve/<int:pk>/', approve_request, name='approve_request'),
   path('disapprove/<int:pk>/', disapprove_request, name='disapprove_request'),
+  path('complete/<int:pk>/', complete_request, name='complete_request'),
   path('access-denied/', access_denied, name='access_denied'),
   path('get_experiments/<int:project_id>/', get_experiments, name='get_experiments'),
 ]

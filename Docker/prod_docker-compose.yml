@@ -1,8 +1,8 @@
-version: '3'
-
 services:
   db:
-    image: postgres:12.2
+    image: postgres:14-alpine
+    container_name: ims_db
+    restart: always
     env_file:
        - .env
     environment:
@@ -13,26 +13,38 @@ services:
       - ../../pgdata:/var/lib/postgresql/data
       - ../db-initialization:/docker-entrypoint-initdb.d
       - ../../db_backups:/db_backups
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   web:
+    build:
+      context: .
+      dockerfile: Dockerfile.production
+    container_name: ims_web
     restart: always
-    build: .
-    environment:
-       - PRODUCTION=1
     env_file:
-       - .env
-    command: bash /code/start_django_server.sh
+      - .env
+    environment:
+      PRODUCTION: 1
+    command: ["bash", "/code/start_django_server.sh"]
+    depends_on:
+      db:
+        condition: service_healthy
     volumes:
       - ../ims:/ims
       - ../../static:/ims/static
       - ../../media:/ims/media
     ports:
       - "5050:5050"
-    depends_on:
-      - db
 
   nginx:
+    image: nginx:1.25-alpine
+    container_name: ims_nginx
     restart: always
-    image: nginx:1.16.1
+    depends_on:
+      - web
     ports:
       - "80:80"
       - "443:443"
@@ -40,5 +52,3 @@ services:
       - ../../static:/static
       - ../ims:/src
       - ./config/nginx:/etc/nginx/conf.d
-    depends_on:
-      - web
