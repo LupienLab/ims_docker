@@ -5,64 +5,30 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Approval Request</title>
-  <style>
-    body {
-      background-color: #f4f4f4;
-    }
-
-    .container {
-      margin-top: 20px;
-      background: white;
-      padding: 20px;
-      border-radius: 5px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .button {
-      display: inline-block;
-      padding: 10px 20px;
-      margin-top: 20px;
-      background-color: #007BFF;
-      color: white;
-      text-decoration: none;
-      border-radius: 5px;
-    }
-
-    .footer {
-      margin-top: 20px;
-      font-size: 12px;
-      color: #999;
-    }
-
-    .footer img {
-      max-width: 40rem;
-      /* Adjust the size as needed */
-      height: auto;
-    }
-  </style>
 </head>
 
-<body>
-  <div class="container">
-    <h1 class="text-primary">Request Processed</h1>
-    <p>Dear {{ requester_name }},</p>
-    <p>Your Request has been processed:</p>
-    <p><strong>Request Details:</strong></p>
-    <ul>
-      <li><strong>Title:</strong> {{ request_title }}</li>
-      <li><strong>Requested By:</strong> {{ requester_name }}</li>
-      <li><strong>Processed By:</strong> {{ approver_name }}</li>
-      <li><strong>Result:</strong> {{ result }}</li>
-      <li><strong>comments:</strong> {{ comments }}</li>
+<body style="background-color: #f4f4f4; margin: 0; padding: 20px; font-family: Arial, sans-serif;">
+  <div style="margin-top: 20px; background: #ffffff; padding: 20px; max-width: 600px; margin-left: auto; margin-right: auto;">
+    <h1 style="color: #007BFF; margin: 0 0 16px 0; font-size: 24px;">Request Processed11</h1>
+    <p style="margin: 0 0 16px 0;">Dear {{ requester_name }},</p>
+    <p style="margin: 0 0 16px 0;">Your Request has been processed:</p>
+    <p style="margin: 0 0 8px 0;"><strong>Request Details:</strong></p>
+    <ul style="margin: 0 0 16px 0; padding-left: 20px;">
+      <li style="margin: 0 0 8px 0;"><strong>Title:</strong> {{ request_title }}</li>
+      <li style="margin: 0 0 8px 0;"><strong>Requested By:</strong> {{ requester_name }}</li>
+      <li style="margin: 0 0 8px 0;"><strong>Processed By:</strong> {{ approver_name }}</li>
+      <li style="margin: 0 0 8px 0;"><strong>Result:</strong> {{ result }}</li>
+      <li style="margin: 0 0 8px 0;"><strong>Comments:</strong> {{ comments }}</li>
     </ul>
-    <p>Please review the request at your earliest convenience. You can view your requests using the button
-      below:</p>
-    <a href="{{ approval_link }}" class="button">View Request</a>
-    <p>Thank you for your attention to this matter.</p>
-    <p>Best regards,<br>{{ approver_name }}</p>
-    <div class="footer">
-      <p>This is an automated message. Please do not reply.</p>
-      <img src="{{ logo_url }}" alt="Lupien Lab Logo">
+    <p style="margin: 0 0 20px 0;">Please review the request at your earliest convenience. You can view your requests using the button below:</p>
+    <a href="{{ approval_link }}" 
+       style="display: inline-block; padding: 10px 20px; background-color: #010407; color: #ffffff; text-decoration: none; border-radius: 5px; font-family: Arial, sans-serif;" 
+       target="_blank">View Request</a>
+    <p style="margin: 16px 0 16px 0;">Thank you for your attention to this matter.</p>
+    <p style="margin: 0 0 24px 0;">Best regards,<br>{{ approver_name }}</p>
+    <div style="margin-top: 20px; font-size: 12px; color: #999999;">
+      <p style="margin: 0 0 8px 0;">This is an automated message. Please do not reply.</p>
+      <img src="{{ logo_url }}" alt="Lupien Lab Logo" style="max-width: 640px; height: auto; display: block;" width="600">
     </div>
   </div>
 </body>

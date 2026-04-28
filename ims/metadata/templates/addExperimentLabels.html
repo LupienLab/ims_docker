@@ -20,7 +20,7 @@
     {{ formset.management_form }}
     {% for form in formset %}
     <div class="row form-row spacer mb-3">
-      {% crispy form %}
+      {{ form|crispy }}
 
 
       <button class="btn btn-danger remove-form-row" name="id_form-0-delete">Delete Group</button>

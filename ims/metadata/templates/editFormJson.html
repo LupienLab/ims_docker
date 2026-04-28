@@ -13,7 +13,7 @@
   {{ jsonEntry|json_script:"json-data" }}
 
   <h1>Edit {{form | modelname}}</h1>
-  {% crispy form %}
+  {{ form|crispy }}
 
   <div id="json_form_display">
 
