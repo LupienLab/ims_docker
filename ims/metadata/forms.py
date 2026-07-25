@@ -29,7 +29,7 @@ class ExperimentForm(ModelForm):
     class Meta:
         model = Experiment
         exclude = ('created_at','created_by','edited_at','edited_by','json_fields','biosample','uid')
-        fields = ('name','biosample_quantity','biosample_quantity_units','concentration_of_sample','volume_of_sample','bio_rep_no','tec_rep_no','json_type','protocol','description')
+        fields = ('name','biosample_quantity','biosample_quantity_units','concentration_of_sample','volume_of_sample','concentration_of_dna','bio_rep_no','tec_rep_no','json_type','protocol','description')
         widgets = {
             'protocol': RelatedFieldWidgetCanAdd(Treatment,'addProtocol'),
         }

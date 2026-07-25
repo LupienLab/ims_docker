@@ -165,6 +165,7 @@ class Experiment(UserLog,CloneMixin):
     biosample_quantity_units = models.ForeignKey(Choice, related_name='biosample_quantity_units', limit_choices_to={'class_type': "quantity_units"}, null=True, blank=True, on_delete=models.SET_NULL, help_text="The units that go along with the biological sample quantity")
     concentration_of_sample=models.CharField(max_length=100, null=True, blank=True, help_text="For DNA and Libraries, concentration of sample (ng/ul)")
     volume_of_sample=models.CharField(max_length=100, null=True, blank=True, help_text="For Fresh cells, DNA and Libraries, Sample volume (uL or pellet)")
+    concentration_of_dna=models.CharField(max_length=100, null=True, blank=True, help_text="For plasma samples, concentration of DNA (ng DNA/mL plasma)")
     bio_rep_no = models.IntegerField(null=False, default=1, help_text="Biological replicate number")
     tec_rep_no = models.IntegerField(null=False, default=1, help_text="Technical replicate number")
     protocol = models.ForeignKey(Protocol,related_name='exp_protocol', null=True, blank=True, on_delete=models.SET_NULL, help_text="Reference protocol document")
